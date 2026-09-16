@@ -4,48 +4,124 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>🎯 Dartturnier Manager (501 SI/DO)</title>
+
+<!-- PWA / App-Unterstützung für Android & iOS -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Dart Manager">
+
 <style>
-  :root { --primary: #1b5e20; --accent: #2e7d32; --light: #e8f5e9; --yellow: #fffde7; }
-  body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 15px; background: #f4f6f9; color: #333; }
-  h1 { text-align: center; color: var(--primary); margin-bottom: 20px; }
-  .card { background: white; border-radius: 8px; padding: 15px; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-  .btn { background: var(--accent); color: white; border: none; padding: 10px 15px; font-size: 14px; font-weight: bold; border-radius: 5px; cursor: pointer; margin-right: 8px; margin-bottom: 10px; transition: transform 0.1s; }
-  .btn:hover { background: var(--primary); transform: scale(1.02); }
+  :root { 
+    --bg-dark: #12181f;
+    --card-dark: #1e2630;
+    --card-border: #2d3748;
+    --accent-green: #2e7d32;
+    --accent-hover: #1b5e20;
+    --text-main: #e2e8f0;
+    --text-muted: #a0aec0;
+    --yellow-highlight: #4a3b00;
+  }
+
+  /* DARK THEME DESIGN */
+  body { 
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+    margin: 0; 
+    padding: 20px 15px; 
+    background-color: var(--bg-dark);
+    color: var(--text-main); 
+    min-height: 100vh;
+  }
+
+  h1 { text-align: center; color: #ffffff; margin-bottom: 25px; text-shadow: 0 2px 4px rgba(0,0,0,0.8); font-size: 28px; }
+  
+  .card { 
+    background: var(--card-dark); 
+    border: 1px solid var(--card-border);
+    border-radius: 12px; 
+    padding: 20px; 
+    margin-bottom: 25px; 
+    box-shadow: 0 8px 25px rgba(0,0,0,0.5); 
+  }
+
+  h3, h4 { color: #ffffff; margin-top: 0; }
+  
+  .btn { 
+    background: var(--accent-green); 
+    color: white; 
+    border: none; 
+    padding: 12px 18px; 
+    font-size: 14px; 
+    font-weight: bold; 
+    border-radius: 6px; 
+    cursor: pointer; 
+    margin-right: 8px; 
+    margin-bottom: 10px; 
+    transition: all 0.2s; 
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3); 
+  }
+  .btn:hover:not(:disabled) { background: var(--accent-hover); transform: translateY(-2px); }
+  .btn:disabled { background: #4a5568 !important; color: #a0aec0 !important; cursor: not-allowed !important; transform: none !important; opacity: 0.6; }
+  
   .btn-print { background: #0277bd; }
   .btn-print:hover { background: #01579b; }
-  .btn-save { background: #f57c00; }
-  .btn-save:hover { background: #e65100; }
+  .btn-save { background: #d97706; }
+  .btn-save:hover { background: #b45309; }
   .btn-reset { background: #c62828; }
   .btn-reset:hover { background: #b71c1c; }
   
-  table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 14px; }
-  th { background: var(--accent); color: white; padding: 10px; text-align: center; }
-  td { padding: 8px; border: 1px solid #ddd; text-align: center; }
-  tr:nth-child(even) { background: #fafafa; }
-  .match-row { cursor: pointer; transition: background 0.2s; }
-  .match-row:hover { filter: brightness(0.95); }
-  .legend-box { background: var(--light); border-left: 5px solid var(--primary); padding: 10px 15px; margin-top: 10px; border-radius: 4px; font-size: 13px; }
+  /* DARK TABLES */
+  table { width: 100%; border-collapse: collapse; margin-top: 12px; background: #1a202c; border-radius: 8px; overflow: hidden; }
+  th { background: #2d3748; color: #ffffff; padding: 12px 10px; text-align: center; font-size: 15px; border-bottom: 2px solid #4a5568; }
+  td { padding: 10px 8px; border: 1px solid #2d3748; text-align: center; color: var(--text-main); }
+  tr:nth-child(even) { background-color: #171923; }
   
-  /* Modal Pop-ups */
-  .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); justify-content: center; align-items: center; z-index: 1000; }
-  .modal-content { background: white; padding: 25px; border-radius: 12px; width: 360px; text-align: center; box-shadow: 0 5px 20px rgba(0,0,0,0.3); }
-  .modal input[type="number"] { width: 60px; padding: 8px; font-size: 18px; text-align: center; margin: 10px; }
-  .modal input[type="text"] { width: 80%; padding: 8px; font-size: 15px; text-align: center; margin: 10px; border: 1px solid #ccc; border-radius: 4px; }
+  .match-row { cursor: pointer; transition: background 0.2s; }
+  .match-row:hover { background-color: #2d3748 !important; }
+  
+  .legend-box { background: #171923; border-left: 5px solid var(--accent-green); padding: 12px 15px; margin-top: 10px; border-radius: 6px; font-size: 13.5px; line-height: 1.5; color: var(--text-muted); }
+  
+  /* MODAL POP-UPS (DARK) */
+  .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); justify-content: center; align-items: center; z-index: 1000; backdrop-filter: blur(4px); }
+  .modal-content { background: var(--card-dark); border: 1px solid var(--card-border); padding: 25px; border-radius: 14px; width: 380px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.8); color: white; }
+  .modal input[type="text"] { width: 85%; padding: 10px; font-size: 15px; text-align: center; margin: 10px 0; border: 1px solid #4a5568; border-radius: 6px; background: #1a202c; color: white; }
 
-  /* Buttons im Pop-up */
+  /* BUTTON GRIDS IN MODALS */
   .grid-buttons { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 15px 0; }
-  .select-btn { background: #f0f0f0; color: #333; border: 2px solid #ccc; padding: 12px; font-size: 16px; font-weight: bold; border-radius: 8px; cursor: pointer; transition: all 0.2s; }
-  .select-btn:hover { background: #e0e0e0; border-color: #999; }
-  .select-btn.selected { background: var(--accent); color: white; border-color: var(--primary); }
+  .grid-5 { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin: 10px 0; }
+  
+  .select-btn { background: #2d3748; color: white; border: 2px solid #4a5568; padding: 12px 5px; font-size: 16px; font-weight: bold; border-radius: 8px; cursor: pointer; transition: all 0.2s; }
+  .select-btn:hover { background: #4a5568; }
+  .select-btn.selected { background: var(--accent-green); color: white; border-color: #48bb78; box-shadow: 0 0 10px rgba(72, 187, 120, 0.5); }
 
-  .player-list-vertical { display: flex; flex-direction: column; gap: 8px; max-width: 320px; margin-top: 10px; }
+  /* DRAG & DROP SPIELERLISTE */
+  .player-list-vertical { display: flex; flex-direction: column; gap: 8px; max-width: 360px; margin-top: 12px; }
+  .draggable-item { 
+    display: flex; 
+    align-items: center; 
+    gap: 10px; 
+    padding: 8px 12px; 
+    border-radius: 6px; 
+    background: #1a202c; 
+    border: 1px solid #2d3748; 
+    cursor: grab; 
+    user-select: none;
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .draggable-item:active { cursor: grabbing; transform: scale(1.02); box-shadow: 0 5px 15px rgba(0,0,0,0.4); }
+  .drag-handle { font-size: 18px; color: var(--text-muted); cursor: grab; }
+  .player-input-field { flex: 1; padding: 6px 10px; border: 1px solid #4a5568; border-radius: 4px; font-weight: bold; color: #1a202c; }
 
-  /* PDF & Druck-Optimierung */
+  /* STYLISCHE OPTIMIERTE PDF & DRUCK-ANSICHT */
   @media print {
     .no-print { display: none !important; }
-    body { background: white; padding: 0; }
-    .card { box-shadow: none; border: 1px solid #ccc; page-break-inside: avoid; }
-    h1 { margin-top: 0; color: black; }
+    body { background: #ffffff !important; padding: 0 !important; color: #000 !important; }
+    .card { box-shadow: none !important; border: 2px solid #1b5e20 !important; border-radius: 8px !important; margin-bottom: 20px !important; padding: 15px !important; background: #fff !important; color: #000 !important; }
+    h1 { color: #1b5e20 !important; font-size: 24px !important; text-shadow: none !important; border-bottom: 2px solid #1b5e20; padding-bottom: 8px; margin-bottom: 15px; }
+    table { background: #fff !important; }
+    th { background: #1b5e20 !important; color: #ffffff !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    td { border: 1px solid #888 !important; color: #000 !important; }
+    .match-row { background-color: transparent !important; }
+    tr:nth-child(even) { background-color: #f8f9fa !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   }
 </style>
 </head>
@@ -61,15 +137,15 @@
   <button class="btn btn-print" onclick="window.print()">🖨️ PDF / Druckansicht</button>
   <button class="btn btn-reset" onclick="resetSeasonWithPassword()">🔄 Saison zurücksetzen</button>
 
-  <div style="margin-top: 15px; background: #f0f4f8; padding: 10px; border-radius: 6px; border: 1px solid #d0d7de;">
-    <label for="savedSeasonsSelect" style="font-weight:bold;">📂 Gespeicherte Saison aufrufen:</label><br>
-    <select id="savedSeasonsSelect" onchange="loadSelectedSeason()" style="padding: 6px; font-size: 14px; margin-top: 5px; width: 220px;">
+  <div style="margin-top: 15px; background: #1a202c; padding: 12px; border-radius: 8px; border: 1px solid #2d3748;">
+    <label for="savedSeasonsSelect" style="font-weight:bold; color:var(--text-main);">📂 Gespeicherte Saison aufrufen:</label><br>
+    <select id="savedSeasonsSelect" onchange="loadSelectedSeason()" style="padding: 8px; font-size: 14px; margin-top: 6px; width: 230px; border-radius: 4px; border: 1px solid #4a5568; background:#2d3748; color:white;">
       <option value="">-- Saison auswählen --</option>
     </select>
-    <button class="btn btn-reset" style="padding: 5px 10px; font-size: 12px; margin-left: 5px;" onclick="deleteSelectedSeason()">Saison Löschen</button>
+    <button class="btn btn-reset" style="padding: 7px 12px; font-size: 13px; margin-left: 6px;" onclick="deleteSelectedSeason()">Löschen</button>
   </div>
   
-  <h4 style="margin-top:15px;" id="whoIsHeader">Wer ist dabei? (Max. 10 Spieler)</h4>
+  <h4 style="margin-top:18px;" id="whoIsHeader">Wer ist dabei? (Drag & Drop zum Sortieren)</h4>
   <div id="playerInputs" class="player-list-vertical"></div>
 </div>
 
@@ -79,7 +155,7 @@
   <div class="legend-box">
     <strong>Spielmodus:</strong> 501 Single In / Double Out (First to 4 Legs).<br>
     <strong>Punktevergabe:</strong> Jedes gewonnene Leg bringt 1 Punkt. Der Gesamtsieger des Matches erhält zusätzlich die gewählten <em>Siegerpunkte</em> (1, 2 oder 3).<br>
-    <em>Beispiel bei 1 Siegerpunkt:</em> Ein 4:3-Ergebnis bringt 5 Punkte für den Sieger und 3 Punkte für den Verlierer (4:4 ist unzulässig).
+    <em>Bedingung:</em> Ein Match ist erst beendet, wenn genau ein Spieler 4 Legs gewonnen hat (z. B. 4:3 oder 2:4).
   </div>
 </div>
 
@@ -98,7 +174,7 @@
 
   <!-- SPIELPLAN -->
   <div class="card">
-    <h3>Spieltage & Matches <span class="no-print" style="font-size:12px; font-weight:normal;">(Klick auf ein Match zum Eintragen)</span></h3>
+    <h3>Spieltage & Matches <span class="no-print" style="font-size:12px; font-weight:normal; color:var(--text-muted);">(Klick auf ein Match zum Eintragen)</span></h3>
     <table>
       <thead>
         <tr><th>Spieltag</th><th>Heim</th><th>vs</th><th>Gast</th><th>Legs Heim</th><th>Legs Gast</th><th>Punkte Heim</th><th>Punkte Gast</th></tr>
@@ -136,25 +212,42 @@
       <button class="select-btn btn-bonus" onclick="selectBonusPoints(3)">+3 Pkt</button>
     </div>
 
-    <div style="margin-top:15px;">
+    <div style="margin-top:18px;">
       <button class="btn" onclick="confirmStartSaison()">Saison Starten</button>
       <button class="btn" style="background:#777;" onclick="closeStartModal()">Abbrechen</button>
     </div>
   </div>
 </div>
 
-<!-- RESULT POP-UP MODAL -->
+<!-- RESULT POP-UP MODAL (Klick-Buttons + Valider Speichern-Button) -->
 <div id="resultModal" class="modal">
   <div class="modal-content">
     <h3 id="modalMatchTitle">Match Ergebnis</h3>
-    <p>Legs (First to 4 / Max. 4 Gewinnsätze)</p>
-    <div>
-      <label id="lblHome"></label>: <input type="number" id="inpHome" min="0" max="4"><br>
-      <label id="lblAway"></label>: <input type="number" id="inpAway" min="0" max="4">
+    
+    <p style="margin-bottom:4px; font-weight:bold; color:var(--text-muted);" id="lblHomeMatch"></p>
+    <div class="grid-5">
+      <button class="select-btn btn-legs-h" onclick="selectLegsHome(0)">0</button>
+      <button class="select-btn btn-legs-h" onclick="selectLegsHome(1)">1</button>
+      <button class="select-btn btn-legs-h" onclick="selectLegsHome(2)">2</button>
+      <button class="select-btn btn-legs-h" onclick="selectLegsHome(3)">3</button>
+      <button class="select-btn btn-legs-h" onclick="selectLegsHome(4)">4</button>
     </div>
-    <br>
-    <button class="btn" onclick="saveResult()">Ergebnis Speichern</button>
-    <button class="btn" style="background:#777;" onclick="closeModal()">Abbrechen</button>
+
+    <p style="margin-bottom:4px; margin-top:15px; font-weight:bold; color:var(--text-muted);" id="lblAwayMatch"></p>
+    <div class="grid-5">
+      <button class="select-btn btn-legs-g" onclick="selectLegsAway(0)">0</button>
+      <button class="select-btn btn-legs-g" onclick="selectLegsAway(1)">1</button>
+      <button class="select-btn btn-legs-g" onclick="selectLegsAway(2)">2</button>
+      <button class="select-btn btn-legs-g" onclick="selectLegsAway(3)">3</button>
+      <button class="select-btn btn-legs-g" onclick="selectLegsAway(4)">4</button>
+    </div>
+
+    <p id="validationHint" style="font-size:12px; color:#fc8181; margin-top:12px; min-height:18px;"></p>
+
+    <div style="margin-top:10px;">
+      <button class="btn" id="btnSaveResult" onclick="saveResult()" disabled>Ergebnis Speichern</button>
+      <button class="btn" style="background:#777;" onclick="closeModal()">Abbrechen</button>
+    </div>
   </div>
 </div>
 
@@ -179,41 +272,106 @@
 
   const colors = ["#ffcdd2","#e1bee7","#d1c4e9","#c5cae9","#bbdefb","#b2ebf2","#b2dfdb","#c8e6c9","#dcedc8","#fff9c4"];
   const dayThemeColors = [
-    { bg: "#e3f2fd", border: "#90caf9" },
-    { bg: "#e8f5e9", border: "#a5d6a7" },
-    { bg: "#fff8e1", border: "#ffe082" },
-    { bg: "#f3e5f5", border: "#ce93d8" },
-    { bg: "#e0f2f1", border: "#80cbc4" },
-    { bg: "#fbe9e7", border: "#ffab91" },
-    { bg: "#efebe9", border: "#bcaaa4" }
+    { bg: "#1a2736", border: "#2b4c7e" },
+    { bg: "#192e25", border: "#2d6a4f" },
+    { bg: "#332a15", border: "#745215" },
+    { bg: "#2d1a36", border: "#6b2d7b" },
+    { bg: "#163033", border: "#1f6b75" },
+    { bg: "#36201a", border: "#7b3523" },
+    { bg: "#242424", border: "#4f4f4f" }
   ];
 
   let currentSeasonName = "Saison 1", currentMatches = [], activePlayers = [], selectedMatchIndex = null;
   let selectedCount = 4, selectedBonus = 1;
+  let tempLegsH = null, tempLegsG = null;
 
-  const container = document.getElementById('playerInputs');
-  
+  // INITIALISIERUNG DER STAMMDATEN MIT DRAG & DROP
+  let playersData = [];
+
   function initPlayerInputs() {
-    container.innerHTML = '';
+    playersData = [];
     for(let i=1; i<=10; i++) {
       let savedName = localStorage.getItem(`dart_pName_${i}`) || "";
-      container.innerHTML += `<div style="display:flex; align-items:center; gap:8px;">
-        <span style="width:70px; font-weight:bold; font-size:13px;">Spieler ${i}:</span>
-        <input type="text" id="pName_${i}" value="${savedName}" placeholder="Name eintragen..." 
-               onchange="savePlayerName(${i}, this.value)" 
-               style="flex:1; padding:6px; border:1px solid #ccc; border-radius:4px; background:${colors[i-1]}; font-weight:bold;">
-      </div>`;
+      playersData.push({ id: i, name: savedName, color: colors[i-1] });
     }
+    // Sortiere: Ausgefüllte Namen nach oben
+    sortPlayersData();
+    renderDraggablePlayerList();
   }
 
-  function savePlayerName(idx, val) {
-    localStorage.setItem(`dart_pName_${idx}`, val.trim());
+  function sortPlayersData() {
+    playersData.sort((a, b) => {
+      if (a.name !== "" && b.name === "") return -1;
+      if (a.name === "" && b.name !== "") return 1;
+      return 0;
+    });
   }
 
+  function renderDraggablePlayerList() {
+    const container = document.getElementById('playerInputs');
+    container.innerHTML = '';
+    
+    playersData.forEach((p, idx) => {
+      container.innerHTML += `
+        <div class="draggable-item" draggable="true" data-index="${idx}">
+          <span class="drag-handle">☰</span>
+          <span style="font-weight:bold; font-size:13px; width:22px;">${idx+1}.</span>
+          <input type="text" class="player-input-field" value="${p.name}" placeholder="Name eintragen..." 
+                 onchange="updatePlayerName(${idx}, this.value)" style="background:${p.color};">
+        </div>`;
+    });
+
+    addDragDropListeners();
+  }
+
+  function updatePlayerName(idx, val) {
+    playersData[idx].name = val.trim();
+    saveAllPlayersToStorage();
+    sortPlayersData();
+    renderDraggablePlayerList();
+  }
+
+  function saveAllPlayersToStorage() {
+    playersData.forEach((p, i) => {
+      localStorage.setItem(`dart_pName_${i+1}`, p.name);
+    });
+  }
+
+  // DRAG & DROP EVENT HANDLING
+  let dragSrcIndex = null;
+  function addDragDropListeners() {
+    const items = document.querySelectorAll('.draggable-item');
+    items.forEach(item => {
+      item.addEventListener('dragstart', (e) => {
+        dragSrcIndex = parseInt(item.getAttribute('data-index'));
+        e.dataTransfer.effectAllowed = 'move';
+      });
+
+      item.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+      });
+
+      item.addEventListener('drop', (e) => {
+        e.preventDefault();
+        const targetIndex = parseInt(item.getAttribute('data-index'));
+        if (dragSrcIndex !== null && dragSrcIndex !== targetIndex) {
+          const movedItem = playersData.splice(dragSrcIndex, 1)[0];
+          playersData.splice(targetIndex, 0, movedItem);
+          saveAllPlayersToStorage();
+          renderDraggablePlayerList();
+        }
+      });
+    });
+  }
+
+  // SAISON NEUSTART
   function openStartModal() {
     if (isSeasonActive) {
-      const confirmReset = confirm("⚠️ Es läuft bereits eine Saison! Möchtest du wirklich eine neue Saison starten? Nicht gespeicherte Daten der aktuellen Saison gehen verloren.");
-      if (!confirmReset) return;
+      const autoSave = confirm("⚠️ Es läuft bereits eine Saison!\n\nSoll der aktuelle Stand der laufenden Saison vor dem Start der neuen Saison AUTOMATISCH GESPEICHERT werden?");
+      if (autoSave) {
+        saveCurrentSeason();
+      }
       if (!verifyPassword("Neue Saison starten")) return;
     }
     document.getElementById('inpSeasonName').value = `Saison ${new Date().toLocaleDateString()}`;
@@ -244,9 +402,9 @@
     bonusPoints = selectedBonus;
 
     activePlayers = [];
-    for(let i=1; i<=selectedCount; i++) {
-      let name = document.getElementById(`pName_${i}`).value.trim() || `Spieler ${i}`;
-      activePlayers.push({ id: i, name: name, color: colors[i-1] });
+    for(let i=0; i<selectedCount; i++) {
+      let name = playersData[i].name || `Spieler ${i+1}`;
+      activePlayers.push({ id: i+1, name: name, color: colors[i % colors.length] });
     }
 
     isSeasonActive = true;
@@ -260,7 +418,6 @@
     updateSavedSeasonsDropdown();
   }
 
-  // SAISON SPEICHERN UND LADEN (LOCAL STORAGE)
   function saveCurrentSeason() {
     if (!isSeasonActive) { alert("Es läuft aktuell keine Saison zum Speichern!"); return; }
     
@@ -337,16 +494,17 @@
       currentMatches = [];
       activePlayers = [];
       document.getElementById('tournamentArea').style.display = 'none';
-      document.getElementById('whoIsHeader').innerText = "Wer ist dabei? (Max. 10 Spieler)";
+      document.getElementById('whoIsHeader').innerText = "Wer ist dabei? (Drag & Drop zum Sortieren)";
       initPlayerInputs();
     }
   }
 
   function renderActivePlayersInControl() {
     document.getElementById('whoIsHeader').innerText = `Wer ist dabei? (Aktive Saison: ${activePlayers.length} Spieler)`;
+    const container = document.getElementById('playerInputs');
     container.innerHTML = '';
     activePlayers.forEach((p, idx) => {
-      container.innerHTML += `<div style="padding:6px 12px; border-radius:4px; background:${p.color}; font-weight:bold; border:1px solid #ccc;">
+      container.innerHTML += `<div style="padding:8px 12px; border-radius:6px; background:${p.color}; color:#1a202c; font-weight:bold; border:1px solid #ccc;">
         ${idx+1}. ${p.name}
       </div>`;
     });
@@ -389,7 +547,7 @@
       if(!m.away) {
         tbody.innerHTML += `<tr style="${rowStyle}">
           <td style="font-weight:bold;">Spieltag ${m.day}</td>
-          <td style="background:${m.home.color}; font-weight:bold;">${m.home.name}</td>
+          <td style="background:${m.home.color}; color:#1a202c; font-weight:bold;">${m.home.name}</td>
           <td colspan="6"><em>PAUSE / SPIELFREI</em></td>
         </tr>`;
       } else {
@@ -397,9 +555,9 @@
         let pktG = m.legsG !== null ? (m.legsG + (m.legsG === 4 ? bonusPoints : 0)) : '';
         tbody.innerHTML += `<tr class="match-row" style="${rowStyle}" onclick="openModal(${idx})">
           <td style="font-weight:bold;">Spieltag ${m.day}</td>
-          <td style="background:${m.home.color}; font-weight:bold;">${m.home.name}</td>
+          <td style="background:${m.home.color}; color:#1a202c; font-weight:bold;">${m.home.name}</td>
           <td>vs</td>
-          <td style="background:${m.away.color}; font-weight:bold;">${m.away.name}</td>
+          <td style="background:${m.away.color}; color:#1a202c; font-weight:bold;">${m.away.name}</td>
           <td><b>${m.legsH ?? ''}</b></td>
           <td><b>${m.legsG ?? ''}</b></td>
           <td>${pktH}</td>
@@ -409,31 +567,78 @@
     });
   }
 
+  // RESULT POP-UP MIT DIREKT-BUTTONS UND SPERR-VALIDIERUNG
   function openModal(idx) {
     selectedMatchIndex = idx;
     const m = currentMatches[idx];
-    document.getElementById('modalMatchTitle').innerText = `${m.home.name} vs ${m.away.name}`;
-    document.getElementById('lblHome').innerText = m.home.name;
-    document.getElementById('lblAway').innerText = m.away.name;
-    document.getElementById('inpHome').value = m.legsH ?? '';
-    document.getElementById('inpAway').value = m.legsG ?? '';
+    document.getElementById('modalMatchTitle').innerText = `Spieltag ${m.day}`;
+    document.getElementById('lblHomeMatch').innerText = `Legs für ${m.home.name}:`;
+    document.getElementById('lblAwayMatch').innerText = `Legs für ${m.away.name}:`;
+    
+    tempLegsH = m.legsH;
+    tempLegsG = m.legsG;
+    
+    updateLegButtonsUI();
+    validateResultAndToggleSave();
+    
     document.getElementById('resultModal').style.display = 'flex';
   }
 
   function closeModal() { document.getElementById('resultModal').style.display = 'none'; }
 
-  function saveResult() {
-    const h = parseInt(document.getElementById('inpHome').value);
-    const g = parseInt(document.getElementById('inpAway').value);
-    if(isNaN(h) || isNaN(g) || h < 0 || h > 4 || g < 0 || g > 4) { alert("Legs müssen zwischen 0 und 4 liegen!"); return; }
+  function selectLegsHome(val) {
+    tempLegsH = val;
+    updateLegButtonsUI();
+    validateResultAndToggleSave();
+  }
 
-    if (h === 4 && g === 4) {
-      alert("⚠️ Ein Ergebnis von 4:4 ist nicht möglich! Es darf nur genau ein Spieler 4 Legs gewinnen.");
+  function selectLegsAway(val) {
+    tempLegsG = val;
+    updateLegButtonsUI();
+    validateResultAndToggleSave();
+  }
+
+  function updateLegButtonsUI() {
+    document.querySelectorAll('.btn-legs-h').forEach((btn, idx) => {
+      btn.classList.toggle('selected', idx === tempLegsH);
+    });
+    document.querySelectorAll('.btn-legs-g').forEach((btn, idx) => {
+      btn.classList.toggle('selected', idx === tempLegsG);
+    });
+  }
+
+  // VALIDIERUNG UND DEAKTIVIERUNG DES SPEICHERN-BUTTONS
+  function validateResultAndToggleSave() {
+    const btnSave = document.getElementById('btnSaveResult');
+    const hint = document.getElementById('validationHint');
+
+    if (tempLegsH === null || tempLegsG === null) {
+      btnSave.disabled = true;
+      hint.innerText = "Bitte wähle für beide Spieler ein Ergebnis aus.";
       return;
     }
 
-    currentMatches[selectedMatchIndex].legsH = h;
-    currentMatches[selectedMatchIndex].legsG = g;
+    if (tempLegsH === 4 && tempLegsG === 4) {
+      btnSave.disabled = true;
+      hint.innerText = "⚠️ 4:4 unzulässig! Nur 1 Spieler darf 4 Legs haben.";
+      return;
+    }
+
+    if (tempLegsH < 4 && tempLegsG < 4) {
+      btnSave.disabled = true;
+      hint.innerText = "⚠️ Mindestens ein Spieler muss 4 Legs haben!";
+      return;
+    }
+
+    // Wenn genau ein Spieler 4 Legs hat und der andere < 4 Legs
+    btnSave.disabled = false;
+    hint.innerText = "";
+  }
+
+  function saveResult() {
+    if (tempLegsH === null || tempLegsG === null) return;
+    currentMatches[selectedMatchIndex].legsH = tempLegsH;
+    currentMatches[selectedMatchIndex].legsG = tempLegsG;
     closeModal();
     renderSchedule();
     renderTable();
@@ -462,10 +667,10 @@
     stats.forEach((s, idx) => {
       tbody.innerHTML += `<tr>
         <td><b>${idx+1}</b></td>
-        <td style="background:${s.player.color}; text-align:left; font-weight:bold;">${s.player.name}</td>
+        <td style="background:${s.player.color}; color:#1a202c; text-align:left; font-weight:bold;">${s.player.name}</td>
         <td>${s.spiele}</td><td>${s.siege}</td><td>${s.niederlagen}</td>
         <td>${s.legsP}</td><td>${s.legsM}</td>
-        <td style="background:#e8f5e9; font-weight:bold;">${s.punkte}</td>
+        <td style="background:#2e7d32; color:white; font-weight:bold;">${s.punkte}</td>
       </tr>`;
     });
   }

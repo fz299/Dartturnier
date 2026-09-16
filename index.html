@@ -13,6 +13,8 @@
   .btn:hover { background: var(--primary); }
   .btn-print { background: #0277bd; }
   .btn-print:hover { background: #01579b; }
+  .btn-reset { background: #c62828; }
+  .btn-reset:hover { background: #b71c1c; }
   table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 14px; }
   th { background: var(--accent); color: white; padding: 8px; text-align: center; }
   td { padding: 8px; border: 1px solid #ddd; text-align: center; }
@@ -26,6 +28,9 @@
   .modal-content { background: white; padding: 20px; border-radius: 8px; width: 320px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
   .modal input { width: 60px; padding: 8px; font-size: 16px; text-align: center; margin: 10px; }
 
+  /* Untereinander-Anordnung für Spielerliste */
+  .player-list-vertical { display: flex; flex-direction: column; gap: 8px; max-width: 300px; margin-top: 10px; }
+
   /* PDF & Druck-Optimierung */
   @media print {
     .no-print { display: none !important; }
@@ -35,7 +40,7 @@
   }
 </style>
 </head>
-<body>
+<body id="mainBody" style="display:none;">
 
 <h1 class="no-print">🎯 Dartturnier Manager (501 SI/DO)</h1>
 
@@ -45,9 +50,10 @@
   <button class="btn" onclick="startSaison(1)">Starte Saison Teil 1 (Hinrunde)</button>
   <button class="btn" onclick="startSaison(2)">Starte Saison Teil 2 (Rückrunde)</button>
   <button class="btn btn-print" onclick="window.print()">🖨️ PDF / Druckansicht</button>
+  <button class="btn btn-reset" onclick="resetSeasonWithPassword()">🔄 Saison zurücksetzen</button>
   
-  <h4 style="margin-top:15px;" id="whoIsHeader">Wer ist dabei?</h4>
-  <div id="playerInputs" style="display: flex; flex-wrap: wrap; gap: 8px;"></div>
+  <h4 style="margin-top:15px;" id="whoIsHeader">Wer ist dabei? (Max. 10 Spieler)</h4>
+  <div id="playerInputs" class="player-list-vertical"></div>
 </div>
 
 <!-- LEGENDE / ERKLÄRUNG -->
@@ -56,7 +62,7 @@
   <div class="legend-box">
     <strong>Spielmodus:</strong> 501 Single In / Double Out (First to 4 Legs).<br>
     <strong>Punktevergabe:</strong> Jedes gewonnene Leg bringt 1 Punkt. Der Gesamtsieger des Matches erhält zusätzlich die gewählten <em>Siegerpunkte</em> (1, 2 oder 3).<br>
-    <em>Beispiel bei 1 Siegerpunkt:</em> Ein 4:3-Ergebnis bringt 5 Punkte für den Sieger und 3 Punkte für den Verlierer.
+    <em>Beispiel bei 1 Siegerpunkt:</em> Ein 4:3-Ergebnis bringt 5 Punkte für den Sieger und 3 Punkte für den Verlierer (4:4 ist unzulässig).
   </div>
 </div>
 
@@ -101,21 +107,45 @@
 </div>
 
 <script>
-  const colors = ["#ffcdd2","#e1bee7","#d1c4e9","#c5cae9","#bbdefb","#b2ebf2","#b2dfdb","#c8e6c9","#dcedc8","#f0f4c3","#fff9c4","#ffe0b2","#ffccbc","#d7ccc8","#f5f5f5","#cfd8dc","#ffb3ba","#ffdfba","#bae1ff","#baffc9"];
+  const MASTER_PW = "1328";
+  let isSeasonActive = false;
+
+  // PASSWORTSCHUTZ BEIM SEITENAUFRUF
+  function checkInitialPassword() {
+    const pw = prompt("🔐 Bitte Passwort eingeben, um auf den Dartturnier Manager zuzugreifen:");
+    if (pw === MASTER_PW) {
+      document.getElementById('mainBody').style.display = 'block';
+    } else {
+      alert("❌ Falsches Passwort! Zugriff verweigert.");
+      document.body.innerHTML = "<h2 style='text-align:center; margin-top:50px; color:#c62828;'>🔐 Zugriff verweigert. Falsches Passwort.</h2>";
+    }
+  }
+
+  // PASSWORT-PRÜFUNG BEI KRITISCHEN AKTIONEN
+  function verifyPassword(actionMessage) {
+    const pw = prompt(`🔐 Passwort erforderlich (${actionMessage}):`);
+    if (pw === MASTER_PW) {
+      return true;
+    } else {
+      alert("❌ Falsches Passwort!");
+      return false;
+    }
+  }
+
+  const colors = ["#ffcdd2","#e1bee7","#d1c4e9","#c5cae9","#bbdefb","#b2ebf2","#b2dfdb","#c8e6c9","#dcedc8","#fff9c4"];
   let activeSeason = 1, currentMatches = [], activePlayers = [], selectedMatchIndex = null, bonusPoints = 1;
 
-  // Initialisieren der Namensfelder (mit LocalStorage Unterstützung)
   const container = document.getElementById('playerInputs');
   
   function initPlayerInputs() {
     container.innerHTML = '';
-    for(let i=1; i<=20; i++) {
+    for(let i=1; i<=10; i++) {
       let savedName = localStorage.getItem(`dart_pName_${i}`) || "";
-      container.innerHTML += `<div style="display:flex; align-items:center; gap:4px;">
-        <small>${i}:</small>
-        <input type="text" id="pName_${i}" value="${savedName}" placeholder="Name..." 
+      container.innerHTML += `<div style="display:flex; align-items:center; gap:8px;">
+        <span style="width:70px; font-weight:bold; font-size:13px;">Spieler ${i}:</span>
+        <input type="text" id="pName_${i}" value="${savedName}" placeholder="Name eintragen..." 
                onchange="savePlayerName(${i}, this.value)" 
-               style="width:100px; padding:4px; border:1px solid #ccc; background:${colors[i-1]}; font-weight:bold;">
+               style="flex:1; padding:6px; border:1px solid #ccc; border-radius:4px; background:${colors[i-1]}; font-weight:bold;">
       </div>`;
     }
   }
@@ -124,16 +154,18 @@
     localStorage.setItem(`dart_pName_${idx}`, val.trim());
   }
 
-  initPlayerInputs();
-
   function startSaison(teil) {
-    // Pop-up 1: Teilnehmeranzahl
-    const inputCount = prompt(`Wie viele Teilnehmer spielen in Saison Teil ${teil} mit? (2 bis 20):`, "4");
+    if (isSeasonActive) {
+      const confirmReset = confirm("⚠️ Es läuft bereits eine Saison! Möchtest du wirklich eine neue Saison starten? Die bisherigen Daten dieser Saison werden gelöscht.");
+      if (!confirmReset) return;
+      if (!verifyPassword("Saison neu starten")) return;
+    }
+
+    const inputCount = prompt(`Wie viele Teilnehmer spielen in Saison Teil ${teil} mit? (2 bis 10):`, "4");
     if(!inputCount) return;
     const n = parseInt(inputCount);
-    if(isNaN(n) || n < 2 || n > 20) { alert("Bitte eine Zahl zwischen 2 und 20 eingeben!"); return; }
+    if(isNaN(n) || n < 2 || n > 10) { alert("Bitte eine Zahl zwischen 2 und 10 eingeben!"); return; }
 
-    // Pop-up 2: Siegerpunkte (1, 2 oder 3)
     const inputBonus = prompt(`Wie viele Zusatzpunkte erhält der Match-Sieger? (1, 2 oder 3):`, "1");
     if(!inputBonus) return;
     const bonus = parseInt(inputBonus);
@@ -147,7 +179,7 @@
       activePlayers.push({ id: i, name: name, color: colors[i-1] });
     }
 
-    // Zeige unter "Wer ist dabei?" nur noch die aktiven Spieler an
+    isSeasonActive = true;
     renderActivePlayersInControl();
 
     generateSchedule(n, teil === 2);
@@ -156,11 +188,30 @@
     renderTable();
   }
 
+  function resetSeasonWithPassword() {
+    if (!isSeasonActive) {
+      alert("Es ist aktuell keine Saison aktiv, die zurückgesetzt werden könnte.");
+      return;
+    }
+    const confirmReset = confirm("⚠️ ACHTUNG: Möchtest du die laufende Saison wirklich zurücksetzen?\n\nAlle eingetragenen Spielergebnisse und die Rangliste werden GELÖSCHT!\nDie eingegebenen Namen bleiben erhalten.");
+    if (!confirmReset) return;
+
+    if (verifyPassword("Saison zurücksetzen")) {
+      isSeasonActive = false;
+      currentMatches = [];
+      activePlayers = [];
+      document.getElementById('tournamentArea').style.display = 'none';
+      document.getElementById('whoIsHeader').innerText = "Wer ist dabei? (Max. 10 Spieler)";
+      initPlayerInputs();
+      alert("✅ Saison erfolgreich zurückgesetzt. Alle Namen wurden beibehalten.");
+    }
+  }
+
   function renderActivePlayersInControl() {
     document.getElementById('whoIsHeader').innerText = `Wer ist dabei? (Aktive Saison: ${activePlayers.length} Spieler)`;
     container.innerHTML = '';
     activePlayers.forEach((p, idx) => {
-      container.innerHTML += `<div style="padding:4px 8px; border-radius:4px; background:${p.color}; font-weight:bold; border:1px solid #ccc;">
+      container.innerHTML += `<div style="padding:6px 12px; border-radius:4px; background:${p.color}; font-weight:bold; border:1px solid #ccc;">
         ${idx+1}. ${p.name}
       </div>`;
     });
@@ -225,7 +276,17 @@
   function saveResult() {
     const h = parseInt(document.getElementById('inpHome').value);
     const g = parseInt(document.getElementById('inpAway').value);
-    if(isNaN(h) || isNaN(g) || h < 0 || h > 4 || g < 0 || g > 4) { alert("Legs müssen zwischen 0 und 4 liegen!"); return; }
+    if(isNaN(h) || isNaN(g) || h < 0 || h > 4 || g < 0 || g > 4) { 
+      alert("Legs müssen zwischen 0 und 4 liegen!"); 
+      return; 
+    }
+
+    // PRÜFUNG: 4:4 verhindern
+    if (h === 4 && g === 4) {
+      alert("⚠️ Ein Ergebnis von 4:4 ist nicht möglich! Ein Match benötigt einen eindeutigen Sieger. Es kann nur genau ein Spieler 4 Legs gewinnen.");
+      return;
+    }
+
     currentMatches[selectedMatchIndex].legsH = h;
     currentMatches[selectedMatchIndex].legsG = g;
     closeModal();
@@ -263,6 +324,10 @@
       </tr>`;
     });
   }
+
+  // INITIALISIERUNG
+  checkInitialPassword();
+  initPlayerInputs();
 </script>
 </body>
 </html>

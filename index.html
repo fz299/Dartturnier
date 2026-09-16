@@ -19,7 +19,7 @@
     --accent-hover: #1b5e20;
     --text-main: #e2e8f0;
     --text-muted: #a0aec0;
-    --yellow-highlight: #4a3b00;
+    --points-bg: #2b3648; /* Edles Dunkelblau/Anthrazit für Punkte */
   }
 
   /* DARK THEME DESIGN */
@@ -71,7 +71,7 @@
   
   /* DARK TABLES */
   table { width: 100%; border-collapse: collapse; margin-top: 12px; background: #1a202c; border-radius: 8px; overflow: hidden; }
-  th { background: #2d3748; color: #ffffff; padding: 12px 10px; text-align: center; font-size: 15px; border-bottom: 2px solid #4a5568; }
+  th { background: #2d3748; color: #ffffff; padding: 12px 10px; text-align: center; font-size: 14px; border-bottom: 2px solid #4a5568; }
   td { padding: 10px 8px; border: 1px solid #2d3748; text-align: center; color: var(--text-main); }
   tr:nth-child(even) { background-color: #171923; }
   
@@ -166,7 +166,7 @@
     <h3 id="saisonTitle">Rangliste</h3>
     <table>
       <thead>
-        <tr><th>Platz</th><th>Spieler</th><th>Spiele</th><th>Siege</th><th>Niederl.</th><th>Legs +</th><th>Legs -</th><th>Punkte</th></tr>
+        <tr><th>Platz</th><th>Spieler</th><th>Spiele</th><th>Siege</th><th>Niederl.</th><th>Gewonnene Legs</th><th>Verlorene Legs</th><th>Punkte</th></tr>
       </thead>
       <tbody id="standingsBody"></tbody>
     </table>
@@ -285,7 +285,6 @@
   let selectedCount = 4, selectedBonus = 1;
   let tempLegsH = null, tempLegsG = null;
 
-  // INITIALISIERUNG DER STAMMDATEN MIT DRAG & DROP
   let playersData = [];
 
   function initPlayerInputs() {
@@ -294,7 +293,6 @@
       let savedName = localStorage.getItem(`dart_pName_${i}`) || "";
       playersData.push({ id: i, name: savedName, color: colors[i-1] });
     }
-    // Sortiere: Ausgefüllte Namen nach oben
     sortPlayersData();
     renderDraggablePlayerList();
   }
@@ -315,7 +313,7 @@
       container.innerHTML += `
         <div class="draggable-item" draggable="true" data-index="${idx}">
           <span class="drag-handle">☰</span>
-          <span style="font-weight:bold; font-size:13px; width:22px;">${idx+1}.</span>
+          <span style="font-weight:bold; font-size:13px; width:22px; color:var(--text-muted);">${idx+1}.</span>
           <input type="text" class="player-input-field" value="${p.name}" placeholder="Name eintragen..." 
                  onchange="updatePlayerName(${idx}, this.value)" style="background:${p.color};">
         </div>`;
@@ -337,7 +335,6 @@
     });
   }
 
-  // DRAG & DROP EVENT HANDLING
   let dragSrcIndex = null;
   function addDragDropListeners() {
     const items = document.querySelectorAll('.draggable-item');
@@ -365,7 +362,6 @@
     });
   }
 
-  // SAISON NEUSTART
   function openStartModal() {
     if (isSeasonActive) {
       const autoSave = confirm("⚠️ Es läuft bereits eine Saison!\n\nSoll der aktuelle Stand der laufenden Saison vor dem Start der neuen Saison AUTOMATISCH GESPEICHERT werden?");
@@ -567,7 +563,6 @@
     });
   }
 
-  // RESULT POP-UP MIT DIREKT-BUTTONS UND SPERR-VALIDIERUNG
   function openModal(idx) {
     selectedMatchIndex = idx;
     const m = currentMatches[idx];
@@ -607,7 +602,6 @@
     });
   }
 
-  // VALIDIERUNG UND DEAKTIVIERUNG DES SPEICHERN-BUTTONS
   function validateResultAndToggleSave() {
     const btnSave = document.getElementById('btnSaveResult');
     const hint = document.getElementById('validationHint');
@@ -630,7 +624,6 @@
       return;
     }
 
-    // Wenn genau ein Spieler 4 Legs hat und der andere < 4 Legs
     btnSave.disabled = false;
     hint.innerText = "";
   }
@@ -670,7 +663,7 @@
         <td style="background:${s.player.color}; color:#1a202c; text-align:left; font-weight:bold;">${s.player.name}</td>
         <td>${s.spiele}</td><td>${s.siege}</td><td>${s.niederlagen}</td>
         <td>${s.legsP}</td><td>${s.legsM}</td>
-        <td style="background:#2e7d32; color:white; font-weight:bold;">${s.punkte}</td>
+        <td style="background:var(--points-bg); color:#ffffff; font-weight:bold; border:1px solid #4a5568;">${s.punkte}</td>
       </tr>`;
     });
   }

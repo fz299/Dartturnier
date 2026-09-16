@@ -13,26 +13,27 @@
 <style>
   :root { 
     --bg-dark: #12181f;
-    --card-dark: #1e2630;
+    --card-dark: rgba(30, 38, 48, 0.92); /* Leicht transparent für edlen Effekt */
     --card-border: #2d3748;
     --accent-green: #2e7d32;
     --accent-hover: #1b5e20;
     --text-main: #e2e8f0;
     --text-muted: #a0aec0;
-    --points-bg: #2b3648; /* Edles Dunkelblau/Anthrazit für Punkte */
+    --points-bg: #2b3648;
   }
 
-  /* DARK THEME DESIGN */
+  /* BILD-HINTERGRUND MIT DUNKLEM OVERLAY FÜR OPTIMALE LESBARKEIT */
   body { 
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
     margin: 0; 
     padding: 20px 15px; 
-    background-color: var(--bg-dark);
+    background: linear-gradient(rgba(18, 24, 31, 0.85), rgba(18, 24, 31, 0.85)), url('background.jpg') no-repeat center center fixed;
+    background-size: cover;
     color: var(--text-main); 
     min-height: 100vh;
   }
 
-  h1 { text-align: center; color: #ffffff; margin-bottom: 25px; text-shadow: 0 2px 4px rgba(0,0,0,0.8); font-size: 28px; }
+  h1 { text-align: center; color: #ffffff; margin-bottom: 25px; text-shadow: 0 2px 4px rgba(0,0,0,0.9); font-size: 28px; }
   
   .card { 
     background: var(--card-dark); 
@@ -40,7 +41,8 @@
     border-radius: 12px; 
     padding: 20px; 
     margin-bottom: 25px; 
-    box-shadow: 0 8px 25px rgba(0,0,0,0.5); 
+    box-shadow: 0 8px 25px rgba(0,0,0,0.6); 
+    backdrop-filter: blur(5px); /* Glaseffekt für moderne Optik */
   }
 
   h3, h4 { color: #ffffff; margin-top: 0; }
@@ -57,7 +59,7 @@
     margin-right: 8px; 
     margin-bottom: 10px; 
     transition: all 0.2s; 
-    box-shadow: 0 2px 5px rgba(0,0,0,0.3); 
+    box-shadow: 0 2px 5px rgba(0,0,0,0.4); 
   }
   .btn:hover:not(:disabled) { background: var(--accent-hover); transform: translateY(-2px); }
   .btn:disabled { background: #4a5568 !important; color: #a0aec0 !important; cursor: not-allowed !important; transform: none !important; opacity: 0.6; }
@@ -70,19 +72,19 @@
   .btn-reset:hover { background: #b71c1c; }
   
   /* DARK TABLES */
-  table { width: 100%; border-collapse: collapse; margin-top: 12px; background: #1a202c; border-radius: 8px; overflow: hidden; }
+  table { width: 100%; border-collapse: collapse; margin-top: 12px; background: rgba(26, 32, 44, 0.95); border-radius: 8px; overflow: hidden; }
   th { background: #2d3748; color: #ffffff; padding: 12px 10px; text-align: center; font-size: 14px; border-bottom: 2px solid #4a5568; }
   td { padding: 10px 8px; border: 1px solid #2d3748; text-align: center; color: var(--text-main); }
-  tr:nth-child(even) { background-color: #171923; }
+  tr:nth-child(even) { background-color: rgba(23, 25, 35, 0.95); }
   
   .match-row { cursor: pointer; transition: background 0.2s; }
   .match-row:hover { background-color: #2d3748 !important; }
   
-  .legend-box { background: #171923; border-left: 5px solid var(--accent-green); padding: 12px 15px; margin-top: 10px; border-radius: 6px; font-size: 13.5px; line-height: 1.5; color: var(--text-muted); }
+  .legend-box { background: rgba(23, 25, 35, 0.9); border-left: 5px solid var(--accent-green); padding: 12px 15px; margin-top: 10px; border-radius: 6px; font-size: 13.5px; line-height: 1.5; color: var(--text-muted); }
   
   /* MODAL POP-UPS (DARK) */
-  .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); justify-content: center; align-items: center; z-index: 1000; backdrop-filter: blur(4px); }
-  .modal-content { background: var(--card-dark); border: 1px solid var(--card-border); padding: 25px; border-radius: 14px; width: 380px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.8); color: white; }
+  .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); justify-content: center; align-items: center; z-index: 1000; backdrop-filter: blur(5px); }
+  .modal-content { background: var(--card-dark); border: 1px solid var(--card-border); padding: 25px; border-radius: 14px; width: 380px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.9); color: white; }
   .modal input[type="text"] { width: 85%; padding: 10px; font-size: 15px; text-align: center; margin: 10px 0; border: 1px solid #4a5568; border-radius: 6px; background: #1a202c; color: white; }
 
   /* BUTTON GRIDS IN MODALS */
@@ -101,13 +103,13 @@
     gap: 10px; 
     padding: 8px 12px; 
     border-radius: 6px; 
-    background: #1a202c; 
+    background: rgba(26, 32, 44, 0.9); 
     border: 1px solid #2d3748; 
     cursor: grab; 
     user-select: none;
     transition: transform 0.15s, box-shadow 0.15s;
   }
-  .draggable-item:active { cursor: grabbing; transform: scale(1.02); box-shadow: 0 5px 15px rgba(0,0,0,0.4); }
+  .draggable-item:active { cursor: grabbing; transform: scale(1.02); box-shadow: 0 5px 15px rgba(0,0,0,0.6); }
   .drag-handle { font-size: 18px; color: var(--text-muted); cursor: grab; }
   .player-input-field { flex: 1; padding: 6px 10px; border: 1px solid #4a5568; border-radius: 4px; font-weight: bold; color: #1a202c; }
 
@@ -137,7 +139,7 @@
   <button class="btn btn-print" onclick="window.print()">🖨️ PDF / Druckansicht</button>
   <button class="btn btn-reset" onclick="resetSeasonWithPassword()">🔄 Saison zurücksetzen</button>
 
-  <div style="margin-top: 15px; background: #1a202c; padding: 12px; border-radius: 8px; border: 1px solid #2d3748;">
+  <div style="margin-top: 15px; background: rgba(26, 32, 44, 0.9); padding: 12px; border-radius: 8px; border: 1px solid #2d3748;">
     <label for="savedSeasonsSelect" style="font-weight:bold; color:var(--text-main);">📂 Gespeicherte Saison aufrufen:</label><br>
     <select id="savedSeasonsSelect" onchange="loadSelectedSeason()" style="padding: 8px; font-size: 14px; margin-top: 6px; width: 230px; border-radius: 4px; border: 1px solid #4a5568; background:#2d3748; color:white;">
       <option value="">-- Saison auswählen --</option>
@@ -219,7 +221,7 @@
   </div>
 </div>
 
-<!-- RESULT POP-UP MODAL (Klick-Buttons + Valider Speichern-Button) -->
+<!-- RESULT POP-UP MODAL -->
 <div id="resultModal" class="modal">
   <div class="modal-content">
     <h3 id="modalMatchTitle">Match Ergebnis</h3>

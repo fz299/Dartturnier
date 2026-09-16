@@ -10,10 +10,14 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Dart Manager">
 
+<!-- GOOGLE FIREBASE SDKs (COMPAT MODUS FÜR BROWSER) -->
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+
 <style>
   :root { 
     --bg-dark: #12181f;
-    --card-dark: rgba(30, 38, 48, 0.92); /* Leicht transparent für edlen Effekt */
+    --card-dark: rgba(30, 38, 48, 0.92);
     --card-border: #2d3748;
     --accent-green: #2e7d32;
     --accent-hover: #1b5e20;
@@ -42,7 +46,7 @@
     padding: 20px; 
     margin-bottom: 25px; 
     box-shadow: 0 8px 25px rgba(0,0,0,0.6); 
-    backdrop-filter: blur(5px); /* Glaseffekt für moderne Optik */
+    backdrop-filter: blur(5px);
   }
 
   h3, h4 { color: #ffffff; margin-top: 0; }
@@ -254,6 +258,23 @@
 </div>
 
 <script>
+  // ==============================================================================
+  // DEINE DEKLARIERTEN FIREBASE ZUGANGSDATEN (EINGEBAUT)
+  // ==============================================================================
+  const firebaseConfig = {
+    apiKey: "AIzaSyAQbM5BStPcO5qlpMJlIwLkVP8b2IXPQ9k",
+    authDomain: "dart-turnier-f94af.firebaseapp.com",
+    databaseURL: "https://dart-turnier-f94af-default-rtdb.firebaseio.com",
+    projectId: "dart-turnier-f94af",
+    storageBucket: "dart-turnier-f94af.firebasestorage.app",
+    messagingSenderId: "687251127621",
+    appId: "1:687251127621:web:9e55fe825c63094b5b122c"
+  };
+
+  // Firebase initialisieren
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
+
   const MASTER_PW = "1328";
   let isSeasonActive = false;
 
@@ -290,13 +311,16 @@
   let playersData = [];
 
   function initPlayerInputs() {
-    playersData = [];
-    for(let i=1; i<=10; i++) {
-      let savedName = localStorage.getItem(`dart_pName_${i}`) || "";
-      playersData.push({ id: i, name: savedName, color: colors[i-1] });
-    }
-    sortPlayersData();
-    renderDraggablePlayerList();
+    db.ref('playersData').once('value', (snapshot) => {
+      const data = snapshot.val();
+      playersData = [];
+      for(let i=1; i<=10; i++) {
+        let name = (data && data[i]) ? data[i] : (localStorage.getItem(`dart_pName_${i}`) || "");
+        playersData.push({ id: i, name: name, color: colors[i-1] });
+      }
+      sortPlayersData();
+      renderDraggablePlayerList();
+    });
   }
 
   function sortPlayersData() {
@@ -326,15 +350,18 @@
 
   function updatePlayerName(idx, val) {
     playersData[idx].name = val.trim();
-    saveAllPlayersToStorage();
+    saveAllPlayersToCloud();
     sortPlayersData();
     renderDraggablePlayerList();
   }
 
-  function saveAllPlayersToStorage() {
+  function saveAllPlayersToCloud() {
+    let saveObj = {};
     playersData.forEach((p, i) => {
+      saveObj[i+1] = p.name;
       localStorage.setItem(`dart_pName_${i+1}`, p.name);
     });
+    db.ref('playersData').set(saveObj);
   }
 
   let dragSrcIndex = null;
@@ -357,7 +384,7 @@
         if (dragSrcIndex !== null && dragSrcIndex !== targetIndex) {
           const movedItem = playersData.splice(dragSrcIndex, 1)[0];
           playersData.splice(targetIndex, 0, movedItem);
-          saveAllPlayersToStorage();
+          saveAllPlayersToCloud();
           renderDraggablePlayerList();
         }
       });
@@ -413,35 +440,37 @@
     document.getElementById('tournamentArea').style.display = 'block';
     document.getElementById('saisonTitle').innerText = `Rangliste - ${currentSeasonName} (Sieger-Zusatzpunkte: +${bonusPoints})`;
     renderTable();
-    updateSavedSeasonsDropdown();
+    saveCurrentSeason();
   }
 
   function saveCurrentSeason() {
     if (!isSeasonActive) { alert("Es läuft aktuell keine Saison zum Speichern!"); return; }
     
-    let saved = JSON.parse(localStorage.getItem('dart_saved_seasons') || '{}');
-    saved[currentSeasonName] = {
+    const seasonData = {
       seasonName: currentSeasonName,
       bonusPoints: bonusPoints,
       activePlayers: activePlayers,
       currentMatches: currentMatches
     };
-    localStorage.setItem('dart_saved_seasons', JSON.stringify(saved));
-    alert(`✅ Saison '${currentSeasonName}' wurde erfolgreich gespeichert!`);
-    updateSavedSeasonsDropdown();
+
+    db.ref('savedSeasons/' + currentSeasonName).set(seasonData);
+    db.ref('activeSeasonState').set(seasonData);
+    alert(`✅ Saison '${currentSeasonName}' wurde erfolgreich in der Cloud gespeichert!`);
   }
 
   function updateSavedSeasonsDropdown() {
-    let saved = JSON.parse(localStorage.getItem('dart_saved_seasons') || '{}');
-    let select = document.getElementById('savedSeasonsSelect');
-    select.innerHTML = '<option value="">-- Saison auswählen --</option>';
-    for (let sKey in saved) {
-      let opt = document.createElement('option');
-      opt.value = sKey;
-      opt.innerText = sKey;
-      if (sKey === currentSeasonName && isSeasonActive) opt.selected = true;
-      select.appendChild(opt);
-    }
+    db.ref('savedSeasons').on('value', (snapshot) => {
+      const saved = snapshot.val() || {};
+      let select = document.getElementById('savedSeasonsSelect');
+      select.innerHTML = '<option value="">-- Saison auswählen --</option>';
+      for (let sKey in saved) {
+        let opt = document.createElement('option');
+        opt.value = sKey;
+        opt.innerText = sKey;
+        if (sKey === currentSeasonName && isSeasonActive) opt.selected = true;
+        select.appendChild(opt);
+      }
+    });
   }
 
   function loadSelectedSeason() {
@@ -449,21 +478,24 @@
     let sKey = select.value;
     if (!sKey) return;
 
-    let saved = JSON.parse(localStorage.getItem('dart_saved_seasons') || '{}');
-    let sData = saved[sKey];
-    if (!sData) return;
+    db.ref('savedSeasons/' + sKey).once('value', (snapshot) => {
+      let sData = snapshot.val();
+      if (!sData) return;
 
-    currentSeasonName = sData.seasonName;
-    bonusPoints = sData.bonusPoints;
-    activePlayers = sData.activePlayers;
-    currentMatches = sData.currentMatches;
-    isSeasonActive = true;
+      currentSeasonName = sData.seasonName;
+      bonusPoints = sData.bonusPoints;
+      activePlayers = sData.activePlayers;
+      currentMatches = sData.currentMatches;
+      isSeasonActive = true;
 
-    renderActivePlayersInControl();
-    document.getElementById('tournamentArea').style.display = 'block';
-    document.getElementById('saisonTitle').innerText = `Rangliste - ${currentSeasonName} (Sieger-Zusatzpunkte: +${bonusPoints})`;
-    renderSchedule();
-    renderTable();
+      db.ref('activeSeasonState').set(sData);
+
+      renderActivePlayersInControl();
+      document.getElementById('tournamentArea').style.display = 'block';
+      document.getElementById('saisonTitle').innerText = `Rangliste - ${currentSeasonName} (Sieger-Zusatzpunkte: +${bonusPoints})`;
+      renderSchedule();
+      renderTable();
+    });
   }
 
   function deleteSelectedSeason() {
@@ -473,11 +505,8 @@
 
     if (confirm(`Möchtest du die gespeicherte Saison '${sKey}' wirklich löschen?`)) {
       if (verifyPassword("Saison löschen")) {
-        let saved = JSON.parse(localStorage.getItem('dart_saved_seasons') || '{}');
-        delete saved[sKey];
-        localStorage.setItem('dart_saved_seasons', JSON.stringify(saved));
+        db.ref('savedSeasons/' + sKey).remove();
         alert(`Saison '${sKey}' wurde gelöscht.`);
-        updateSavedSeasonsDropdown();
       }
     }
   }
@@ -491,11 +520,30 @@
       isSeasonActive = false;
       currentMatches = [];
       activePlayers = [];
+      db.ref('activeSeasonState').remove();
       document.getElementById('tournamentArea').style.display = 'none';
       document.getElementById('whoIsHeader').innerText = "Wer ist dabei? (Drag & Drop zum Sortieren)";
       initPlayerInputs();
     }
   }
+
+  // AUTOMATISCHE ECHTZEIT-SYNCHRONISATION FÜR ALLE VERBUNDENEN HANDYS
+  db.ref('activeSeasonState').on('value', (snapshot) => {
+    const sData = snapshot.val();
+    if (sData) {
+      currentSeasonName = sData.seasonName;
+      bonusPoints = sData.bonusPoints;
+      activePlayers = sData.activePlayers;
+      currentMatches = sData.currentMatches;
+      isSeasonActive = true;
+
+      renderActivePlayersInControl();
+      document.getElementById('tournamentArea').style.display = 'block';
+      document.getElementById('saisonTitle').innerText = `Rangliste - ${currentSeasonName} (Sieger-Zusatzpunkte: +${bonusPoints})`;
+      renderSchedule();
+      renderTable();
+    }
+  });
 
   function renderActivePlayersInControl() {
     document.getElementById('whoIsHeader').innerText = `Wer ist dabei? (Aktive Saison: ${activePlayers.length} Spieler)`;
@@ -635,8 +683,8 @@
     currentMatches[selectedMatchIndex].legsH = tempLegsH;
     currentMatches[selectedMatchIndex].legsG = tempLegsG;
     closeModal();
-    renderSchedule();
-    renderTable();
+    
+    saveCurrentSeason();
   }
 
   function renderTable() {

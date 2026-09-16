@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🎯 Dartturnier Manager (501 SI/DO)</title>
+<style>
+  :root { --primary: #1b5e20; --accent: #2e7d32; --light: #e8f5e9; --yellow: #fffde7; }
+  body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 15px; background: #f4f6f9; color: #333; }
+  h1 { text-align: center; color: var(--primary); margin-bottom: 20px; }
+  .card { background: white; border-radius: 8px; padding: 15px; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+  .btn { background: var(--accent); color: white; border: none; padding: 10px 15px; font-size: 14px; font-weight: bold; border-radius: 5px; cursor: pointer; margin-right: 10px; margin-bottom: 10px; }
+  .btn:hover { background: var(--primary); }
+  table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 14px; }
+  th { background: var(--accent); color: white; padding: 8px; text-align: center; }
+  td { padding: 8px; border: 1px solid #ddd; text-align: center; }
+  tr:nth-child(even) { background: #fafafa; }
+  .match-row { cursor: pointer; transition: background 0.2s; }
+  .match-row:hover { background: var(--yellow) !important; }
+  .badge { padding: 4px 8px; border-radius: 4px; font-weight: bold; display: inline-block; }
+  
+  /* Modal Pop-up */
+  .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; }
+  .modal-content { background: white; padding: 20px; border-radius: 8px; width: 320px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+  .modal input { width: 60px; padding: 8px; font-size: 16px; text-align: center; margin: 10px; }
+</style>
+</head>
+<body>
+
+<h1>🎯 Dartturnier Manager (501 SI/DO)</h1>
+
+<!-- STEUERUNG -->
+<div class="card">
+  <h3>1. Programm-Steuerung</h3>
+  <button class="btn" onclick="startSaison(1)">Starte Saison Teil 1 (Hinrunde)</button>
+  <button class="btn" onclick="startSaison(2)">Starte Saison Teil 2 (Rückrunde)</button>
+  <h4 style="margin-top:15px;">Stammdaten (Namen hinterlegen):</h4>
+  <div id="playerInputs" style="display: flex; flex-wrap: wrap; gap: 8px;"></div>
+</div>
+
+<!-- TURNIERANZEIGE -->
+<div id="tournamentArea" style="display:none;">
+  <!-- RANGLISTE -->
+  <div class="card">
+    <h3 id="saisonTitle">Rangliste</h3>
+    <table>
+      <thead>
+        <tr><th>Platz</th><th>Spieler</th><th>Spiele</th><th>Siege</th><th>Niederl.</th><th>Legs +</th><th>Legs -</th><th>Punkte</th></tr>
+      </thead>
+      <tbody id="standingsBody"></tbody>
+    </table>
+  </div>
+
+  <!-- SPIELPLAN -->
+  <div class="card">
+    <h3>Spieltage & Matches (Klick auf ein Match zum Eintragen)</h3>
+    <table>
+      <thead>
+        <tr><th>Spieltag</th><th>Heim</th><th>vs</th><th>Gast</th><th>Legs H</th><th>Legs G</th><th>Pkt H</th><th>Pkt G</th></tr>
+      </thead>
+      <tbody id="scheduleBody"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- RESULT POP-UP MODAL -->
+<div id="resultModal" class="modal">
+  <div class="modal-content">
+    <h3 id="modalMatchTitle">Match Ergebnis</h3>
+    <p>Legs (First to 4 / Max. 4 Gewinnsätze)</p>
+    <div>
+      <label id="lblHome"></label>: <input type="number" id="inpHome" min="0" max="4"><br>
+      <label id="lblAway"></label>: <input type="number" id="inpAway" min="0" max="4">
+    </div>
+    <br>
+    <button class="btn" onclick="saveResult()">Ergebnis Speichern</button>
+    <button class="btn" style="background:#777;" onclick="closeModal()">Abbrechen</button>
+  </div>
+</div>
+
+<script>
+  const colors = ["#ffcdd2","#e1bee7","#d1c4e9","#c5cae9","#bbdefb","#b2ebf2","#b2dfdb","#c8e6c9","#dcedc8","#f0f4c3","#fff9c4","#ffe0b2","#ffccbc","#d7ccc8","#f5f5f5","#cfd8dc","#ffb3ba","#ffdfba","#bae1ff","#baffc9"];
+  let activeSeason = 1, currentMatches = [], activePlayers = [], selectedMatchIndex = null;
+
+  // Stammdatenfeldeingabe erzeugen
+  const container = document.getElementById('playerInputs');
+  for(let i=1; i<=20; i++) {
+    container.innerHTML += `<div style="display:flex; align-items:center; gap:4px;">
+      <small>${i}:</small>
+      <input type="text" id="pName_${i}" value="Spieler ${i}" style="width:100px; padding:4px; border:1px solid #ccc; background:${colors[i-1]}; font-weight:bold;">
+    </div>`;
+  }
+
+  function startSaison(teil) {
+    const input = prompt(`Wie viele Teilnehmer spielen in Saison Teil ${teil} mit? (2 bis 20):`, "4");
+    if(!input) return;
+    const n = parseInt(input);
+    if(isNaN(n) || n < 2 || n > 20) { alert("Bitte eine Zahl zwischen 2 und 20 eingeben!"); return; }
+
+    activeSeason = teil;
+    activePlayers = [];
+    for(let i=1; i<=n; i++) {
+      let name = document.getElementById(`pName_${i}`).value.trim() || `Spieler ${i}`;
+      activePlayers.push({ id: i, name: name, color: colors[i-1] });
+    }
+
+    generateSchedule(n, teil === 2);
+    document.getElementById('tournamentArea').style.display = 'block';
+    document.getElementById('saisonTitle').innerText = `Rangliste - Saison Teil ${teil}`;
+    renderTable();
+  }
+
+  function generateSchedule(n, isRueckrunde) {
+    let pool = activePlayers.map((p, idx) => idx);
+    if(n % 2 !== 0) pool.push(-1); // Bye / Pause
+    const numRounds = pool.length - 1, half = pool.length / 2;
+    currentMatches = [];
+
+    for(let r=0; r<numRounds; r++) {
+      for(let i=0; i<half; i++) {
+        let p1 = pool[i], p2 = pool[pool.length - 1 - i];
+        if(isRueckrunde) [p1, p2] = [p2, p1];
+        if(p1 !== -1 && p2 !== -1) {
+          currentMatches.push({ day: r+1, home: activePlayers[p1], away: activePlayers[p2], legsH: null, legsG: null });
+        } else if(p1 !== -1 || p2 !== -1) {
+          let active = p1 !== -1 ? activePlayers[p1] : activePlayers[p2];
+          currentMatches.push({ day: r+1, home: active, away: null, legsH: null, legsG: null });
+        }
+      }
+      pool.splice(1, 0, pool.pop());
+    }
+    renderSchedule();
+  }
+
+  function renderSchedule() {
+    const tbody = document.getElementById('scheduleBody');
+    tbody.innerHTML = '';
+    currentMatches.forEach((m, idx) => {
+      if(!m.away) {
+        tbody.innerHTML += `<tr><td>Spieltag ${m.day}</td><td style="background:${m.home.color}">${m.home.name}</td><td colspan="6"><em>PAUSE / SPIELFREI</em></td></tr>`;
+      } else {
+        let pktH = m.legsH !== null ? (m.legsH + (m.legsH === 4 ? 1 : 0)) : '';
+        let pktG = m.legsG !== null ? (m.legsG + (m.legsG === 4 ? 1 : 0)) : '';
+        tbody.innerHTML += `<tr class="match-row" onclick="openModal(${idx})">
+          <td>Spieltag ${m.day}</td>
+          <td style="background:${m.home.color}; font-weight:bold;">${m.home.name}</td>
+          <td>vs</td>
+          <td style="background:${m.away.color}; font-weight:bold;">${m.away.name}</td>
+          <td><b>${m.legsH ?? ''}</b></td><td><b>${m.legsG ?? ''}</b></td>
+          <td>${pktH}</td><td>${pktG}</td>
+        </tr>`;
+      }
+    });
+  }
+
+  function openModal(idx) {
+    selectedMatchIndex = idx;
+    const m = currentMatches[idx];
+    document.getElementById('modalMatchTitle').innerText = `${m.home.name} vs ${m.away.name}`;
+    document.getElementById('lblHome').innerText = m.home.name;
+    document.getElementById('lblAway').innerText = m.away.name;
+    document.getElementById('inpHome').value = m.legsH ?? '';
+    document.getElementById('inpAway').value = m.legsG ?? '';
+    document.getElementById('resultModal').style.display = 'flex';
+  }
+
+  function closeModal() { document.getElementById('resultModal').style.display = 'none'; }
+
+  function saveResult() {
+    const h = parseInt(document.getElementById('inpHome').value);
+    const g = parseInt(document.getElementById('inpAway').value);
+    if(isNaN(h) || isNaN(g) || h < 0 || h > 4 || g < 0 || g > 4) { alert("Legs müssen zwischen 0 und 4 liegen!"); return; }
+    currentMatches[selectedMatchIndex].legsH = h;
+    currentMatches[selectedMatchIndex].legsG = g;
+    closeModal();
+    renderSchedule();
+    renderTable();
+  }
+
+  function renderTable() {
+    let stats = activePlayers.map(p => ({ player: p, spiele: 0, siege: 0, niederlagen: 0, legsP: 0, legsM: 0, punkte: 0 }));
+    currentMatches.forEach(m => {
+      if(m.away && m.legsH !== null && m.legsG !== null) {
+        let h = stats.find(s => s.player.name === m.home.name);
+        let g = stats.find(s => s.player.name === m.away.name);
+        h.spiele++; g.spiele++;
+        h.legsP += m.legsH; h.legsM += m.legsG;
+        g.legsP += m.legsG; g.legsM += m.legsH;
+        let pktH = m.legsH + (m.legsH === 4 ? 1 : 0);
+        let pktG = m.legsG + (m.legsG === 4 ? 1 : 0);
+        h.punkte += pktH; g.punkte += pktG;
+        if(m.legsH === 4) { h.siege++; g.niederlagen++; }
+        if(m.legsG === 4) { g.siege++; h.niederlagen++; }
+      }
+    });
+
+    stats.sort((a,b) => b.punkte - a.punkte || (b.legsP - b.legsM) - (a.legsP - a.legsM));
+    const tbody = document.getElementById('standingsBody');
+    tbody.innerHTML = '';
+    stats.forEach((s, idx) => {
+      tbody.innerHTML += `<tr>
+        <td><b>${idx+1}</b></td>
+        <td style="background:${s.player.color}; text-align:left; font-weight:bold;">${s.player.name}</td>
+        <td>${s.spiele}</td><td>${s.siege}</td><td>${s.niederlagen}</td>
+        <td>${s.legsP}</td><td>${s.legsM}</td>
+        <td style="background:#e8f5e9; font-weight:bold;">${s.punkte}</td>
+      </tr>`;
+    });
+  }
+</script>
+</body>
+</html>

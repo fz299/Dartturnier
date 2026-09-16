@@ -11,34 +11,56 @@
   .card { background: white; border-radius: 8px; padding: 15px; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
   .btn { background: var(--accent); color: white; border: none; padding: 10px 15px; font-size: 14px; font-weight: bold; border-radius: 5px; cursor: pointer; margin-right: 10px; margin-bottom: 10px; }
   .btn:hover { background: var(--primary); }
+  .btn-print { background: #0277bd; }
+  .btn-print:hover { background: #01579b; }
   table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 14px; }
   th { background: var(--accent); color: white; padding: 8px; text-align: center; }
   td { padding: 8px; border: 1px solid #ddd; text-align: center; }
   tr:nth-child(even) { background: #fafafa; }
   .match-row { cursor: pointer; transition: background 0.2s; }
   .match-row:hover { background: var(--yellow) !important; }
-  .badge { padding: 4px 8px; border-radius: 4px; font-weight: bold; display: inline-block; }
+  .legend-box { background: var(--light); border-left: 5px solid var(--primary); padding: 10px 15px; margin-top: 10px; border-radius: 4px; font-size: 13px; }
   
   /* Modal Pop-up */
-  .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; }
+  .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000; }
   .modal-content { background: white; padding: 20px; border-radius: 8px; width: 320px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
   .modal input { width: 60px; padding: 8px; font-size: 16px; text-align: center; margin: 10px; }
+
+  /* PDF & Druck-Optimierung */
+  @media print {
+    .no-print { display: none !important; }
+    body { background: white; padding: 0; }
+    .card { box-shadow: none; border: 1px solid #ccc; page-break-inside: avoid; }
+    h1 { margin-top: 0; color: black; }
+  }
 </style>
 </head>
 <body>
 
-<h1>🎯 Dartturnier Manager (501 SI/DO)</h1>
+<h1 class="no-print">🎯 Dartturnier Manager (501 SI/DO)</h1>
 
 <!-- STEUERUNG -->
-<div class="card">
-  <h3>1. Programm-Steuerung</h3>
+<div class="card no-print">
+  <h3>1. Starte neue Saison</h3>
   <button class="btn" onclick="startSaison(1)">Starte Saison Teil 1 (Hinrunde)</button>
   <button class="btn" onclick="startSaison(2)">Starte Saison Teil 2 (Rückrunde)</button>
-  <h4 style="margin-top:15px;">Stammdaten (Namen hinterlegen):</h4>
+  <button class="btn btn-print" onclick="window.print()">🖨️ PDF / Druckansicht</button>
+  
+  <h4 style="margin-top:15px;" id="whoIsHeader">Wer ist dabei?</h4>
   <div id="playerInputs" style="display: flex; flex-wrap: wrap; gap: 8px;"></div>
 </div>
 
-<!-- TURNIERANZEIGE -->
+<!-- LEGENDE / ERKLÄRUNG -->
+<div class="card no-print">
+  <h3>ℹ️ Legende & Punktesystem</h3>
+  <div class="legend-box">
+    <strong>Spielmodus:</strong> 501 Single In / Double Out (First to 4 Legs).<br>
+    <strong>Punktevergabe:</strong> Jedes gewonnene Leg bringt 1 Punkt. Der Gesamtsieger des Matches erhält zusätzlich die gewählten <em>Siegerpunkte</em> (1, 2 oder 3).<br>
+    <em>Beispiel bei 1 Siegerpunkt:</em> Ein 4:3-Ergebnis bringt 5 Punkte für den Sieger und 3 Punkte für den Verlierer.
+  </div>
+</div>
+
+<!-- TURNIERANZEIGE (Druckbereich) -->
 <div id="tournamentArea" style="display:none;">
   <!-- RANGLISTE -->
   <div class="card">
@@ -53,10 +75,10 @@
 
   <!-- SPIELPLAN -->
   <div class="card">
-    <h3>Spieltage & Matches (Klick auf ein Match zum Eintragen)</h3>
+    <h3>Spieltage & Matches <span class="no-print" style="font-size:12px; font-weight:normal;">(Klick auf ein Match zum Eintragen)</span></h3>
     <table>
       <thead>
-        <tr><th>Spieltag</th><th>Heim</th><th>vs</th><th>Gast</th><th>Legs H</th><th>Legs G</th><th>Pkt H</th><th>Pkt G</th></tr>
+        <tr><th>Spieltag</th><th>Heim</th><th>vs</th><th>Gast</th><th>Legs Heim</th><th>Legs Gast</th><th>Punkte Heim</th><th>Punkte Gast</th></tr>
       </thead>
       <tbody id="scheduleBody"></tbody>
     </table>
@@ -80,22 +102,43 @@
 
 <script>
   const colors = ["#ffcdd2","#e1bee7","#d1c4e9","#c5cae9","#bbdefb","#b2ebf2","#b2dfdb","#c8e6c9","#dcedc8","#f0f4c3","#fff9c4","#ffe0b2","#ffccbc","#d7ccc8","#f5f5f5","#cfd8dc","#ffb3ba","#ffdfba","#bae1ff","#baffc9"];
-  let activeSeason = 1, currentMatches = [], activePlayers = [], selectedMatchIndex = null;
+  let activeSeason = 1, currentMatches = [], activePlayers = [], selectedMatchIndex = null, bonusPoints = 1;
 
-  // Stammdatenfeldeingabe erzeugen
+  // Initialisieren der Namensfelder (mit LocalStorage Unterstützung)
   const container = document.getElementById('playerInputs');
-  for(let i=1; i<=20; i++) {
-    container.innerHTML += `<div style="display:flex; align-items:center; gap:4px;">
-      <small>${i}:</small>
-      <input type="text" id="pName_${i}" value="Spieler ${i}" style="width:100px; padding:4px; border:1px solid #ccc; background:${colors[i-1]}; font-weight:bold;">
-    </div>`;
+  
+  function initPlayerInputs() {
+    container.innerHTML = '';
+    for(let i=1; i<=20; i++) {
+      let savedName = localStorage.getItem(`dart_pName_${i}`) || "";
+      container.innerHTML += `<div style="display:flex; align-items:center; gap:4px;">
+        <small>${i}:</small>
+        <input type="text" id="pName_${i}" value="${savedName}" placeholder="Name..." 
+               onchange="savePlayerName(${i}, this.value)" 
+               style="width:100px; padding:4px; border:1px solid #ccc; background:${colors[i-1]}; font-weight:bold;">
+      </div>`;
+    }
   }
 
+  function savePlayerName(idx, val) {
+    localStorage.setItem(`dart_pName_${idx}`, val.trim());
+  }
+
+  initPlayerInputs();
+
   function startSaison(teil) {
-    const input = prompt(`Wie viele Teilnehmer spielen in Saison Teil ${teil} mit? (2 bis 20):`, "4");
-    if(!input) return;
-    const n = parseInt(input);
+    // Pop-up 1: Teilnehmeranzahl
+    const inputCount = prompt(`Wie viele Teilnehmer spielen in Saison Teil ${teil} mit? (2 bis 20):`, "4");
+    if(!inputCount) return;
+    const n = parseInt(inputCount);
     if(isNaN(n) || n < 2 || n > 20) { alert("Bitte eine Zahl zwischen 2 und 20 eingeben!"); return; }
+
+    // Pop-up 2: Siegerpunkte (1, 2 oder 3)
+    const inputBonus = prompt(`Wie viele Zusatzpunkte erhält der Match-Sieger? (1, 2 oder 3):`, "1");
+    if(!inputBonus) return;
+    const bonus = parseInt(inputBonus);
+    if(isNaN(bonus) || bonus < 1 || bonus > 3) { alert("Bitte 1, 2 oder 3 wählen!"); return; }
+    bonusPoints = bonus;
 
     activeSeason = teil;
     activePlayers = [];
@@ -104,10 +147,23 @@
       activePlayers.push({ id: i, name: name, color: colors[i-1] });
     }
 
+    // Zeige unter "Wer ist dabei?" nur noch die aktiven Spieler an
+    renderActivePlayersInControl();
+
     generateSchedule(n, teil === 2);
     document.getElementById('tournamentArea').style.display = 'block';
-    document.getElementById('saisonTitle').innerText = `Rangliste - Saison Teil ${teil}`;
+    document.getElementById('saisonTitle').innerText = `Rangliste - Saison Teil ${teil} (Sieger-Zusatzpunkte: +${bonusPoints})`;
     renderTable();
+  }
+
+  function renderActivePlayersInControl() {
+    document.getElementById('whoIsHeader').innerText = `Wer ist dabei? (Aktive Saison: ${activePlayers.length} Spieler)`;
+    container.innerHTML = '';
+    activePlayers.forEach((p, idx) => {
+      container.innerHTML += `<div style="padding:4px 8px; border-radius:4px; background:${p.color}; font-weight:bold; border:1px solid #ccc;">
+        ${idx+1}. ${p.name}
+      </div>`;
+    });
   }
 
   function generateSchedule(n, isRueckrunde) {
@@ -139,8 +195,8 @@
       if(!m.away) {
         tbody.innerHTML += `<tr><td>Spieltag ${m.day}</td><td style="background:${m.home.color}">${m.home.name}</td><td colspan="6"><em>PAUSE / SPIELFREI</em></td></tr>`;
       } else {
-        let pktH = m.legsH !== null ? (m.legsH + (m.legsH === 4 ? 1 : 0)) : '';
-        let pktG = m.legsG !== null ? (m.legsG + (m.legsG === 4 ? 1 : 0)) : '';
+        let pktH = m.legsH !== null ? (m.legsH + (m.legsH === 4 ? bonusPoints : 0)) : '';
+        let pktG = m.legsG !== null ? (m.legsG + (m.legsG === 4 ? bonusPoints : 0)) : '';
         tbody.innerHTML += `<tr class="match-row" onclick="openModal(${idx})">
           <td>Spieltag ${m.day}</td>
           <td style="background:${m.home.color}; font-weight:bold;">${m.home.name}</td>
@@ -186,8 +242,8 @@
         h.spiele++; g.spiele++;
         h.legsP += m.legsH; h.legsM += m.legsG;
         g.legsP += m.legsG; g.legsM += m.legsH;
-        let pktH = m.legsH + (m.legsH === 4 ? 1 : 0);
-        let pktG = m.legsG + (m.legsG === 4 ? 1 : 0);
+        let pktH = m.legsH + (m.legsH === 4 ? bonusPoints : 0);
+        let pktG = m.legsG + (m.legsG === 4 ? bonusPoints : 0);
         h.punkte += pktH; g.punkte += pktG;
         if(m.legsH === 4) { h.siege++; g.niederlagen++; }
         if(m.legsG === 4) { g.siege++; h.niederlagen++; }

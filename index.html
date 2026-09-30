@@ -72,6 +72,8 @@
   .btn-print:hover { background: #01579b; }
   .btn-save { background: #d97706; }
   .btn-save:hover { background: #b45309; }
+  .btn-load { background: #00838f; }
+  .btn-load:hover { background: #006064; }
   .btn-stats { background: #8e24aa; }
   .btn-stats:hover { background: #6a1b9a; }
   .btn-reset { background: #c62828; }
@@ -147,15 +149,18 @@
   <button class="btn" onclick="openStartModal()">🚀 Neue Saison starten</button>
   <button class="btn btn-save" onclick="saveCurrentSeason()">💾 Aktuelle Saison speichern</button>
   <button class="btn btn-stats" onclick="openGlobalStatsModal()">📊 Gesamtstatistik anzeigen</button>
-  <button class="btn btn-print" onclick="window.print()">🖨️️ PDF / Druckansicht</button>
+  <button class="btn btn-print" onclick="window.print()">🖨 PDF / Druckansicht</button>
   <button class="btn btn-reset" onclick="resetSeasonWithPassword()">🔄 Saison zurücksetzen</button>
 
   <div style="margin-top: 15px; background: rgba(26, 32, 44, 0.9); padding: 12px; border-radius: 8px; border: 1px solid #2d3748;">
     <label for="savedSeasonsSelect" style="font-weight:bold; color:var(--text-main);">📂 Gespeicherte Saison aufrufen:</label><br>
-    <select id="savedSeasonsSelect" onchange="loadSelectedSeason()" style="padding: 8px; font-size: 14px; margin-top: 6px; width: 230px; border-radius: 4px; border: 1px solid #4a5568; background:#2d3748; color:white;">
-      <option value="">-- Saison auswählen --</option>
-    </select>
-    <button class="btn btn-reset" style="padding: 7px 12px; font-size: 13px; margin-left: 6px;" onclick="deleteSelectedSeason()">Löschen</button>
+    <div style="display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin-top:8px;">
+      <select id="savedSeasonsSelect" style="padding: 8px; font-size: 14px; min-width: 200px; border-radius: 4px; border: 1px solid #4a5568; background:#2d3748; color:white;">
+        <option value="">-- Saison auswählen --</option>
+      </select>
+      <button class="btn btn-load" style="margin-bottom:0; padding: 8px 14px; font-size: 13px;" onclick="loadSelectedSeasonExplicit()">📥 Saison laden</button>
+      <button class="btn btn-reset" style="margin-bottom:0; padding: 8px 12px; font-size: 13px;" onclick="deleteSelectedSeason()">Löschen</button>
+    </div>
   </div>
   
   <h4 style="margin-top:18px;" id="whoIsHeader">Wer ist dabei? (Drag & Drop zum Sortieren)</h4>
@@ -535,6 +540,7 @@
 
     db.ref('savedSeasons/' + currentSeasonName).set(seasonData);
     db.ref('activeSeasonState').set(seasonData);
+    alert(`✅ Saison '${currentSeasonName}' wurde erfolgreich gespeichert!`);
   }
 
   function updateSavedSeasonsDropdown() {
@@ -552,10 +558,14 @@
     });
   }
 
-  function loadSelectedSeason() {
+  // EXPLIZITER KLICK AUF DEN "SAISON LADEN" BUTTON
+  function loadSelectedSeasonExplicit() {
     let select = document.getElementById('savedSeasonsSelect');
     let sKey = select.value;
-    if (!sKey) return;
+    if (!sKey) {
+      alert("Bitte wähle zuerst eine Saison aus dem Dropdown-Menü aus!");
+      return;
+    }
 
     db.ref('savedSeasons/' + sKey).once('value', (snapshot) => {
       let sData = snapshot.val();
@@ -574,6 +584,8 @@
       document.getElementById('saisonTitle').innerText = `Rangliste - ${currentSeasonName} (Sieger-Zusatzpunkte: +${bonusPoints})`;
       renderSchedule();
       renderTable();
+      
+      alert(`✅ Saison '${currentSeasonName}' wurde erfolgreich geladen!`);
     });
   }
 
@@ -592,7 +604,7 @@
 
   function resetSeasonWithPassword() {
     if (!isSeasonActive) { alert("Es ist aktuell keine Saison aktiv, die zurückgesetzt werden könnte."); return; }
-    const confirmReset = confirm("⚠️️ ACHTUNG: Möchtest du die aktuelle Ansicht zurücksetzen?\n\nNicht gespeicherte Ergebnisse dieser Saison gehen verloren.");
+    const confirmReset = confirm("⚠️ ACHTUNG: Möchtest du die aktuelle Ansicht zurücksetzen?\n\nNicht gespeicherte Ergebnisse dieser Saison gehen verloren.");
     if (!confirmReset) return;
 
     if (verifyPassword("Ansicht zurücksetzen")) {
@@ -746,7 +758,7 @@
 
     if (tempLegsH === 4 && tempLegsG === 4) {
       btnSave.disabled = true;
-      hint.innerText = "⚠️️ 4:4 unzulässig! Nur 1 Spieler darf 4 Legs haben.";
+      hint.innerText = "⚠️ 4:4 unzulässig! Nur 1 Spieler darf 4 Legs haben.";
       return;
     }
 
@@ -760,7 +772,6 @@
     hint.innerText = "";
   }
 
-  // SCHRITT 1 VON SPIEL-SPEICHERUNG: PROMPT STATS (JA/NEIN)
   function saveResultPromptStats() {
     if (tempLegsH === null || tempLegsG === null) return;
     currentMatches[selectedMatchIndex].legsH = tempLegsH;
@@ -775,7 +786,6 @@
     saveCurrentSeason();
   }
 
-  // SCHRITT 2: LEG STATS EINGABE MODAL ÖFFNEN
   function openLegStatsInputModal() {
     document.getElementById('askStatsModal').style.display = 'none';
     const m = currentMatches[selectedMatchIndex];
@@ -783,7 +793,6 @@
     document.getElementById('statHomeHeader').innerText = m.home.name;
     document.getElementById('statAwayHeader').innerText = m.away.name;
 
-    // Falls Stats existieren, vorbelegen
     const s = m.stats || {};
     document.getElementById('st_ppr_h').value = s.ppr_h ?? '';
     document.getElementById('st_ppr_g').value = s.ppr_g ?? '';
@@ -837,7 +846,6 @@
     saveCurrentSeason();
   }
 
-  // EINSICHT VERGANGENER STATS
   function viewMatchStats(idx) {
     const m = currentMatches[idx];
     if (!m.stats) {
@@ -865,7 +873,6 @@
     document.getElementById('viewStatsModal').style.display = 'flex';
   }
 
-  // GLOBAL SAISON STATISTIK (KUMULIERT)
   function openGlobalStatsModal() {
     if (!isSeasonActive) { alert("Es läuft aktuell keine Saison!"); return; }
     

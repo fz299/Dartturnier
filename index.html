@@ -3,7 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dartturnier Manager (501 SI/DO) 🎯</title>
+<title>THIS IS DARTA 🎯</title>
+
+<!-- WHATSAPP & SOCIAL MEDIA LINK-VORSCHAU -->
+<meta property="og:title" content="THIS IS DARTA 🎯">
+<meta property="og:description" content="Dartsaison - Manager">
+<meta property="og:type" content="website">
 
 <!-- HOMEPAGE FAVICON / APP ICON (DART PFEIL / SCHEIBE) -->
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎯</text></svg>">
@@ -11,7 +16,7 @@
 <!-- PWA / App-Unterstützung für Android & iOS -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Dart Manager">
+<meta name="apple-mobile-web-app-title" content="THIS IS DARTA">
 
 <!-- GOOGLE FIREBASE SDKs (COMPAT MODUS FÜR BROWSER) -->
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
@@ -64,7 +69,27 @@
     border-color: #48bb78;
   }
 
-  h1 { text-align: center; color: #ffffff; margin-bottom: 25px; text-shadow: 0 2px 4px rgba(0,0,0,0.9); font-size: 28px; }
+  /* KOPFZEILEN-STYLING */
+  .header-title-container {
+    text-align: center;
+    margin-bottom: 25px;
+  }
+  h1 { 
+    color: #ffffff; 
+    margin: 0 0 4px 0; 
+    text-shadow: 0 2px 6px rgba(0,0,0,0.9); 
+    font-size: 32px; 
+    letter-spacing: 1px;
+    font-weight: 800;
+  }
+  .header-subtitle {
+    color: var(--text-muted);
+    font-size: 15px;
+    margin: 0;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
   
   .card { 
     background: var(--card-dark); 
@@ -252,7 +277,8 @@
     .no-print { display: none !important; }
     body { background: #ffffff !important; padding: 0 !important; color: #000 !important; }
     .card { box-shadow: none !important; border: 2px solid #1b5e20 !important; border-radius: 8px !important; margin-bottom: 20px !important; padding: 15px !important; background: #fff !important; color: #000 !important; }
-    h1 { color: #1b5e20 !important; font-size: 24px !important; text-shadow: none !important; border-bottom: 2px solid #1b5e20; padding-bottom: 8px; margin-bottom: 15px; }
+    h1 { color: #1b5e20 !important; font-size: 24px !important; text-shadow: none !important; margin-bottom: 2px; }
+    .header-subtitle { color: #555 !important; }
     table { background: #fff !important; }
     th { background: #1b5e20 !important; color: #ffffff !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
     td { border: 1px solid #888 !important; color: #000 !important; }
@@ -264,9 +290,12 @@
 <body id="mainBody" style="display:none;">
 
 <!-- VERSIONSANZEIGE GANZ LINKS OBEN (KLICKBAR) -->
-<div class="version-badge-top-left no-print" onclick="openVersionHistoryModal()">v1.1.0</div>
+<div class="version-badge-top-left no-print" onclick="openVersionHistoryModal()">v1.2.0</div>
 
-<h1 class="no-print">Dartturnier Manager (501 SI/DO) 🎯</h1>
+<div class="header-title-container no-print">
+  <h1>THIS IS DARTA 🎯</h1>
+  <p class="header-subtitle">Dartsaison - Manager</p>
+</div>
 
 <!-- STEUERUNG -->
 <div class="card no-print">
@@ -492,23 +521,30 @@
     <div style="max-height: 55vh; overflow-y: auto;">
       
       <div class="version-entry">
-        <h4>v1.1.0 (Aktuell)</h4>
+        <h4>v1.2.0 (Aktuell)</h4>
         <ul>
-          <li><strong>Fix Speicherfunktion:</strong> Saison-Speicherung in LocalStorage + Cloud abgesichert.</li>
+          <li><strong>Neuer Name & Untertitel:</strong> 'THIS IS DARTA 🎯' als Haupttitel & 'Dartsaison - Manager' als Untertitel.</li>
+          <li><strong>WhatsApp-Linkvorschau:</strong> Neuer Titel und Beschreibung für geteilte Links.</li>
+          <li><strong>Speicher-Fix:</strong> Doppelte Absicherung der Saisonspeicherung in Cloud & Browser.</li>
+        </ul>
+      </div>
+
+      <div class="version-entry">
+        <h4>v1.1.0</h4>
+        <ul>
           <li><strong>Versional-Changelog:</strong> Klickbares Versions-Badge oben links hinzugefügt.</li>
           <li><strong>Favicon:</strong> Darts-Icon (🎯) für Browser-Tab und App-Home-Bildschirm ergänzt.</li>
-          <li><strong>Titel:</strong> Darts-Emoji ans Ende des Seitentitels gesetzt.</li>
+          <li><strong>Optisches Feedback:</strong> Grünes Aufblinken des Dropdowns beim Speichern.</li>
         </ul>
       </div>
 
       <div class="version-entry">
         <h4>v1.0.0</h4>
         <ul>
-          <li><strong>Plausibilitätsprüfungen Leg Stats:</strong> Max-Limits für Darts, Checkout %, Big Fish (170) & Highscores.</li>
+          <li><strong>Leg Stats Prüfungen:</strong> Max-Limits für Darts, Checkout %, Big Fish (170) & Highscores.</li>
           <li><strong>2-Spalten Layout:</strong> Spielerliste (1-10 und 11-20) übersichtlich nebeneinander.</li>
           <li><strong>Dauerhafter Login:</strong> Automatisches Merken des Login-Status im Browser.</li>
           <li><strong>Bearbeiten-Funktion:</strong> Leg Stats über ✏️ Stift-Symbol nachträglich korrigierbar.</li>
-          <li><strong>Simpsons Namen:</strong> Vorbefüllung mit Vor- und Nachnamen prominenter Charaktere.</li>
         </ul>
       </div>
 
@@ -691,7 +727,7 @@
 
   function openStartModal() {
     if (isSeasonActive) {
-      const autoSave = confirm("⚠️ Es läuft bereits eine Saison!\n\nSoll der aktuelle Stand der laufenden Saison vor dem Start der neuen Saison AUTOMATISCH GESPEICHERT werden?");
+      const autoSave = confirm("⚠️️ Es läuft bereits eine Saison!\n\nSoll der aktuelle Stand der laufenden Saison vor dem Start der neuen Saison AUTOMATISCH GESPEICHERT werden?");
       if (autoSave) {
         saveCurrentSeason();
       }
@@ -740,7 +776,6 @@
     saveCurrentSeason();
   }
 
-  // VOLLSTÄNDIG REPARIERTE SPEICHERFUNKTION (LOKAL & CLOUD MIT VISUELLEM FEEDBACK)
   function saveCurrentSeason() {
     if (!isSeasonActive) { 
       alert("Es läuft aktuell keine Saison zum Speichern!"); 
@@ -754,12 +789,10 @@
       currentMatches: currentMatches
     };
 
-    // 1. In LocalStorage speichern
     let localSaved = JSON.parse(localStorage.getItem('dart_saved_seasons') || '{}');
     localSaved[currentSeasonName] = seasonData;
     localStorage.setItem('dart_saved_seasons', JSON.stringify(localSaved));
 
-    // 2. In Firebase Cloud sichern
     try {
       db.ref('savedSeasons/' + currentSeasonName).set(seasonData);
       db.ref('activeSeasonState').set(seasonData);
@@ -767,7 +800,6 @@
       console.warn("Cloud-Sync Warnung:", e);
     }
 
-    // 3. Optisches Feedback: Dropdown leuchtet auf
     const selectElem = document.getElementById('savedSeasonsSelect');
     selectElem.classList.remove('flash-success');
     void selectElem.offsetWidth;
@@ -780,7 +812,6 @@
     let select = document.getElementById('savedSeasonsSelect');
     select.innerHTML = '<option value="">-- Saison auswählen --</option>';
 
-    // Lade aus LocalStorage & Firebase
     let localSaved = JSON.parse(localStorage.getItem('dart_saved_seasons') || '{}');
     for (let sKey in localSaved) {
       let opt = document.createElement('option');
@@ -812,7 +843,6 @@
       return;
     }
 
-    // Erst lokal prüfen, dann Cloud
     let localSaved = JSON.parse(localStorage.getItem('dart_saved_seasons') || '{}');
     if (localSaved[sKey]) {
       applyLoadedSeason(localSaved[sKey]);

@@ -237,7 +237,7 @@
   }
   .player-column { display: flex; flex-direction: column; gap: 8px; }
 
-  /* DRAG & DROP STYLING MIT DEUTLICHEM LEUCHT- & SKALIERUNGS-EFFEKT */
+  /* DRAG & DROP STYLING MIT VISUELLEM DROP-INDIKATOR (GAP) */
   .draggable-item { 
     display: flex; 
     align-items: center; 
@@ -251,16 +251,32 @@
     -webkit-user-select: none;
     -webkit-touch-callout: none;
     touch-action: none;
-    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
+    transition: transform 0.15s ease, box-shadow 0.15s ease, margin 0.15s ease, opacity 0.15s ease;
   }
 
-  /* STARKER VISUELLER EFFEKT BEI AUSWAHL / ZIEHEN */
+  /* AKTIV GEZOGENES ELEMENT (HERVORGEROHEN) */
   .draggable-item.dragging {
     transform: scale(1.08);
     background-color: rgba(30, 50, 40, 0.98) !important;
     border: 2px solid #48bb78 !important;
     box-shadow: 0 0 20px rgba(72, 187, 120, 0.8), 0 10px 25px rgba(0,0,0,0.9) !important;
     z-index: 100;
+  }
+
+  /* ZIEL-ELEMENT SANFT VERKLEINERN */
+  .draggable-item.drag-over-target {
+    transform: scale(0.96);
+    opacity: 0.8;
+  }
+
+  /* LÜCKE (GAP) OBERHALB / UNTERHALB DES ZIEL-ELEMENTS */
+  .draggable-item.drop-gap-above {
+    margin-top: 28px !important;
+    border-top: 2px dashed #48bb78 !important;
+  }
+  .draggable-item.drop-gap-below {
+    margin-bottom: 28px !important;
+    border-bottom: 2px dashed #48bb78 !important;
   }
 
   .drag-handle { 
@@ -330,7 +346,7 @@
 <body id="mainBody" style="display:none;">
 
 <!-- VERSIONSANZEIGE GANZ LINKS OBEN (KLICKBAR) -->
-<div class="version-badge-top-left no-print" onclick="openVersionHistoryModal()">v1.9.0</div>
+<div class="version-badge-top-left no-print" onclick="openVersionHistoryModal()">v2.0.0</div>
 
 <div class="header-title-container no-print">
   <h1>THIS IS DARTA 🎯</h1>
@@ -621,9 +637,16 @@
     <div style="max-height: 55vh; overflow-y: auto;">
 
       <div class="version-entry">
-        <h4>v1.9.0 (Aktuell)</h4>
+        <h4>v2.0.0 (Aktuell)</h4>
         <ul>
-          <li><strong>Visuelle Drag&Drop-Hervorhebung:</strong> Das ausgewählte Namenselement vergrößert sich und leuchtet grün auf, während es verschoben wird.</li>
+          <li><strong>Drop-Indikator & Gap-Lücke:</strong> Beim Ziehen eines Namens öffnet sich eine deutliche Platzhalter-Lücke (oben/unten) am Ziel. Das Ziel-Element verkleinert sich sanft.</li>
+        </ul>
+      </div>
+
+      <div class="version-entry">
+        <h4>v1.9.0</h4>
+        <ul>
+          <li><strong>Visuelle Drag&Drop-Hervorhebung:</strong> Das ausgewählte Namenselement vergrößert sich und leuchtet grün auf.</li>
         </ul>
       </div>
 
@@ -645,13 +668,6 @@
         <h4>v1.6.0</h4>
         <ul>
           <li><strong>✏️ Saison bearbeiten:</strong> Saisons können nachträglich im Namen, den Zusatzpunkten und der Spieleranzahl angepasst werden.</li>
-        </ul>
-      </div>
-
-      <div class="version-entry">
-        <h4>v1.5.0</h4>
-        <ul>
-          <li><strong>Fortlaufende Nummerierung:</strong> Neue Saisons heißen automatisch 'Saison 1', 'Saison 2' usw.</li>
         </ul>
       </div>
 
@@ -876,42 +892,79 @@
     db.ref('playersData').set(saveObj);
   }
 
-  // OPTIMIERTE STYLISCHE DRAG&DROP STEUERUNG MIT VISUELLEM HIGHLIGHT-EFFEKT
+  // PRÄZISE DRAG & DROP STEUERUNG MIT HILFE DES GAP- / DROP-INDIKATORS
   let dragSrcIndex = null;
   let touchDragElement = null;
+  let currentTargetItem = null;
+
+  function clearDragStyles() {
+    document.querySelectorAll('.draggable-item').forEach(el => {
+      el.classList.remove('dragging', 'drag-over-target', 'drop-gap-above', 'drop-gap-below');
+    });
+  }
 
   function addDragDropListeners() {
     const items = document.querySelectorAll('.draggable-item');
 
     items.forEach(item => {
-      // DESKTOP DRAG & DROP
+      // DESKTOP DRAG & DROP MIT VISUELLER LÜCKE
       item.addEventListener('dragstart', (e) => {
         dragSrcIndex = parseInt(item.getAttribute('data-index'));
         item.classList.add('dragging');
         e.dataTransfer.effectAllowed = 'move';
       });
 
-      item.addEventListener('dragend', () => {
-        item.classList.remove('dragging');
-      });
-
       item.addEventListener('dragover', (e) => {
         e.preventDefault();
         e.dataTransfer.dropEffect = 'move';
+        
+        if (item.classList.contains('dragging')) return;
+
+        clearDragStylesExceptDragging();
+        item.classList.add('drag-over-target');
+
+        const rect = item.getBoundingClientRect();
+        const midY = rect.top + rect.height / 2;
+        if (e.clientY < midY) {
+          item.classList.add('drop-gap-above');
+          item.classList.remove('drop-gap-below');
+        } else {
+          item.classList.add('drop-gap-below');
+          item.classList.remove('drop-gap-above');
+        }
+      });
+
+      item.addEventListener('dragleave', () => {
+        item.classList.remove('drag-over-target', 'drop-gap-above', 'drop-gap-below');
+      });
+
+      item.addEventListener('dragend', () => {
+        clearDragStyles();
       });
 
       item.addEventListener('drop', (e) => {
         e.preventDefault();
         const targetIndex = parseInt(item.getAttribute('data-index'));
-        if (dragSrcIndex !== null && dragSrcIndex !== targetIndex) {
-          const movedItem = playersData.splice(dragSrcIndex, 1)[0];
-          playersData.splice(targetIndex, 0, movedItem);
-          saveAllPlayersToCloud();
-          renderDraggablePlayerList();
+        const rect = item.getBoundingClientRect();
+        const midY = rect.top + rect.height / 2;
+        let insertIndex = targetIndex;
+
+        if (e.clientY >= midY && dragSrcIndex < targetIndex) {
+          insertIndex = targetIndex;
+        } else if (e.clientY < midY && dragSrcIndex > targetIndex) {
+          insertIndex = targetIndex;
         }
+
+        if (dragSrcIndex !== null && dragSrcIndex !== insertIndex) {
+          const movedItem = playersData.splice(dragSrcIndex, 1)[0];
+          playersData.splice(insertIndex, 0, movedItem);
+          saveAllPlayersToCloud();
+        }
+        clearDragStyles();
+        renderDraggablePlayerList();
       });
 
-      // MOBILE TOUCH DRAG & DROP (MIT LEUCHTENDEM HOVER-EFFEKT)
+      // MOBILE TOUCH DRAG & DROP (IPHONE/ANDROID OPTIMIERT)
       const handle = item.querySelector('.drag-handle');
       if (handle) {
         handle.addEventListener('touchstart', (e) => {
@@ -924,27 +977,49 @@
           if (!touchDragElement) return;
           const touchLocation = e.touches[0];
           const targetEl = document.elementFromPoint(touchLocation.clientX, touchLocation.clientY);
+          
+          clearDragStylesExceptDragging();
+
           if (targetEl) {
             const targetItem = targetEl.closest('.draggable-item');
             if (targetItem && targetItem !== touchDragElement) {
-              const targetIndex = parseInt(targetItem.getAttribute('data-index'));
-              if (dragSrcIndex !== null && targetIndex !== undefined && !isNaN(targetIndex)) {
-                const movedItem = playersData.splice(dragSrcIndex, 1)[0];
-                playersData.splice(targetIndex, 0, movedItem);
-                dragSrcIndex = targetIndex;
-                renderDraggablePlayerList();
+              currentTargetItem = targetItem;
+              targetItem.classList.add('drag-over-target');
+
+              const rect = targetItem.getBoundingClientRect();
+              const midY = rect.top + rect.height / 2;
+
+              if (touchLocation.clientY < midY) {
+                targetItem.classList.add('drop-gap-above');
+              } else {
+                targetItem.classList.add('drop-gap-below');
               }
             }
           }
         }, { passive: true });
 
-        handle.addEventListener('touchend', () => {
-          if (touchDragElement) {
-            touchDragElement.classList.remove('dragging');
-            touchDragElement = null;
-            saveAllPlayersToCloud();
+        handle.addEventListener('touchend', (e) => {
+          if (touchDragElement && currentTargetItem) {
+            const targetIndex = parseInt(currentTargetItem.getAttribute('data-index'));
+            if (dragSrcIndex !== null && !isNaN(targetIndex) && dragSrcIndex !== targetIndex) {
+              const movedItem = playersData.splice(dragSrcIndex, 1)[0];
+              playersData.splice(targetIndex, 0, movedItem);
+              saveAllPlayersToCloud();
+            }
           }
+          touchDragElement = null;
+          currentTargetItem = null;
+          clearDragStyles();
+          renderDraggablePlayerList();
         });
+      }
+    });
+  }
+
+  function clearDragStylesExceptDragging() {
+    document.querySelectorAll('.draggable-item').forEach(el => {
+      if (!el.classList.contains('dragging')) {
+        el.classList.remove('drag-over-target', 'drop-gap-above', 'drop-gap-below');
       }
     });
   }

@@ -37,6 +37,22 @@
     min-height: 100vh;
   }
 
+  /* VERSION BADGE OBEN LINKS */
+  .version-badge-top-left {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    background: rgba(45, 55, 72, 0.8);
+    color: var(--text-muted);
+    border: 1px solid var(--card-border);
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: bold;
+    letter-spacing: 0.5px;
+    z-index: 10;
+  }
+
   h1 { text-align: center; color: #ffffff; margin-bottom: 25px; text-shadow: 0 2px 4px rgba(0,0,0,0.9); font-size: 28px; }
   
   .card { 
@@ -214,6 +230,9 @@
 </style>
 </head>
 <body id="mainBody" style="display:none;">
+
+<!-- VERSIONSANZEIGE GANZ LINKS OBEN -->
+<div class="version-badge-top-left no-print">v1.0.0</div>
 
 <h1 class="no-print">🎯 Dartturnier Manager (501 SI/DO)</h1>
 
@@ -648,7 +667,6 @@
     saveCurrentSeason();
   }
 
-  // OPTIMIERTE SPEICHER-FUNKTION MIT VISUELLEM BLINKEN
   function saveCurrentSeason() {
     if (!isSeasonActive) { alert("Es läuft aktuell keine Saison zum Speichern!"); return; }
     
@@ -662,10 +680,9 @@
     db.ref('savedSeasons/' + currentSeasonName).set(seasonData);
     db.ref('activeSeasonState').set(seasonData);
 
-    // OPTISCHES FEEDBACK: DROPDOWN AUFBLINKEN LASSEN
     const selectElem = document.getElementById('savedSeasonsSelect');
     selectElem.classList.remove('flash-success');
-    void selectElem.offsetWidth; // Trigger Reflow
+    void selectElem.offsetWidth;
     selectElem.classList.add('flash-success');
   }
 

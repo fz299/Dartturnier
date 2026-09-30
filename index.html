@@ -311,7 +311,7 @@
 <body id="mainBody" style="display:none;">
 
 <!-- VERSIONSANZEIGE GANZ LINKS OBEN (KLICKBAR) -->
-<div class="version-badge-top-left no-print" onclick="openVersionHistoryModal()">v1.6.0</div>
+<div class="version-badge-top-left no-print" onclick="openVersionHistoryModal()">v1.7.0</div>
 
 <div class="header-title-container no-print">
   <h1>THIS IS DARTA 🎯</h1>
@@ -427,7 +427,7 @@
   </div>
 </div>
 
-<!-- POP-UP MODAL FÜR SAISON BEARBEITEN (NEU) -->
+<!-- POP-UP MODAL FÜR SAISON BEARBEITEN -->
 <div id="editSeasonModal" class="modal">
   <div class="modal-content">
     <h3>✏️ Saison bearbeiten</h3>
@@ -602,7 +602,14 @@
     <div style="max-height: 55vh; overflow-y: auto;">
 
       <div class="version-entry">
-        <h4>v1.6.0 (Aktuell)</h4>
+        <h4>v1.7.0 (Aktuell)</h4>
+        <ul>
+          <li><strong>Auto-Reset beim Löschen:</strong> Beim Löschen einer Saison wird die Ansicht automatisch auf Null zurückgesetzt und das Turnierfenster geschlossen.</li>
+        </ul>
+      </div>
+
+      <div class="version-entry">
+        <h4>v1.6.0</h4>
         <ul>
           <li><strong>✏️ Saison bearbeiten:</strong> Saisons können nachträglich im Namen, den Zusatzpunkten und der Spieleranzahl angepasst werden.</li>
           <li><strong>Dynamischer Spielplan:</strong> Hinzugefügte oder entfernte Spieler passen den Spielplan & die Statistiken automatisch an.</li>
@@ -842,7 +849,7 @@
 
     let nameExists = playersData.some((p, idx) => idx !== editingPlayerIdx && p.name.toLowerCase() === val.toLowerCase());
     if (nameExists) {
-      alert("⚠️ Dieser Name wird bereits verwendet. Bitte wähle einen eindeutigen Namen!");
+      alert("⚠️️ Dieser Name wird bereits verwendet. Bitte wähle einen eindeutigen Namen!");
       return;
     }
 
@@ -958,9 +965,6 @@
     saveCurrentSeason();
   }
 
-  // ==============================================================================
-  // LOGIK FÜR SAISON BEARBEITEN (NEU)
-  // ==============================================================================
   function openEditSeasonModal() {
     if (!isSeasonActive) {
       let select = document.getElementById('savedSeasonsSelect');
@@ -1003,7 +1007,6 @@
     currentSeasonName = newName;
     bonusPoints = editSelectedBonus;
 
-    // FALLS NAME GEÄNDERT WURDE, ALTEN EINTRAG LÖSCHEN
     if (oldSeasonName !== newName) {
       let localSaved = JSON.parse(localStorage.getItem('dart_saved_seasons') || '{}');
       delete localSaved[oldSeasonName];
@@ -1011,7 +1014,6 @@
       db.ref('savedSeasons/' + oldSeasonName).remove();
     }
 
-    // TEILNEHMER-ANPASSUNG (SPIELER HINZUFÜGEN ODER ENTFERNEN)
     let oldCount = activePlayers.length;
     if (editSelectedCount > oldCount) {
       for (let i = oldCount; i < editSelectedCount; i++) {
@@ -1132,6 +1134,7 @@
     renderTable();
   }
 
+  // LÖSCHEN EINER SAISON MIT AUTOMATISCHEM ZURÜCKSETZEN DER ANSICHT
   function deleteSelectedSeason() {
     let select = document.getElementById('savedSeasonsSelect');
     let sKey = select.value;
@@ -1143,6 +1146,18 @@
       localStorage.setItem('dart_saved_seasons', JSON.stringify(localSaved));
 
       db.ref('savedSeasons/' + sKey).remove();
+
+      // IF DIE GELÖSCHTE SAISON GERADE AKTIV GELADEN WAR, ANSICHT ZURÜCKSETZEN
+      if (currentSeasonName === sKey || isSeasonActive) {
+        isSeasonActive = false;
+        currentMatches = [];
+        activePlayers = [];
+        db.ref('activeSeasonState').remove();
+        document.getElementById('tournamentArea').style.display = 'none';
+        document.getElementById('whoIsHeader').innerText = "Wer ist dabei? (Drag & Drop zum Sortieren)";
+        initPlayerInputs();
+      }
+
       updateSavedSeasonsDropdown();
       alert(`Saison '${sKey}' wurde gelöscht.`);
     }
@@ -1199,7 +1214,6 @@
     if(n % 2 !== 0) pool.push(-1);
     const numRounds = pool.length - 1, half = pool.length / 2;
     
-    // BEHALTE BEREITS GESPIELTE MATCHES BEI
     let oldMatches = [...currentMatches];
     currentMatches = [];
 

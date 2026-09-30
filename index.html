@@ -79,6 +79,19 @@
   .btn-reset { background: #c62828; }
   .btn-reset:hover { background: #b71c1c; }
   
+  /* STATUS BADGE */
+  .login-status-badge {
+    display: inline-block;
+    background: #1c4522;
+    color: #48bb78;
+    border: 1px solid #2f855a;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: bold;
+    float: right;
+  }
+
   /* DARK TABLES */
   table { width: 100%; border-collapse: collapse; margin-top: 12px; background: rgba(26, 32, 44, 0.95); border-radius: 8px; overflow: hidden; }
   th { background: #2d3748; color: #ffffff; padding: 12px 10px; text-align: center; font-size: 14px; border-bottom: 2px solid #4a5568; }
@@ -96,10 +109,11 @@
   .modal input[type="text"], .modal input[type="number"] { width: 85%; padding: 8px; font-size: 14px; text-align: center; margin: 4px 0; border: 1px solid #4a5568; border-radius: 6px; background: #1a202c; color: white; }
 
   /* BUTTON GRIDS IN MODALS */
+  .grid-buttons-players { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin: 15px 0; }
   .grid-buttons { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 15px 0; }
   .grid-5 { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin: 10px 0; }
   
-  .select-btn { background: #2d3748; color: white; border: 2px solid #4a5568; padding: 12px 5px; font-size: 16px; font-weight: bold; border-radius: 8px; cursor: pointer; transition: all 0.2s; }
+  .select-btn { background: #2d3748; color: white; border: 2px solid #4a5568; padding: 10px 2px; font-size: 15px; font-weight: bold; border-radius: 8px; cursor: pointer; transition: all 0.2s; }
   .select-btn:hover { background: #4a5568; }
   .select-btn.selected { background: var(--accent-green); color: white; border-color: #48bb78; box-shadow: 0 0 10px rgba(72, 187, 120, 0.5); }
 
@@ -108,7 +122,7 @@
   .stats-grid label { font-weight: bold; color: var(--text-muted); }
 
   /* DRAG & DROP SPIELERLISTE */
-  .player-list-vertical { display: flex; flex-direction: column; gap: 8px; max-width: 360px; margin-top: 12px; }
+  .player-list-vertical { display: flex; flex-direction: column; gap: 8px; max-width: 380px; margin-top: 12px; }
   .draggable-item { 
     display: flex; 
     align-items: center; 
@@ -145,12 +159,13 @@
 
 <!-- STEUERUNG -->
 <div class="card no-print">
+  <span class="login-status-badge">🟢 Eingeloggt</span>
   <h3>1. Saison-Steuerung</h3>
   <button class="btn" onclick="openStartModal()">🚀 Neue Saison starten</button>
   <button class="btn btn-save" onclick="saveCurrentSeason()">💾 Aktuelle Saison speichern</button>
   <button class="btn btn-stats" onclick="openGlobalStatsModal()">📊 Gesamtstatistik anzeigen</button>
   <button class="btn btn-print" onclick="window.print()">🖨 PDF / Druckansicht</button>
-  <button class="btn btn-reset" onclick="resetSeasonWithPassword()">🔄 Saison zurücksetzen</button>
+  <button class="btn btn-reset" onclick="resetSeason()">🔄 Saison zurücksetzen</button>
 
   <div style="margin-top: 15px; background: rgba(26, 32, 44, 0.9); padding: 12px; border-radius: 8px; border: 1px solid #2d3748;">
     <label for="savedSeasonsSelect" style="font-weight:bold; color:var(--text-main);">📂 Gespeicherte Saison aufrufen:</label><br>
@@ -210,8 +225,8 @@
     <p style="margin-bottom:2px; font-weight:bold;">1. Name der Saison:</p>
     <input type="text" id="inpSeasonName" placeholder="z. B. Saison Teil 1, Rückrunde...">
 
-    <p style="margin-bottom:2px; font-weight:bold;">2. Anzahl Spieler:</p>
-    <div class="grid-buttons">
+    <p style="margin-bottom:2px; font-weight:bold;">2. Anzahl Spieler (2 bis 20):</p>
+    <div class="grid-buttons-players">
       <button class="select-btn btn-count" onclick="selectPlayerCount(2)">2</button>
       <button class="select-btn btn-count" onclick="selectPlayerCount(3)">3</button>
       <button class="select-btn btn-count selected" onclick="selectPlayerCount(4)">4</button>
@@ -221,6 +236,16 @@
       <button class="select-btn btn-count" onclick="selectPlayerCount(8)">8</button>
       <button class="select-btn btn-count" onclick="selectPlayerCount(9)">9</button>
       <button class="select-btn btn-count" onclick="selectPlayerCount(10)">10</button>
+      <button class="select-btn btn-count" onclick="selectPlayerCount(11)">11</button>
+      <button class="select-btn btn-count" onclick="selectPlayerCount(12)">12</button>
+      <button class="select-btn btn-count" onclick="selectPlayerCount(13)">13</button>
+      <button class="select-btn btn-count" onclick="selectPlayerCount(14)">14</button>
+      <button class="select-btn btn-count" onclick="selectPlayerCount(15)">15</button>
+      <button class="select-btn btn-count" onclick="selectPlayerCount(16)">16</button>
+      <button class="select-btn btn-count" onclick="selectPlayerCount(17)">17</button>
+      <button class="select-btn btn-count" onclick="selectPlayerCount(18)">18</button>
+      <button class="select-btn btn-count" onclick="selectPlayerCount(19)">19</button>
+      <button class="select-btn btn-count" onclick="selectPlayerCount(20)">20</button>
     </div>
 
     <p style="margin-bottom:2px; font-weight:bold;">3. Sieger-Zusatzpunkte:</p>
@@ -269,7 +294,7 @@
   </div>
 </div>
 
-<!-- PROMPT STATS MODAL (JA / NEIN ABFRAGE) -->
+<!-- PROMPT STATS MODAL -->
 <div id="askStatsModal" class="modal">
   <div class="modal-content">
     <h3>📊 Statistiken erfassen?</h3>
@@ -361,11 +386,26 @@
   const db = firebase.database();
 
   const MASTER_PW = "1328";
-  let isSeasonActive = false;
 
+  // SIMPSONS PROMINENTE CHARAKTERE FÜR VORAUSFÜLLUNG (VOR- UND NACHNAME)
+  const simpsonsNames = [
+    "Homer Simpson", "Marge Simpson", "Bart Simpson", "Lisa Simpson", "Maggie Simpson",
+    "Ned Flanders", "Barney Gumble", "Moe Szyslak", "Krusty Krustofski", "Charles Burns",
+    "Waylon Smithers", "Seymour Skinner", "Edna Krabappel", "Milhouse Van Houten", "Nelson Muntz",
+    "Apu Nahasapeemapetilon", "Chief Wiggum", "Sideshow Bob", "Fat Tony", "Disco Stu"
+  ];
+
+  // LOGINSCHUTZ & DAUERHAFTE SESSION-SPEICHERUNG IN LOCALSTORAGE
   function checkInitialPassword() {
+    let isLoggedIn = localStorage.getItem("dart_logged_in");
+    if (isLoggedIn === "true") {
+      document.getElementById('mainBody').style.display = 'block';
+      return;
+    }
+
     const pw = prompt("🔐 Bitte Passwort eingeben, um auf den Dartturnier Manager zuzugreifen:");
     if (pw === MASTER_PW) {
+      localStorage.setItem("dart_logged_in", "true");
       document.getElementById('mainBody').style.display = 'block';
     } else {
       alert("❌ Falsches Passwort! Zugriff verweigert.");
@@ -373,12 +413,7 @@
     }
   }
 
-  function verifyPassword(actionMessage) {
-    const pw = prompt(`🔐 Passwort erforderlich (${actionMessage}):`);
-    return pw === MASTER_PW;
-  }
-
-  const colors = ["#ffcdd2","#e1bee7","#d1c4e9","#c5cae9","#bbdefb","#b2ebf2","#b2dfdb","#c8e6c9","#dcedc8","#fff9c4"];
+  const colors = ["#ffcdd2","#e1bee7","#d1c4e9","#c5cae9","#bbdefb","#b2ebf2","#b2dfdb","#c8e6c9","#dcedc8","#fff9c4","#f8bbd0","#e1bee7","#d1c4e9","#c5cae9","#bbdefb","#b2ebf2","#b2dfdb","#c8e6c9","#dcedc8","#fff9c4"];
   const dayThemeColors = [
     { bg: "#1a2736", border: "#2b4c7e" },
     { bg: "#192e25", border: "#2d6a4f" },
@@ -392,6 +427,7 @@
   let currentSeasonName = "Saison 1", currentMatches = [], activePlayers = [], selectedMatchIndex = null;
   let selectedCount = 4, selectedBonus = 1;
   let tempLegsH = null, tempLegsG = null;
+  let isSeasonActive = false;
 
   let playersData = [];
 
@@ -399,8 +435,11 @@
     db.ref('playersData').once('value', (snapshot) => {
       const data = snapshot.val();
       playersData = [];
-      for(let i=1; i<=10; i++) {
+      for(let i=1; i<=20; i++) {
         let name = (data && data[i]) ? data[i] : (localStorage.getItem(`dart_pName_${i}`) || "");
+        if (!name || name.trim() === "") {
+          name = simpsonsNames[i-1] || `Spieler ${i}`;
+        }
         playersData.push({ id: i, name: name, color: colors[i-1] });
       }
       sortPlayersData();
@@ -482,7 +521,6 @@
       if (autoSave) {
         saveCurrentSeason();
       }
-      if (!verifyPassword("Neue Saison starten")) return;
     }
     document.getElementById('inpSeasonName').value = `Saison ${new Date().toLocaleDateString()}`;
     document.getElementById('startSeasonModal').style.display = 'flex';
@@ -558,7 +596,6 @@
     });
   }
 
-  // EXPLIZITER KLICK AUF DEN "SAISON LADEN" BUTTON
   function loadSelectedSeasonExplicit() {
     let select = document.getElementById('savedSeasonsSelect');
     let sKey = select.value;
@@ -595,27 +632,23 @@
     if (!sKey) { alert("Bitte wähle eine Saison zum Löschen aus!"); return; }
 
     if (confirm(`Möchtest du die gespeicherte Saison '${sKey}' wirklich löschen?`)) {
-      if (verifyPassword("Saison löschen")) {
-        db.ref('savedSeasons/' + sKey).remove();
-        alert(`Saison '${sKey}' wurde gelöscht.`);
-      }
+      db.ref('savedSeasons/' + sKey).remove();
+      alert(`Saison '${sKey}' wurde gelöscht.`);
     }
   }
 
-  function resetSeasonWithPassword() {
+  function resetSeason() {
     if (!isSeasonActive) { alert("Es ist aktuell keine Saison aktiv, die zurückgesetzt werden könnte."); return; }
     const confirmReset = confirm("⚠️ ACHTUNG: Möchtest du die aktuelle Ansicht zurücksetzen?\n\nNicht gespeicherte Ergebnisse dieser Saison gehen verloren.");
     if (!confirmReset) return;
 
-    if (verifyPassword("Ansicht zurücksetzen")) {
-      isSeasonActive = false;
-      currentMatches = [];
-      activePlayers = [];
-      db.ref('activeSeasonState').remove();
-      document.getElementById('tournamentArea').style.display = 'none';
-      document.getElementById('whoIsHeader').innerText = "Wer ist dabei? (Drag & Drop zum Sortieren)";
-      initPlayerInputs();
-    }
+    isSeasonActive = false;
+    currentMatches = [];
+    activePlayers = [];
+    db.ref('activeSeasonState').remove();
+    document.getElementById('tournamentArea').style.display = 'none';
+    document.getElementById('whoIsHeader').innerText = "Wer ist dabei? (Drag & Drop zum Sortieren)";
+    initPlayerInputs();
   }
 
   db.ref('activeSeasonState').on('value', (snapshot) => {
@@ -690,7 +723,9 @@
       } else {
         let pktH = m.legsH !== null ? (m.legsH + (m.legsH === 4 ? bonusPoints : 0)) : '';
         let pktG = m.legsG !== null ? (m.legsG + (m.legsG === 4 ? bonusPoints : 0)) : '';
-        let hasStats = m.stats ? '📊' : '-';
+        
+        // GRÜNER HAKEN WENN STATISTIKEN ERFASST WURDEN
+        let hasStats = m.stats ? '✅' : '-';
         
         tbody.innerHTML += `<tr class="match-row" style="${rowStyle}">
           <td style="font-weight:bold;" onclick="openModal(${idx})">Spieltag ${m.day}</td>

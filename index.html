@@ -250,7 +250,6 @@
   .draggable-item:active { cursor: grabbing; transform: scale(1.02); box-shadow: 0 5px 15px rgba(0,0,0,0.6); }
   .drag-handle { font-size: 16px; color: var(--text-muted); cursor: grab; }
   
-  /* NEUES NAME BUTTON STYLING (NICHT FETT, DUNKELGRAUER SCHRAFTTON) */
   .player-name-display-btn { 
     flex: 1; 
     min-width: 0; 
@@ -310,7 +309,7 @@
 <body id="mainBody" style="display:none;">
 
 <!-- VERSIONSANZEIGE GANZ LINKS OBEN (KLICKBAR) -->
-<div class="version-badge-top-left no-print" onclick="openVersionHistoryModal()">v1.3.0</div>
+<div class="version-badge-top-left no-print" onclick="openVersionHistoryModal()">v1.4.0</div>
 
 <div class="header-title-container no-print">
   <h1>THIS IS DARTA 🎯</h1>
@@ -347,7 +346,7 @@
 
 <!-- LEGENDE / ERKLÄRUNG -->
 <div class="card no-print">
-  <h3>ℹ️ Legende & Punktesystem</h3>
+  <h3>ℹ️️ Legende & Punktesystem</h3>
   <div class="legend-box">
     <strong>Spielmodus:</strong> 501 Single In / Double Out (First to 4 Legs).<br>
     <strong>Punktevergabe:</strong> Jedes gewonnene Leg bringt 1 Punkt. Der Gesamtsieger des Matches erhält zusätzlich die gewählten <em>Siegerpunkte</em> (1, 2 oder 3).<br>
@@ -431,8 +430,9 @@
     <h3>✏️ Spielernamen ändern</h3>
     <p id="editPlayerModalSub" style="color:var(--text-muted); font-size:13px; margin-bottom:10px;"></p>
     <input type="text" id="inpEditPlayerNameVal" placeholder="Name eingeben...">
-    <div style="margin-top:15px;">
+    <div style="margin-top:15px; display:flex; justify-content:center; gap:8px; flex-wrap:wrap;">
       <button class="btn" onclick="saveEditedPlayerNameFromModal()">Name Speichern</button>
+      <button class="btn btn-reset" style="margin-bottom:0;" onclick="resetPlayerNameToSimpsons()">🔄 Name zurücksetzen</button>
       <button class="btn" style="background:#777;" onclick="document.getElementById('editPlayerNameModal').style.display='none'">Abbrechen</button>
     </div>
   </div>
@@ -554,17 +554,26 @@
     <div style="max-height: 55vh; overflow-y: auto;">
 
       <div class="version-entry">
-        <h4>v1.3.0 (Aktuell)</h4>
+        <h4>v1.4.0 (Aktuell)</h4>
         <ul>
-          <li><strong>Pop-up Namenseingabe:</strong> Beim Klick auf eine Spielernummer öffnet sich ein Pop-up-Fenster zur Namensänderung.</li>
-          <li><strong>Namens-Styling:</strong> Spielernamen in der Liste nicht mehr fett gedruckt und in Dunkelgrau (`#2d3748`).</li>
+          <li><strong>Keine doppelten Namen:</strong> Intelligente Eindeutigkeits-Prüfung verhindert Mehrfachbenennung (wie 2x Disco Stu).</li>
+          <li><strong>Name zurücksetzen Button:</strong> Neuer Button '🔄 Name zurücksetzen' im Namens-Modal wählt automatisch den nächsten unbenutzten Simpsons-Namen.</li>
+          <li><strong>Doppelnamen-Schutz:</strong> Warnung bei versuchter doppelter manueller Namenseingabe.</li>
+        </ul>
+      </div>
+
+      <div class="version-entry">
+        <h4>v1.3.0</h4>
+        <ul>
+          <li><strong>Pop-up Namenseingabe:</strong> Klick auf Spielernummer öffnet ein Namensänderungs-Modal.</li>
+          <li><strong>Namens-Styling:</strong> Spielernamen schlicht und in Dunkelgrau gehalten.</li>
         </ul>
       </div>
       
       <div class="version-entry">
         <h4>v1.2.0</h4>
         <ul>
-          <li><strong>Neuer Name & Untertitel:</strong> 'THIS IS DARTA 🎯' als Haupttitel & 'Dartsaison - Manager' als Untertitel.</li>
+          <li><strong>Neuer Name & Untertitel:</strong> 'THIS IS DARTA 🎯' als Haupttitel & 'Dartsaison - Manager'.</li>
           <li><strong>WhatsApp-Linkvorschau:</strong> Neuer Titel und Beschreibung für geteilte Links.</li>
           <li><strong>Speicher-Fix:</strong> Doppelte Absicherung der Saisonspeicherung in Cloud & Browser.</li>
         </ul>
@@ -575,7 +584,6 @@
         <ul>
           <li><strong>Versional-Changelog:</strong> Klickbares Versions-Badge oben links hinzugefügt.</li>
           <li><strong>Favicon:</strong> Darts-Icon (🎯) für Browser-Tab und App-Home-Bildschirm ergänzt.</li>
-          <li><strong>Optisches Feedback:</strong> Grünes Aufblinken des Dropdowns beim Speichern.</li>
         </ul>
       </div>
 
@@ -585,7 +593,6 @@
           <li><strong>Leg Stats Prüfungen:</strong> Max-Limits für Darts, Checkout %, Big Fish (170) & Highscores.</li>
           <li><strong>2-Spalten Layout:</strong> Spielerliste (1-10 und 11-20) übersichtlich nebeneinander.</li>
           <li><strong>Dauerhafter Login:</strong> Automatisches Merken des Login-Status im Browser.</li>
-          <li><strong>Bearbeiten-Funktion:</strong> Leg Stats über ✏️️ Stift-Symbol nachträglich korrigierbar.</li>
         </ul>
       </div>
 
@@ -670,17 +677,36 @@
 
   let playersData = [];
 
+  // HILFSFUNKTION: FINDEST DEN NÄCHSTEN NOCH UNBENUTZTEN SIMPSONS NAMEN
+  function getUnusedSimpsonsName(excludeIndex = null) {
+    let usedNames = playersData
+      .filter((p, idx) => idx !== excludeIndex && p.name && p.name.trim() !== "")
+      .map(p => p.name.trim().toLowerCase());
+
+    for (let sName of simpsonsNames) {
+      if (!usedNames.includes(sName.toLowerCase())) {
+        return sName;
+      }
+    }
+    return `Spieler ${playersData.length + 1}`;
+  }
+
   function initPlayerInputs() {
     db.ref('playersData').once('value', (snapshot) => {
       const data = snapshot.val();
       playersData = [];
       for(let i=1; i<=20; i++) {
         let name = (data && data[i]) ? data[i] : (localStorage.getItem(`dart_pName_${i}`) || "");
-        if (!name || name.trim() === "") {
-          name = simpsonsNames[i-1] || `Spieler ${i}`;
-        }
         playersData.push({ id: i, name: name, color: colors[i-1] });
       }
+
+      // Prüfe und fülle leere oder doppelte Namen eindeutig auf
+      playersData.forEach((p, i) => {
+        if (!p.name || p.name.trim() === "") {
+          p.name = getUnusedSimpsonsName(i);
+        }
+      });
+
       sortPlayersData();
       renderDraggablePlayerList();
     });
@@ -725,7 +751,6 @@
     addDragDropListeners();
   }
 
-  // POP-UP STEUERUNG FÜR DIE EDTIERUNG DES SPIELERNAMENS
   function openEditPlayerModal(idx) {
     editingPlayerIdx = idx;
     const p = playersData[idx];
@@ -737,9 +762,34 @@
   function saveEditedPlayerNameFromModal() {
     if (editingPlayerIdx === null) return;
     const val = document.getElementById('inpEditPlayerNameVal').value.trim();
+    
+    if (val === "") {
+      resetPlayerNameToSimpsons();
+      return;
+    }
+
+    // PRÜFEN, OB DER NEUE NAME BEREITS BEI EINEM ANDERN SPIELER EXISTIERT
+    let nameExists = playersData.some((p, idx) => idx !== editingPlayerIdx && p.name.toLowerCase() === val.toLowerCase());
+    if (nameExists) {
+      alert("⚠️ Dieser Name wird bereits verwendet. Bitte wähle einen eindeutigen Namen!");
+      return;
+    }
+
     playersData[editingPlayerIdx].name = val;
     document.getElementById('editPlayerNameModal').style.display = 'none';
     
+    saveAllPlayersToCloud();
+    sortPlayersData();
+    renderDraggablePlayerList();
+  }
+
+  // SPIELERNAME AUF NÄCHSTEN FREIEN SIMPSONS NAMEN ZURÜCKSETZEN
+  function resetPlayerNameToSimpsons() {
+    if (editingPlayerIdx === null) return;
+    const newName = getUnusedSimpsonsName(editingPlayerIdx);
+    playersData[editingPlayerIdx].name = newName;
+    document.getElementById('editPlayerNameModal').style.display = 'none';
+
     saveAllPlayersToCloud();
     sortPlayersData();
     renderDraggablePlayerList();

@@ -382,7 +382,7 @@
 <body id="mainBody" style="display:none;">
 
 <!-- VERSIONSANZEIGE GANZ LINKS OBEN (KLICKBAR) -->
-<div class="version-badge-top-left no-print" onclick="openVersionHistoryModal()">v2.3.0</div>
+<div class="version-badge-top-left no-print" onclick="openVersionHistoryModal()">v2.4.0</div>
 
 <div class="header-title-container no-print">
   <h1>THIS IS DARTA 🎯</h1>
@@ -674,13 +674,25 @@
 
       <div class="version-entry open">
         <div class="version-header" onclick="toggleVersionEntry(this)">
-          <h4>v2.3.0 (Aktuell)</h4>
+          <h4>v2.4.0 (Aktuell)</h4>
           <span class="version-toggle-icon">▼</span>
         </div>
         <div class="version-body">
           <ul>
-            <li><strong>Visuelle Hervorhebung manueller Namen:</strong> Echte, manuell eingegebene Namen werden fett und mit einem dezenten Neon-Glow hervorgehoben.</li>
-            <li><strong>Fix Mobil-Drag&Drop:</strong> Scroll-Sperre während des Ziehens verhindert Wackeln und Unterbrechen auf Smartphones.</li>
+            <li><strong>Live-Echtzeit-Synchronisation:</strong> Gespeicherte und gelöschte Saisons synchronisieren sich über Firebase live auf allen Handys, Tablets und PCs.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="version-entry open">
+        <div class="version-header" onclick="toggleVersionEntry(this)">
+          <h4>v2.3.0</h4>
+          <span class="version-toggle-icon">▼</span>
+        </div>
+        <div class="version-body">
+          <ul>
+            <li><strong>Visuelle Hervorhebung manueller Namen:</strong> Echte Namen werden fett und mit leichtem Neon-Glow hervorgehoben.</li>
+            <li><strong>Fix Mobil-Drag&Drop:</strong> Scroll-Sperre während des Ziehens verhindert Wackeln.</li>
           </ul>
         </div>
       </div>
@@ -692,33 +704,19 @@
         </div>
         <div class="version-body">
           <ul>
-            <li><strong>Automatische Erstplatzierung:</strong> Manuell eingetragene Spielernamen sortieren sich sofort automatisch vor die Simpsons-Charaktere.</li>
-            <li><strong>Stabiles Drag & Drop:</strong> Snapping-Effekt mit vergrößerter Lücke (42px).</li>
-          </ul>
-        </div>
-      </div>
-
-      <div class="version-entry open">
-        <div class="version-header" onclick="toggleVersionEntry(this)">
-          <h4>v2.1.0</h4>
-          <span class="version-toggle-icon">▼</span>
-        </div>
-        <div class="version-body">
-          <ul>
-            <li><strong>Aufklappbare Versionsanzeige:</strong> Die neuesten 3 Versionen sind direkt geöffnet.</li>
-            <li><strong>Hintergrund-Scroll-Sperre:</strong> Bei geöffnetem Pop-up-Fenster wird das Scrollen der Hauptseite gesperrt.</li>
+            <li><strong>Automatische Erstplatzierung:</strong> Manuell eingetragene Spielernamen sortieren sich sofort automatisch nach oben.</li>
           </ul>
         </div>
       </div>
 
       <div class="version-entry">
         <div class="version-header" onclick="toggleVersionEntry(this)">
-          <h4>v2.0.0</h4>
+          <h4>v2.1.0</h4>
           <span class="version-toggle-icon">▼</span>
         </div>
         <div class="version-body">
           <ul>
-            <li><strong>Drop-Indikator & Gap-Lücke:</strong> Platzhalter-Lücke beim Drag & Drop.</li>
+            <li><strong>Aufklappbare Versionsanzeige:</strong> Die neuesten 3 Versionen sind geöffnet, ältere einklappbar.</li>
           </ul>
         </div>
       </div>
@@ -973,7 +971,6 @@
     db.ref('playersData').set(saveObj);
   }
 
-  // VOLLSTÄNDIG ULTRA-STABILER TOUCH & DESKTOP DRAG & DROP LOGIK
   let dragSrcIndex = null;
   let touchDragElement = null;
   let currentTargetItem = null;
@@ -997,7 +994,6 @@
     const items = document.querySelectorAll('.draggable-item');
 
     items.forEach(item => {
-      // DESKTOP MAUS DRAG & DROP
       item.addEventListener('dragstart', (e) => {
         dragSrcIndex = parseInt(item.getAttribute('data-index'));
         item.classList.add('dragging');
@@ -1052,7 +1048,6 @@
         renderDraggablePlayerList();
       });
 
-      // ROBUS TES TOUCH DRAG & DROP FÜR IPHONE & ANDROID
       const handle = item.querySelector('.drag-handle');
       if (handle) {
         handle.addEventListener('touchstart', (e) => {
@@ -1263,34 +1258,25 @@
     selectElem.classList.remove('flash-success');
     void selectElem.offsetWidth;
     selectElem.classList.add('flash-success');
-
-    updateSavedSeasonsDropdown();
   }
 
+  // ECHTZEIT-SYNCHRONISATION DER GESPEICHERTEN SAISONS
   function updateSavedSeasonsDropdown() {
-    let select = document.getElementById('savedSeasonsSelect');
-    select.innerHTML = '<option value="">-- Saison auswählen --</option>';
-
-    let localSaved = JSON.parse(localStorage.getItem('dart_saved_seasons') || '{}');
-    for (let sKey in localSaved) {
-      let opt = document.createElement('option');
-      opt.value = sKey;
-      opt.innerText = sKey;
-      if (sKey === currentSeasonName && isSeasonActive) opt.selected = true;
-      select.appendChild(opt);
-    }
-
-    db.ref('savedSeasons').once('value', (snapshot) => {
+    db.ref('savedSeasons').on('value', (snapshot) => {
       const saved = snapshot.val() || {};
+      let select = document.getElementById('savedSeasonsSelect');
+      select.innerHTML = '<option value="">-- Saison auswählen --</option>';
+
+      let localSaved = {};
       for (let sKey in saved) {
-        if (!localSaved[sKey]) {
-          let opt = document.createElement('option');
-          opt.value = sKey;
-          opt.innerText = sKey;
-          if (sKey === currentSeasonName && isSeasonActive) opt.selected = true;
-          select.appendChild(opt);
-        }
+        localSaved[sKey] = saved[sKey];
+        let opt = document.createElement('option');
+        opt.value = sKey;
+        opt.innerText = sKey;
+        if (sKey === currentSeasonName && isSeasonActive) opt.selected = true;
+        select.appendChild(opt);
       }
+      localStorage.setItem('dart_saved_seasons', JSON.stringify(localSaved));
     });
   }
 
@@ -1302,16 +1288,15 @@
       return;
     }
 
-    let localSaved = JSON.parse(localStorage.getItem('dart_saved_seasons') || '{}');
-    if (localSaved[sKey]) {
-      applyLoadedSeason(localSaved[sKey]);
-      return;
-    }
-
     db.ref('savedSeasons/' + sKey).once('value', (snapshot) => {
       let sData = snapshot.val();
       if (sData) {
         applyLoadedSeason(sData);
+      } else {
+        let localSaved = JSON.parse(localStorage.getItem('dart_saved_seasons') || '{}');
+        if (localSaved[sKey]) {
+          applyLoadedSeason(localSaved[sKey]);
+        }
       }
     });
   }
@@ -1352,7 +1337,6 @@
         initPlayerInputs();
       }
 
-      updateSavedSeasonsDropdown();
       alert(`Saison '${sKey}' wurde gelöscht.`);
     }
   }

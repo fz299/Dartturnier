@@ -305,12 +305,12 @@
     transition: all 0.2s ease;
   }
 
-  /* MANUELLER / ECHTER SPIELERNAME: FETT & SUBILER NEON-GLOW EFFEKT */
+  /* MANUELLER / ECHTER SPIELERNAME: VERSTÄRKTER FETT & NEON-GLOW EFFEKT */
   .player-name-display-btn.custom-player-name {
     font-weight: bold !important;
     color: #0d1117 !important;
-    border-color: #48bb78 !important;
-    box-shadow: 0 0 10px rgba(72, 187, 120, 0.6) !important;
+    border: 2px solid #48bb78 !important;
+    box-shadow: 0 0 15px rgba(72, 187, 120, 0.85) !important;
   }
   .player-name-display-btn:hover {
     filter: brightness(0.92);
@@ -382,7 +382,7 @@
 <body id="mainBody" style="display:none;">
 
 <!-- VERSIONSANZEIGE GANZ LINKS OBEN (KLICKBAR) -->
-<div class="version-badge-top-left no-print" onclick="openVersionHistoryModal()">v2.4.0</div>
+<div class="version-badge-top-left no-print" onclick="openVersionHistoryModal()">v2.5.0</div>
 
 <div class="header-title-container no-print">
   <h1>THIS IS DARTA 🎯</h1>
@@ -395,7 +395,6 @@
     <span class="login-status-badge">🟢 Eingeloggt</span>
     <button class="btn-logout" onclick="logoutUser()">🔴 Ausloggen</button>
   </div>
-  <h3>1. Saison-Steuerung</h3>
   <button class="btn" onclick="openStartModal()">🚀 Neue Saison starten</button>
   <button class="btn btn-save" onclick="saveCurrentSeason()">💾 Aktuelle Saison speichern</button>
   <button class="btn btn-stats" onclick="openGlobalStatsModal()">📊 Gesamtstatistik anzeigen</button>
@@ -414,7 +413,7 @@
     </div>
   </div>
   
-  <h4 style="margin-top:18px;" id="whoIsHeader">Wer ist dabei? (Drag & Drop zum Sortieren)</h4>
+  <h4 style="margin-top:18px;" id="whoIsHeader">Wer ist dabei?</h4>
   <div id="playerInputs" class="player-list-two-columns"></div>
 </div>
 
@@ -664,40 +663,55 @@
   </div>
 </div>
 
-<!-- VERSIONSVERLAUF MODAL -->
+<!-- VERSIONSVERLAUF MODAL (VOLLSTÄNDIGER HISTORISCHER ACCORDION-VERLAUF) -->
 <div id="versionHistoryModal" class="modal">
   <div class="modal-content" style="width: 500px; max-width:95%;">
     <h3>📜 VERSIONSVERLAUF</h3>
-    <p style="color:var(--text-muted); font-size:12px; margin-bottom:15px;">Übersicht der Änderungen & Entwicklungen der Homepage</p>
+    <p style="color:var(--text-muted); font-size:12px; margin-bottom:15px;">Übersicht aller Entwicklungen & Updates der Homepage</p>
     
     <div style="max-height: 55vh; overflow-y: auto;">
 
+      <!-- NUR DIE NEUESTE VERSION IST STANDARDMÄSSIG OPEN (OFFEN) -->
       <div class="version-entry open">
         <div class="version-header" onclick="toggleVersionEntry(this)">
-          <h4>v2.4.0 (Aktuell)</h4>
+          <h4>v2.5.0 (Aktuell)</h4>
           <span class="version-toggle-icon">▼</span>
         </div>
         <div class="version-body">
           <ul>
-            <li><strong>Live-Echtzeit-Synchronisation:</strong> Gespeicherte und gelöschte Saisons synchronisieren sich über Firebase live auf allen Handys, Tablets und PCs.</li>
+            <li><strong>Vollständiger Changelog:</strong> Alle historischen Versionen ab v1.0.0 wieder im Verlauf enthalten. Nur v2.5.0 ist standardmäßig geöffnet.</li>
+            <li><strong>Bereinigte Überschriften:</strong> '1. Saison-Steuerung' und 'Drag & Drop zum Sortieren' entfernt.</li>
+            <li><strong>Stärkerer Neon-Glow:</strong> Manuell eingetragene Namen leuchten in einem kräftigeren Grün.</li>
           </ul>
         </div>
       </div>
 
-      <div class="version-entry open">
+      <div class="version-entry">
+        <div class="version-header" onclick="toggleVersionEntry(this)">
+          <h4>v2.4.0</h4>
+          <span class="version-toggle-icon">▼</span>
+        </div>
+        <div class="version-body">
+          <ul>
+            <li><strong>Live-Echtzeit-Synchronisation:</strong> Gespeicherte und gelöschte Saisons synchronisieren sich über Firebase live auf allen Geräten.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="version-entry">
         <div class="version-header" onclick="toggleVersionEntry(this)">
           <h4>v2.3.0</h4>
           <span class="version-toggle-icon">▼</span>
         </div>
         <div class="version-body">
           <ul>
-            <li><strong>Visuelle Hervorhebung manueller Namen:</strong> Echte Namen werden fett und mit leichtem Neon-Glow hervorgehoben.</li>
+            <li><strong>Visuelle Hervorhebung manueller Namen:</strong> Echte Namen werden fett und mit einem dezenten Neon-Glow hervorgehoben.</li>
             <li><strong>Fix Mobil-Drag&Drop:</strong> Scroll-Sperre während des Ziehens verhindert Wackeln.</li>
           </ul>
         </div>
       </div>
 
-      <div class="version-entry open">
+      <div class="version-entry">
         <div class="version-header" onclick="toggleVersionEntry(this)">
           <h4>v2.2.0</h4>
           <span class="version-toggle-icon">▼</span>
@@ -705,6 +719,7 @@
         <div class="version-body">
           <ul>
             <li><strong>Automatische Erstplatzierung:</strong> Manuell eingetragene Spielernamen sortieren sich sofort automatisch nach oben.</li>
+            <li><strong>Stabiles Drag & Drop:</strong> Snapping-Effekt mit vergrößerter Lücke (42px).</li>
           </ul>
         </div>
       </div>
@@ -716,7 +731,140 @@
         </div>
         <div class="version-body">
           <ul>
-            <li><strong>Aufklappbare Versionsanzeige:</strong> Die neuesten 3 Versionen sind geöffnet, ältere einklappbar.</li>
+            <li><strong>Aufklappbare Versionsanzeige:</strong> Die neuesten 3 Versionen waren geöffnet, ältere einklappbar.</li>
+            <li><strong>Hintergrund-Scroll-Sperre:</strong> Bei geöffnetem Pop-up-Fenster wird das Scrollen der Hauptseite gesperrt.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="version-entry">
+        <div class="version-header" onclick="toggleVersionEntry(this)">
+          <h4>v2.0.0</h4>
+          <span class="version-toggle-icon">▼</span>
+        </div>
+        <div class="version-body">
+          <ul>
+            <li><strong>Drop-Indikator & Gap-Lücke:</strong> Platzhalter-Lücke beim Drag & Drop.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="version-entry">
+        <div class="version-header" onclick="toggleVersionEntry(this)">
+          <h4>v1.9.0</h4>
+          <span class="version-toggle-icon">▼</span>
+        </div>
+        <div class="version-body">
+          <ul>
+            <li><strong>Visuelle Drag&Drop-Hervorhebung:</strong> Ausgewähltes Namenselement vergrößert sich und leuchtet grün.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="version-entry">
+        <div class="version-header" onclick="toggleVersionEntry(this)">
+          <h4>v1.8.0</h4>
+          <span class="version-toggle-icon">▼</span>
+        </div>
+        <div class="version-body">
+          <ul>
+            <li><strong>Fix Mobil-Drag&Drop:</strong> Drag & Drop auf iPhones (Chrome/Safari) optimiert.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="version-entry">
+        <div class="version-header" onclick="toggleVersionEntry(this)">
+          <h4>v1.7.0</h4>
+          <span class="version-toggle-icon">▼</span>
+        </div>
+        <div class="version-body">
+          <ul>
+            <li><strong>Auto-Reset beim Löschen:</strong> Beim Löschen einer Saison wird die Ansicht automatisch zurückgesetzt.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="version-entry">
+        <div class="version-header" onclick="toggleVersionEntry(this)">
+          <h4>v1.6.0</h4>
+          <span class="version-toggle-icon">▼</span>
+        </div>
+        <div class="version-body">
+          <ul>
+            <li><strong>✏️ Saison bearbeiten:</strong> Saisons können nachträglich im Namen, den Zusatzpunkten und der Spieleranzahl angepasst werden.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="version-entry">
+        <div class="version-header" onclick="toggleVersionEntry(this)">
+          <h4>v1.5.0</h4>
+          <span class="version-toggle-icon">▼</span>
+        </div>
+        <div class="version-body">
+          <ul>
+            <li><strong>Fortlaufende Nummerierung:</strong> Neue Saisons heißen automatisch 'Saison 1', 'Saison 2' usw.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="version-entry">
+        <div class="version-header" onclick="toggleVersionEntry(this)">
+          <h4>v1.4.0</h4>
+          <span class="version-toggle-icon">▼</span>
+        </div>
+        <div class="version-body">
+          <ul>
+            <li><strong>Keine doppelten Namen:</strong> Eindeutigkeits-Prüfung verhindert Mehrfachbenennungen.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="version-entry">
+        <div class="version-header" onclick="toggleVersionEntry(this)">
+          <h4>v1.3.0</h4>
+          <span class="version-toggle-icon">▼</span>
+        </div>
+        <div class="version-body">
+          <ul>
+            <li><strong>Pop-up Namenseingabe:</strong> Klick auf Spielernummer öffnet Namensänderungs-Modal.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="version-entry">
+        <div class="version-header" onclick="toggleVersionEntry(this)">
+          <h4>v1.2.0</h4>
+          <span class="version-toggle-icon">▼</span>
+        </div>
+        <div class="version-body">
+          <ul>
+            <li><strong>Neuer Name & Untertitel:</strong> 'THIS IS DARTA 🎯' als Haupttitel & 'Dartsaison - Manager'.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="version-entry">
+        <div class="version-header" onclick="toggleVersionEntry(this)">
+          <h4>v1.1.0</h4>
+          <span class="version-toggle-icon">▼</span>
+        </div>
+        <div class="version-body">
+          <ul>
+            <li><strong>Versional-Changelog:</strong> Klickbares Versions-Badge oben links.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="version-entry">
+        <div class="version-header" onclick="toggleVersionEntry(this)">
+          <h4>v1.0.0</h4>
+          <span class="version-toggle-icon">▼</span>
+        </div>
+        <div class="version-body">
+          <ul>
+            <li><strong>Leg Stats Prüfungen:</strong> Max-Limits für Darts, Checkout %, Big Fish (170) & Highscores.</li>
           </ul>
         </div>
       </div>
@@ -971,6 +1119,7 @@
     db.ref('playersData').set(saveObj);
   }
 
+  // VOLLSTÄNDIG ULTRA-STABILER TOUCH & DESKTOP DRAG & DROP LOGIK
   let dragSrcIndex = null;
   let touchDragElement = null;
   let currentTargetItem = null;
@@ -1260,7 +1409,6 @@
     selectElem.classList.add('flash-success');
   }
 
-  // ECHTZEIT-SYNCHRONISATION DER GESPEICHERTEN SAISONS
   function updateSavedSeasonsDropdown() {
     db.ref('savedSeasons').on('value', (snapshot) => {
       const saved = snapshot.val() || {};
@@ -1333,7 +1481,7 @@
         activePlayers = [];
         db.ref('activeSeasonState').remove();
         document.getElementById('tournamentArea').style.display = 'none';
-        document.getElementById('whoIsHeader').innerText = "Wer ist dabei? (Drag & Drop zum Sortieren)";
+        document.getElementById('whoIsHeader').innerText = "Wer ist dabei?";
         initPlayerInputs();
       }
 
@@ -1351,7 +1499,7 @@
     activePlayers = [];
     db.ref('activeSeasonState').remove();
     document.getElementById('tournamentArea').style.display = 'none';
-    document.getElementById('whoIsHeader').innerText = "Wer ist dabei? (Drag & Drop zum Sortieren)";
+    document.getElementById('whoIsHeader').innerText = "Wer ist dabei?";
     initPlayerInputs();
   }
 
@@ -1372,7 +1520,7 @@
 
     activePlayers.forEach((p, idx) => {
       let isCustom = !isSimpsonsName(p.name);
-      let customStyle = isCustom ? 'font-weight:bold; color:#0d1117; border-color:#48bb78; box-shadow:0 0 8px rgba(72,187,120,0.5);' : 'font-weight:normal; color:#2d3748;';
+      let customStyle = isCustom ? 'font-weight:bold; color:#0d1117; border:2px solid #48bb78; box-shadow:0 0 12px rgba(72,187,120,0.85);' : 'font-weight:normal; color:#2d3748;';
 
       let badgeHTML = `<div style="padding:8px 12px; border-radius:6px; background:${p.color}; border:1px solid #ccc; ${customStyle}">
         ${idx+1}. ${p.name}

@@ -26,7 +26,7 @@
     --points-bg: #2b3648;
   }
 
-  /* BILD-HINTERGRUND MIT DUNKLEM OVERLAY FÜR OPTIMALE LESBARKEIT */
+  /* BILD-HINTERGRUND MIT DUNKLEM OVERLAY */
   body { 
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
     margin: 0; 
@@ -72,6 +72,8 @@
   .btn-print:hover { background: #01579b; }
   .btn-save { background: #d97706; }
   .btn-save:hover { background: #b45309; }
+  .btn-stats { background: #8e24aa; }
+  .btn-stats:hover { background: #6a1b9a; }
   .btn-reset { background: #c62828; }
   .btn-reset:hover { background: #b71c1c; }
   
@@ -86,10 +88,10 @@
   
   .legend-box { background: rgba(23, 25, 35, 0.9); border-left: 5px solid var(--accent-green); padding: 12px 15px; margin-top: 10px; border-radius: 6px; font-size: 13.5px; line-height: 1.5; color: var(--text-muted); }
   
-  /* MODAL POP-UPS (DARK) */
+  /* MODAL POP-UPS */
   .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); justify-content: center; align-items: center; z-index: 1000; backdrop-filter: blur(5px); }
-  .modal-content { background: var(--card-dark); border: 1px solid var(--card-border); padding: 25px; border-radius: 14px; width: 380px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.9); color: white; }
-  .modal input[type="text"] { width: 85%; padding: 10px; font-size: 15px; text-align: center; margin: 10px 0; border: 1px solid #4a5568; border-radius: 6px; background: #1a202c; color: white; }
+  .modal-content { background: var(--card-dark); border: 1px solid var(--card-border); padding: 25px; border-radius: 14px; width: 420px; max-width: 90%; max-height: 85vh; overflow-y: auto; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.9); color: white; }
+  .modal input[type="text"], .modal input[type="number"] { width: 85%; padding: 8px; font-size: 14px; text-align: center; margin: 4px 0; border: 1px solid #4a5568; border-radius: 6px; background: #1a202c; color: white; }
 
   /* BUTTON GRIDS IN MODALS */
   .grid-buttons { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 15px 0; }
@@ -98,6 +100,10 @@
   .select-btn { background: #2d3748; color: white; border: 2px solid #4a5568; padding: 12px 5px; font-size: 16px; font-weight: bold; border-radius: 8px; cursor: pointer; transition: all 0.2s; }
   .select-btn:hover { background: #4a5568; }
   .select-btn.selected { background: var(--accent-green); color: white; border-color: #48bb78; box-shadow: 0 0 10px rgba(72, 187, 120, 0.5); }
+
+  /* STATS TABLE STYLE */
+  .stats-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; align-items: center; margin-bottom: 8px; text-align: center; font-size: 13px; }
+  .stats-grid label { font-weight: bold; color: var(--text-muted); }
 
   /* DRAG & DROP SPIELERLISTE */
   .player-list-vertical { display: flex; flex-direction: column; gap: 8px; max-width: 360px; margin-top: 12px; }
@@ -140,7 +146,8 @@
   <h3>1. Saison-Steuerung</h3>
   <button class="btn" onclick="openStartModal()">🚀 Neue Saison starten</button>
   <button class="btn btn-save" onclick="saveCurrentSeason()">💾 Aktuelle Saison speichern</button>
-  <button class="btn btn-print" onclick="window.print()">🖨️ PDF / Druckansicht</button>
+  <button class="btn btn-stats" onclick="openGlobalStatsModal()">📊 Gesamtstatistik anzeigen</button>
+  <button class="btn btn-print" onclick="window.print()">🖨️️ PDF / Druckansicht</button>
   <button class="btn btn-reset" onclick="resetSeasonWithPassword()">🔄 Saison zurücksetzen</button>
 
   <div style="margin-top: 15px; background: rgba(26, 32, 44, 0.9); padding: 12px; border-radius: 8px; border: 1px solid #2d3748;">
@@ -183,7 +190,7 @@
     <h3>Spieltage & Matches <span class="no-print" style="font-size:12px; font-weight:normal; color:var(--text-muted);">(Klick auf ein Match zum Eintragen)</span></h3>
     <table>
       <thead>
-        <tr><th>Spieltag</th><th>Heim</th><th>vs</th><th>Gast</th><th>Legs Heim</th><th>Legs Gast</th><th>Punkte Heim</th><th>Punkte Gast</th></tr>
+        <tr><th>Spieltag</th><th>Heim</th><th>vs</th><th>Gast</th><th>Legs Heim</th><th>Legs Gast</th><th>Punkte Heim</th><th>Punkte Gast</th><th class="no-print">Stats</th></tr>
       </thead>
       <tbody id="scheduleBody"></tbody>
     </table>
@@ -251,15 +258,89 @@
     <p id="validationHint" style="font-size:12px; color:#fc8181; margin-top:12px; min-height:18px;"></p>
 
     <div style="margin-top:10px;">
-      <button class="btn" id="btnSaveResult" onclick="saveResult()" disabled>Ergebnis Speichern</button>
+      <button class="btn" id="btnSaveResult" onclick="saveResultPromptStats()" disabled>Ergebnis Speichern</button>
       <button class="btn" style="background:#777;" onclick="closeModal()">Abbrechen</button>
+    </div>
+  </div>
+</div>
+
+<!-- PROMPT STATS MODAL (JA / NEIN ABFRAGE) -->
+<div id="askStatsModal" class="modal">
+  <div class="modal-content">
+    <h3>📊 Statistiken erfassen?</h3>
+    <p style="color:var(--text-muted); margin-bottom:20px;">Möchtest du die Leg Stats für dieses Match eingeben?</p>
+    <button class="btn btn-stats" onclick="openLegStatsInputModal()">Ja, Statistiken eingeben</button>
+    <button class="btn" style="background:#777;" onclick="skipLegStatsAndSave()">Nein, ohne Stats speichern</button>
+  </div>
+</div>
+
+<!-- LEG STATS EINGABE MODAL -->
+<div id="legStatsModal" class="modal">
+  <div class="modal-content">
+    <h3>📊 LEG STATS ERFASSEN</h3>
+    <p id="legStatsMatchHeader" style="font-weight:bold; color:var(--text-muted);"></p>
+    
+    <div style="max-height: 55vh; overflow-y: auto; padding-right: 5px;">
+      <div class="stats-grid" style="font-weight:bold; border-bottom:1px solid #4a5568; padding-bottom:5px; margin-bottom:8px;">
+        <span id="statHomeHeader">Heim</span>
+        <span>LEG STATS</span>
+        <span id="statAwayHeader">Gast</span>
+      </div>
+
+      <div class="stats-grid"><input type="number" step="0.01" id="st_ppr_h" placeholder="0.00"><label>PPR</label><input type="number" step="0.01" id="st_ppr_g" placeholder="0.00"></div>
+      <div class="stats-grid"><input type="number" step="0.01" id="st_f9_h" placeholder="0.00"><label>FIRST 9 PPR</label><input type="number" step="0.01" id="st_f9_g" placeholder="0.00"></div>
+      <div class="stats-grid"><input type="number" id="st_darts_h" placeholder="0"><label>DARTS THROWN</label><input type="number" id="st_darts_g" placeholder="0"></div>
+      <div class="stats-grid"><input type="number" step="0.1" id="st_co_pct_h" placeholder="0%"><label>CHECKOUT%</label><input type="number" step="0.1" id="st_co_pct_g" placeholder="0%"></div>
+      <div class="stats-grid"><input type="number" id="st_co_pts_h" placeholder="0"><label>CHECKOUT POINTS</label><input type="number" id="st_co_pts_g" placeholder="0"></div>
+      <div class="stats-grid"><input type="number" id="st_60_h" placeholder="0"><label>60+</label><input type="number" id="st_60_g" placeholder="0"></div>
+      <div class="stats-grid"><input type="number" id="st_100_h" placeholder="0"><label>100+</label><input type="number" id="st_100_g" placeholder="0"></div>
+      <div class="stats-grid"><input type="number" id="st_140_h" placeholder="0"><label>140+</label><input type="number" id="st_140_g" placeholder="0"></div>
+      <div class="stats-grid"><input type="number" id="st_180_h" placeholder="0"><label>180</label><input type="number" id="st_180_g" placeholder="0"></div>
+    </div>
+
+    <div style="margin-top:15px;">
+      <button class="btn" onclick="saveMatchStats()">Stats Speichern</button>
+      <button class="btn" style="background:#777;" onclick="closeLegStatsModal()">Abbrechen</button>
+    </div>
+  </div>
+</div>
+
+<!-- VIEW MATCH STATS MODAL -->
+<div id="viewStatsModal" class="modal">
+  <div class="modal-content">
+    <h3>📊 MATCH LEG STATS</h3>
+    <p id="viewStatsHeader" style="font-weight:bold; color:var(--text-muted);"></p>
+    <div id="viewStatsContent"></div>
+    <div style="margin-top:15px;">
+      <button class="btn" onclick="document.getElementById('viewStatsModal').style.display='none'">Schließen</button>
+    </div>
+  </div>
+</div>
+
+<!-- GLOBAL SAISON STATS MODAL -->
+<div id="globalStatsModal" class="modal">
+  <div class="modal-content" style="width: 600px; max-width:95%;">
+    <h3>📊 SAISON GESAMTSTATISTIK</h3>
+    <p id="globalStatsTitle" style="color:var(--text-muted); font-size:13px;"></p>
+    <div style="overflow-x:auto;">
+      <table style="font-size:12px;">
+        <thead>
+          <tr>
+            <th>Spieler</th><th>Ø PPR</th><th>Ø F9 PPR</th><th>Darts</th><th>Ø CO%</th><th>Max CO</th><th>60+</th><th>100+</th><th>140+</th><th>180</th>
+          </tr>
+        </thead>
+        <tbody id="globalStatsBody"></tbody>
+      </table>
+    </div>
+    <div style="margin-top:15px;">
+      <button class="btn" onclick="document.getElementById('globalStatsModal').style.display='none'">Schließen</button>
     </div>
   </div>
 </div>
 
 <script>
   // ==============================================================================
-  // DEINE DEKLARIERTEN FIREBASE ZUGANGSDATEN (EINGEBAUT)
+  // FIREBASE ZUGANGSDATEN
   // ==============================================================================
   const firebaseConfig = {
     apiKey: "AIzaSyAQbM5BStPcO5qlpMJlIwLkVP8b2IXPQ9k",
@@ -271,7 +352,6 @@
     appId: "1:687251127621:web:9e55fe825c63094b5b122c"
   };
 
-  // Firebase initialisieren
   firebase.initializeApp(firebaseConfig);
   const db = firebase.database();
 
@@ -455,7 +535,6 @@
 
     db.ref('savedSeasons/' + currentSeasonName).set(seasonData);
     db.ref('activeSeasonState').set(seasonData);
-    alert(`✅ Saison '${currentSeasonName}' wurde erfolgreich in der Cloud gespeichert!`);
   }
 
   function updateSavedSeasonsDropdown() {
@@ -513,7 +592,7 @@
 
   function resetSeasonWithPassword() {
     if (!isSeasonActive) { alert("Es ist aktuell keine Saison aktiv, die zurückgesetzt werden könnte."); return; }
-    const confirmReset = confirm("⚠️ ACHTUNG: Möchtest du die aktuelle Ansicht zurücksetzen?\n\nNicht gespeicherte Ergebnisse dieser Saison gehen verloren.");
+    const confirmReset = confirm("⚠️️ ACHTUNG: Möchtest du die aktuelle Ansicht zurücksetzen?\n\nNicht gespeicherte Ergebnisse dieser Saison gehen verloren.");
     if (!confirmReset) return;
 
     if (verifyPassword("Ansicht zurücksetzen")) {
@@ -527,7 +606,6 @@
     }
   }
 
-  // AUTOMATISCHE ECHTZEIT-SYNCHRONISATION FÜR ALLE VERBUNDENEN HANDYS
   db.ref('activeSeasonState').on('value', (snapshot) => {
     const sData = snapshot.val();
     if (sData) {
@@ -567,10 +645,10 @@
         let p1 = pool[i], p2 = pool[pool.length - 1 - i];
         if(isRueckrunde) [p1, p2] = [p2, p1];
         if(p1 !== -1 && p2 !== -1) {
-          currentMatches.push({ day: r+1, home: activePlayers[p1], away: activePlayers[p2], legsH: null, legsG: null });
+          currentMatches.push({ day: r+1, home: activePlayers[p1], away: activePlayers[p2], legsH: null, legsG: null, stats: null });
         } else if(p1 !== -1 || p2 !== -1) {
           let active = p1 !== -1 ? activePlayers[p1] : activePlayers[p2];
-          currentMatches.push({ day: r+1, home: active, away: null, legsH: null, legsG: null });
+          currentMatches.push({ day: r+1, home: active, away: null, legsH: null, legsG: null, stats: null });
         }
       }
       pool.splice(1, 0, pool.pop());
@@ -594,20 +672,24 @@
         tbody.innerHTML += `<tr style="${rowStyle}">
           <td style="font-weight:bold;">Spieltag ${m.day}</td>
           <td style="background:${m.home.color}; color:#1a202c; font-weight:bold;">${m.home.name}</td>
-          <td colspan="6"><em>PAUSE / SPIELFREI</em></td>
+          <td colspan="5"><em>PAUSE / SPIELFREI</em></td>
+          <td class="no-print">-</td>
         </tr>`;
       } else {
         let pktH = m.legsH !== null ? (m.legsH + (m.legsH === 4 ? bonusPoints : 0)) : '';
         let pktG = m.legsG !== null ? (m.legsG + (m.legsG === 4 ? bonusPoints : 0)) : '';
-        tbody.innerHTML += `<tr class="match-row" style="${rowStyle}" onclick="openModal(${idx})">
-          <td style="font-weight:bold;">Spieltag ${m.day}</td>
-          <td style="background:${m.home.color}; color:#1a202c; font-weight:bold;">${m.home.name}</td>
-          <td>vs</td>
-          <td style="background:${m.away.color}; color:#1a202c; font-weight:bold;">${m.away.name}</td>
-          <td><b>${m.legsH ?? ''}</b></td>
-          <td><b>${m.legsG ?? ''}</b></td>
-          <td>${pktH}</td>
-          <td>${pktG}</td>
+        let hasStats = m.stats ? '📊' : '-';
+        
+        tbody.innerHTML += `<tr class="match-row" style="${rowStyle}">
+          <td style="font-weight:bold;" onclick="openModal(${idx})">Spieltag ${m.day}</td>
+          <td style="background:${m.home.color}; color:#1a202c; font-weight:bold;" onclick="openModal(${idx})">${m.home.name}</td>
+          <td onclick="openModal(${idx})">vs</td>
+          <td style="background:${m.away.color}; color:#1a202c; font-weight:bold;" onclick="openModal(${idx})">${m.away.name}</td>
+          <td onclick="openModal(${idx})"><b>${m.legsH ?? ''}</b></td>
+          <td onclick="openModal(${idx})"><b>${m.legsG ?? ''}</b></td>
+          <td onclick="openModal(${idx})">${pktH}</td>
+          <td onclick="openModal(${idx})">${pktG}</td>
+          <td class="no-print" onclick="viewMatchStats(${idx})">${hasStats}</td>
         </tr>`;
       }
     });
@@ -664,7 +746,7 @@
 
     if (tempLegsH === 4 && tempLegsG === 4) {
       btnSave.disabled = true;
-      hint.innerText = "⚠️ 4:4 unzulässig! Nur 1 Spieler darf 4 Legs haben.";
+      hint.innerText = "⚠️️ 4:4 unzulässig! Nur 1 Spieler darf 4 Legs haben.";
       return;
     }
 
@@ -678,13 +760,189 @@
     hint.innerText = "";
   }
 
-  function saveResult() {
+  // SCHRITT 1 VON SPIEL-SPEICHERUNG: PROMPT STATS (JA/NEIN)
+  function saveResultPromptStats() {
     if (tempLegsH === null || tempLegsG === null) return;
     currentMatches[selectedMatchIndex].legsH = tempLegsH;
     currentMatches[selectedMatchIndex].legsG = tempLegsG;
     closeModal();
     
+    document.getElementById('askStatsModal').style.display = 'flex';
+  }
+
+  function skipLegStatsAndSave() {
+    document.getElementById('askStatsModal').style.display = 'none';
     saveCurrentSeason();
+  }
+
+  // SCHRITT 2: LEG STATS EINGABE MODAL ÖFFNEN
+  function openLegStatsInputModal() {
+    document.getElementById('askStatsModal').style.display = 'none';
+    const m = currentMatches[selectedMatchIndex];
+    document.getElementById('legStatsMatchHeader').innerText = `${m.home.name} (${m.legsH}) vs (${m.legsG}) ${m.away.name}`;
+    document.getElementById('statHomeHeader').innerText = m.home.name;
+    document.getElementById('statAwayHeader').innerText = m.away.name;
+
+    // Falls Stats existieren, vorbelegen
+    const s = m.stats || {};
+    document.getElementById('st_ppr_h').value = s.ppr_h ?? '';
+    document.getElementById('st_ppr_g').value = s.ppr_g ?? '';
+    document.getElementById('st_f9_h').value = s.f9_h ?? '';
+    document.getElementById('st_f9_g').value = s.f9_g ?? '';
+    document.getElementById('st_darts_h').value = s.darts_h ?? '';
+    document.getElementById('st_darts_g').value = s.darts_g ?? '';
+    document.getElementById('st_co_pct_h').value = s.co_pct_h ?? '';
+    document.getElementById('st_co_pct_g').value = s.co_pct_g ?? '';
+    document.getElementById('st_co_pts_h').value = s.co_pts_h ?? '';
+    document.getElementById('st_co_pts_g').value = s.co_pts_g ?? '';
+    document.getElementById('st_60_h').value = s.c60_h ?? '';
+    document.getElementById('st_60_g').value = s.c60_g ?? '';
+    document.getElementById('st_100_h').value = s.c100_h ?? '';
+    document.getElementById('st_100_g').value = s.c100_g ?? '';
+    document.getElementById('st_140_h').value = s.c140_h ?? '';
+    document.getElementById('st_140_g').value = s.c140_g ?? '';
+    document.getElementById('st_180_h').value = s.c180_h ?? '';
+    document.getElementById('st_180_g').value = s.c180_g ?? '';
+
+    document.getElementById('legStatsModal').style.display = 'flex';
+  }
+
+  function closeLegStatsModal() {
+    document.getElementById('legStatsModal').style.display = 'none';
+  }
+
+  function saveMatchStats() {
+    currentMatches[selectedMatchIndex].stats = {
+      ppr_h: parseFloat(document.getElementById('st_ppr_h').value) || 0,
+      ppr_g: parseFloat(document.getElementById('st_ppr_g').value) || 0,
+      f9_h: parseFloat(document.getElementById('st_f9_h').value) || 0,
+      f9_g: parseFloat(document.getElementById('st_f9_g').value) || 0,
+      darts_h: parseInt(document.getElementById('st_darts_h').value) || 0,
+      darts_g: parseInt(document.getElementById('st_darts_g').value) || 0,
+      co_pct_h: parseFloat(document.getElementById('st_co_pct_h').value) || 0,
+      co_pct_g: parseFloat(document.getElementById('st_co_pct_g').value) || 0,
+      co_pts_h: parseInt(document.getElementById('st_co_pts_h').value) || 0,
+      co_pts_g: parseInt(document.getElementById('st_co_pts_g').value) || 0,
+      c60_h: parseInt(document.getElementById('st_60_h').value) || 0,
+      c60_g: parseInt(document.getElementById('st_60_g').value) || 0,
+      c100_h: parseInt(document.getElementById('st_100_h').value) || 0,
+      c100_g: parseInt(document.getElementById('st_100_g').value) || 0,
+      c140_h: parseInt(document.getElementById('st_140_h').value) || 0,
+      c140_g: parseInt(document.getElementById('st_140_g').value) || 0,
+      c180_h: parseInt(document.getElementById('st_180_h').value) || 0,
+      c180_g: parseInt(document.getElementById('st_180_g').value) || 0
+    };
+
+    closeLegStatsModal();
+    saveCurrentSeason();
+  }
+
+  // EINSICHT VERGANGENER STATS
+  function viewMatchStats(idx) {
+    const m = currentMatches[idx];
+    if (!m.stats) {
+      alert("Für dieses Match wurden keine Leg Stats erfasst.");
+      return;
+    }
+    const s = m.stats;
+    document.getElementById('viewStatsHeader').innerText = `${m.home.name} (${m.legsH}) vs (${m.legsG}) ${m.away.name}`;
+    
+    document.getElementById('viewStatsContent').innerHTML = `
+      <div class="stats-grid" style="font-weight:bold; border-bottom:1px solid #4a5568; padding-bottom:5px;">
+        <span>${m.home.name}</span><span>LEG STATS</span><span>${m.away.name}</span>
+      </div>
+      <div class="stats-grid"><span>${s.ppr_h}</span><label>PPR</label><span>${s.ppr_g}</span></div>
+      <div class="stats-grid"><span>${s.f9_h}</span><label>FIRST 9 PPR</label><span>${s.f9_g}</span></div>
+      <div class="stats-grid"><span>${s.darts_h}</span><label>DARTS THROWN</label><span>${s.darts_g}</span></div>
+      <div class="stats-grid"><span>${s.co_pct_h}%</span><label>CHECKOUT%</label><span>${s.co_pct_g}%</span></div>
+      <div class="stats-grid"><span>${s.co_pts_h}</span><label>CHECKOUT POINTS</label><span>${s.co_pts_g}</span></div>
+      <div class="stats-grid"><span>${s.c60_h}</span><label>60+</label><span>${s.c60_g}</span></div>
+      <div class="stats-grid"><span>${s.c100_h}</span><label>100+</label><span>${s.c100_g}</span></div>
+      <div class="stats-grid"><span>${s.c140_h}</span><label>140+</label><span>${s.c140_g}</span></div>
+      <div class="stats-grid"><span>${s.c180_h}</span><label>180</label><span>${s.c180_g}</span></div>
+    `;
+
+    document.getElementById('viewStatsModal').style.display = 'flex';
+  }
+
+  // GLOBAL SAISON STATISTIK (KUMULIERT)
+  function openGlobalStatsModal() {
+    if (!isSeasonActive) { alert("Es läuft aktuell keine Saison!"); return; }
+    
+    document.getElementById('globalStatsTitle').innerText = `Kumulierte Daten aller Spiele aus '${currentSeasonName}'`;
+    
+    let pStats = activePlayers.map(p => ({
+      name: p.name,
+      color: p.color,
+      count: 0,
+      pprSum: 0,
+      f9Sum: 0,
+      dartsSum: 0,
+      coPctSum: 0,
+      maxCo: 0,
+      c60: 0,
+      c100: 0,
+      c140: 0,
+      c180: 0
+    }));
+
+    currentMatches.forEach(m => {
+      if (m.stats) {
+        let s = m.stats;
+        let h = pStats.find(x => x.name === m.home.name);
+        let g = pStats.find(x => x.name === m.away.name);
+
+        if (h) {
+          h.count++;
+          h.pprSum += s.ppr_h;
+          h.f9Sum += s.f9_h;
+          h.dartsSum += s.darts_h;
+          h.coPctSum += s.co_pct_h;
+          if (s.co_pts_h > h.maxCo) h.maxCo = s.co_pts_h;
+          h.c60 += s.c60_h;
+          h.c100 += s.c100_h;
+          h.c140 += s.c140_h;
+          h.c180 += s.c180_h;
+        }
+
+        if (g) {
+          g.count++;
+          g.pprSum += s.ppr_g;
+          g.f9Sum += s.f9_g;
+          g.dartsSum += s.darts_g;
+          g.coPctSum += s.co_pct_g;
+          if (s.co_pts_g > g.maxCo) g.maxCo = s.co_pts_g;
+          g.c60 += s.c60_g;
+          g.c100 += s.c100_g;
+          g.c140 += s.c140_g;
+          g.c180 += s.c180_g;
+        }
+      }
+    });
+
+    const tbody = document.getElementById('globalStatsBody');
+    tbody.innerHTML = '';
+
+    pStats.forEach(st => {
+      let avgPpr = st.count > 0 ? (st.pprSum / st.count).toFixed(2) : '0.00';
+      let avgF9 = st.count > 0 ? (st.f9Sum / st.count).toFixed(2) : '0.00';
+      let avgCo = st.count > 0 ? (st.coPctSum / st.count).toFixed(1) : '0.0';
+
+      tbody.innerHTML += `<tr>
+        <td style="background:${st.color}; color:#1a202c; font-weight:bold; text-align:left;">${st.name}</td>
+        <td><b>${avgPpr}</b></td>
+        <td>${avgF9}</td>
+        <td>${st.dartsSum}</td>
+        <td>${avgCo}%</td>
+        <td><b>${st.maxCo}</b></td>
+        <td>${st.c60}</td>
+        <td>${st.c100}</td>
+        <td>${st.c140}</td>
+        <td style="color:#48bb78; font-weight:bold;">${st.c180}</td>
+      </tr>`;
+    });
+
+    document.getElementById('globalStatsModal').style.display = 'flex';
   }
 
   function renderTable() {

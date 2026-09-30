@@ -34,10 +34,10 @@
     --points-bg: #2b3648;
   }
 
-  /* VERHINDERT SCROLLEN IM HINTERGRUND BEI GEÖFFNETEM MODAL */
-  body.modal-open {
+  /* VERHINDERT SCROLLEN IM HINTERGRUND BEI GEÖFFNETEM MODAL ODER BEIM ZIEHEN */
+  body.modal-open, body.dragging-active {
     overflow: hidden !important;
-    touch-action: none;
+    touch-action: none !important;
   }
 
   /* BILD-HINTERGRUND MIT DUNKLEM OVERLAY */
@@ -243,7 +243,7 @@
   }
   .player-column { display: flex; flex-direction: column; gap: 8px; position: relative; }
 
-  /* ULTRA-STABILES DRAG & DROP MIT SEIDENWEICHER GROSSER LÜCKE */
+  /* DRAG & DROP STYLING MIT HOCHSTABILER LÜCKE */
   .draggable-item { 
     display: flex; 
     align-items: center; 
@@ -257,7 +257,7 @@
     -webkit-user-select: none;
     -webkit-touch-callout: none;
     touch-action: none;
-    transition: transform 0.2s cubic-bezier(0.2, 0, 0, 1), margin 0.2s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.2s ease, opacity 0.2s ease;
+    transition: transform 0.15s ease, box-shadow 0.15s ease, margin 0.15s ease, opacity 0.15s ease;
   }
 
   /* GEZOGENES ELEMENT */
@@ -271,11 +271,11 @@
 
   /* DEUTLICHE, GROSSE LÜCKE BEIM EINFÜGEN BEIM ZIEL-ELEMENT */
   .draggable-item.drop-gap-above {
-    margin-top: 45px !important;
+    margin-top: 42px !important;
     border-top: 2px dashed #48bb78 !important;
   }
   .draggable-item.drop-gap-below {
-    margin-bottom: 45px !important;
+    margin-bottom: 42px !important;
     border-bottom: 2px dashed #48bb78 !important;
   }
 
@@ -283,17 +283,18 @@
     font-size: 18px; 
     color: var(--text-muted); 
     cursor: grab; 
-    padding: 2px 6px;
+    padding: 4px 8px;
     touch-action: none;
   }
   
+  /* NAMEN BUTTON STYLING */
   .player-name-display-btn { 
     flex: 1; 
     min-width: 0; 
     padding: 6px 10px; 
     border: 1px solid #4a5568; 
     border-radius: 4px; 
-    font-weight: normal !important; 
+    font-weight: normal; 
     color: #2d3748 !important; 
     font-size: 13px; 
     text-align: left;
@@ -301,7 +302,15 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    transition: filter 0.15s;
+    transition: all 0.2s ease;
+  }
+
+  /* MANUELLER / ECHTER SPIELERNAME: FETT & SUBILER NEON-GLOW EFFEKT */
+  .player-name-display-btn.custom-player-name {
+    font-weight: bold !important;
+    color: #0d1117 !important;
+    border-color: #48bb78 !important;
+    box-shadow: 0 0 10px rgba(72, 187, 120, 0.6) !important;
   }
   .player-name-display-btn:hover {
     filter: brightness(0.92);
@@ -373,7 +382,7 @@
 <body id="mainBody" style="display:none;">
 
 <!-- VERSIONSANZEIGE GANZ LINKS OBEN (KLICKBAR) -->
-<div class="version-badge-top-left no-print" onclick="openVersionHistoryModal()">v2.2.0</div>
+<div class="version-badge-top-left no-print" onclick="openVersionHistoryModal()">v2.3.0</div>
 
 <div class="header-title-container no-print">
   <h1>THIS IS DARTA 🎯</h1>
@@ -655,7 +664,7 @@
   </div>
 </div>
 
-<!-- VERSIONSVERLAUF MODAL (AUFKLAPPBAR / ACCORDION) -->
+<!-- VERSIONSVERLAUF MODAL -->
 <div id="versionHistoryModal" class="modal">
   <div class="modal-content" style="width: 500px; max-width:95%;">
     <h3>📜 VERSIONSVERLAUF</h3>
@@ -665,13 +674,26 @@
 
       <div class="version-entry open">
         <div class="version-header" onclick="toggleVersionEntry(this)">
-          <h4>v2.2.0 (Aktuell)</h4>
+          <h4>v2.3.0 (Aktuell)</h4>
           <span class="version-toggle-icon">▼</span>
         </div>
         <div class="version-body">
           <ul>
-            <li><strong>Automatische Erstplatzierung:</strong> Manuell eingetragene echte Spielernamen sortieren sich sofort automatisch nach oben vor die Simpsons-Charaktere.</li>
-            <li><strong>Stabileres Drag & Drop:</strong> Seidenweicher Snapping-Effekt mit vergrößerter Lücke (45px) beim Verschieben verhindert Wackeln auf Handy & PC.</li>
+            <li><strong>Visuelle Hervorhebung manueller Namen:</strong> Echte, manuell eingegebene Namen werden fett und mit einem dezenten Neon-Glow hervorgehoben.</li>
+            <li><strong>Fix Mobil-Drag&Drop:</strong> Scroll-Sperre während des Ziehens verhindert Wackeln und Unterbrechen auf Smartphones.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="version-entry open">
+        <div class="version-header" onclick="toggleVersionEntry(this)">
+          <h4>v2.2.0</h4>
+          <span class="version-toggle-icon">▼</span>
+        </div>
+        <div class="version-body">
+          <ul>
+            <li><strong>Automatische Erstplatzierung:</strong> Manuell eingetragene Spielernamen sortieren sich sofort automatisch vor die Simpsons-Charaktere.</li>
+            <li><strong>Stabiles Drag & Drop:</strong> Snapping-Effekt mit vergrößerter Lücke (42px).</li>
           </ul>
         </div>
       </div>
@@ -683,13 +705,13 @@
         </div>
         <div class="version-body">
           <ul>
-            <li><strong>Aufklappbare Versionsanzeige:</strong> Die neuesten 3 Versionen sind direkt geöffnet. Ältere bleiben einklappbar erhalten.</li>
+            <li><strong>Aufklappbare Versionsanzeige:</strong> Die neuesten 3 Versionen sind direkt geöffnet.</li>
             <li><strong>Hintergrund-Scroll-Sperre:</strong> Bei geöffnetem Pop-up-Fenster wird das Scrollen der Hauptseite gesperrt.</li>
           </ul>
         </div>
       </div>
 
-      <div class="version-entry open">
+      <div class="version-entry">
         <div class="version-header" onclick="toggleVersionEntry(this)">
           <h4>v2.0.0</h4>
           <span class="version-toggle-icon">▼</span>
@@ -697,30 +719,6 @@
         <div class="version-body">
           <ul>
             <li><strong>Drop-Indikator & Gap-Lücke:</strong> Platzhalter-Lücke beim Drag & Drop.</li>
-          </ul>
-        </div>
-      </div>
-
-      <div class="version-entry">
-        <div class="version-header" onclick="toggleVersionEntry(this)">
-          <h4>v1.9.0</h4>
-          <span class="version-toggle-icon">▼</span>
-        </div>
-        <div class="version-body">
-          <ul>
-            <li><strong>Visuelle Drag&Drop-Hervorhebung:</strong> Ausgewähltes Namenselement vergrößert sich und leuchtet grün.</li>
-          </ul>
-        </div>
-      </div>
-
-      <div class="version-entry">
-        <div class="version-header" onclick="toggleVersionEntry(this)">
-          <h4>v1.8.0</h4>
-          <span class="version-toggle-icon">▼</span>
-        </div>
-        <div class="version-body">
-          <ul>
-            <li><strong>Fix Mobil-Drag&Drop:</strong> Drag & Drop auf iPhones (Chrome/Safari) optimiert.</li>
           </ul>
         </div>
       </div>
@@ -879,7 +877,6 @@
     });
   }
 
-  // AUTOMATISCHE SORTIERUNG: ECHTE / MANUELLE NAMEN ZUERSCHT, DANN SIMPSONS NAMEN
   function sortPlayersData() {
     playersData.sort((a, b) => {
       let isSimpA = isSimpsonsName(a.name);
@@ -899,11 +896,14 @@
     let col2HTML = '<div class="player-column">';
 
     playersData.forEach((p, idx) => {
+      let isCustom = !isSimpsonsName(p.name);
+      let customClass = isCustom ? 'custom-player-name' : '';
+
       let itemHTML = `
         <div class="draggable-item" draggable="true" data-index="${idx}">
           <span class="drag-handle">☰</span>
           <span style="font-weight:bold; font-size:12px; width:20px; color:var(--text-muted);">${idx+1}.</span>
-          <button class="player-name-display-btn" onclick="openEditPlayerModal(${idx})" style="background:${p.color};">
+          <button class="player-name-display-btn ${customClass}" onclick="openEditPlayerModal(${idx})" style="background:${p.color};">
             ${p.name}
           </button>
         </div>`;
@@ -941,7 +941,7 @@
 
     let nameExists = playersData.some((p, idx) => idx !== editingPlayerIdx && p.name.toLowerCase() === val.toLowerCase());
     if (nameExists) {
-      alert("⚠️️ Dieser Name wird bereits verwendet. Bitte wähle einen eindeutigen Namen!");
+      alert("⚠️ Dieser Name wird bereits verwendet. Bitte wähle einen eindeutigen Namen!");
       return;
     }
 
@@ -973,7 +973,7 @@
     db.ref('playersData').set(saveObj);
   }
 
-  // PRÄZISE & RUHIGE DRAG & DROP STEUERUNG MIT GROSSER LÜCKE
+  // VOLLSTÄNDIG ULTRA-STABILER TOUCH & DESKTOP DRAG & DROP LOGIK
   let dragSrcIndex = null;
   let touchDragElement = null;
   let currentTargetItem = null;
@@ -982,6 +982,7 @@
     document.querySelectorAll('.draggable-item').forEach(el => {
       el.classList.remove('dragging', 'drag-over-target', 'drop-gap-above', 'drop-gap-below');
     });
+    document.body.classList.remove('dragging-active');
   }
 
   function clearDragStylesExceptDragging() {
@@ -996,9 +997,11 @@
     const items = document.querySelectorAll('.draggable-item');
 
     items.forEach(item => {
+      // DESKTOP MAUS DRAG & DROP
       item.addEventListener('dragstart', (e) => {
         dragSrcIndex = parseInt(item.getAttribute('data-index'));
         item.classList.add('dragging');
+        document.body.classList.add('dragging-active');
         e.dataTransfer.effectAllowed = 'move';
       });
 
@@ -1049,13 +1052,14 @@
         renderDraggablePlayerList();
       });
 
-      // TOUCH DRAG & DROP FOR IPHONE / CHROME
+      // ROBUS TES TOUCH DRAG & DROP FÜR IPHONE & ANDROID
       const handle = item.querySelector('.drag-handle');
       if (handle) {
         handle.addEventListener('touchstart', (e) => {
           dragSrcIndex = parseInt(item.getAttribute('data-index'));
           touchDragElement = item;
           item.classList.add('dragging');
+          document.body.classList.add('dragging-active');
         }, { passive: true });
 
         handle.addEventListener('touchmove', (e) => {
@@ -1383,7 +1387,10 @@
     let col2HTML = '<div class="player-column">';
 
     activePlayers.forEach((p, idx) => {
-      let badgeHTML = `<div style="padding:8px 12px; border-radius:6px; background:${p.color}; color:#2d3748; font-weight:normal; border:1px solid #ccc;">
+      let isCustom = !isSimpsonsName(p.name);
+      let customStyle = isCustom ? 'font-weight:bold; color:#0d1117; border-color:#48bb78; box-shadow:0 0 8px rgba(72,187,120,0.5);' : 'font-weight:normal; color:#2d3748;';
+
+      let badgeHTML = `<div style="padding:8px 12px; border-radius:6px; background:${p.color}; border:1px solid #ccc; ${customStyle}">
         ${idx+1}. ${p.name}
       </div>`;
       if (idx < 10) {

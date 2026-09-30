@@ -241,9 +241,9 @@
   @media (max-width: 600px) {
     .player-list-two-columns { grid-template-columns: 1fr; }
   }
-  .player-column { display: flex; flex-direction: column; gap: 8px; }
+  .player-column { display: flex; flex-direction: column; gap: 8px; position: relative; }
 
-  /* DRAG & DROP STYLING MIT VISUELLEM DROP-INDIKATOR (GAP) */
+  /* ULTRA-STABILES DRAG & DROP MIT SEIDENWEICHER GROSSER LÜCKE */
   .draggable-item { 
     display: flex; 
     align-items: center; 
@@ -257,28 +257,25 @@
     -webkit-user-select: none;
     -webkit-touch-callout: none;
     touch-action: none;
-    transition: transform 0.15s ease, box-shadow 0.15s ease, margin 0.15s ease, opacity 0.15s ease;
+    transition: transform 0.2s cubic-bezier(0.2, 0, 0, 1), margin 0.2s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.2s ease, opacity 0.2s ease;
   }
 
+  /* GEZOGENES ELEMENT */
   .draggable-item.dragging {
-    transform: scale(1.08);
+    transform: scale(1.06);
     background-color: rgba(30, 50, 40, 0.98) !important;
     border: 2px solid #48bb78 !important;
     box-shadow: 0 0 20px rgba(72, 187, 120, 0.8), 0 10px 25px rgba(0,0,0,0.9) !important;
     z-index: 100;
   }
 
-  .draggable-item.drag-over-target {
-    transform: scale(0.96);
-    opacity: 0.8;
-  }
-
+  /* DEUTLICHE, GROSSE LÜCKE BEIM EINFÜGEN BEIM ZIEL-ELEMENT */
   .draggable-item.drop-gap-above {
-    margin-top: 28px !important;
+    margin-top: 45px !important;
     border-top: 2px dashed #48bb78 !important;
   }
   .draggable-item.drop-gap-below {
-    margin-bottom: 28px !important;
+    margin-bottom: 45px !important;
     border-bottom: 2px dashed #48bb78 !important;
   }
 
@@ -310,7 +307,7 @@
     filter: brightness(0.92);
   }
 
-  /* VERSIONSVERLAUF ACCORDION STYLES (AUFKLAPPBAR) */
+  /* VERSIONSVERLAUF ACCORDION STYLES */
   .version-entry {
     background: rgba(26, 32, 44, 0.85);
     border-left: 4px solid var(--accent-green);
@@ -376,7 +373,7 @@
 <body id="mainBody" style="display:none;">
 
 <!-- VERSIONSANZEIGE GANZ LINKS OBEN (KLICKBAR) -->
-<div class="version-badge-top-left no-print" onclick="openVersionHistoryModal()">v2.1.0</div>
+<div class="version-badge-top-left no-print" onclick="openVersionHistoryModal()">v2.2.0</div>
 
 <div class="header-title-container no-print">
   <h1>THIS IS DARTA 🎯</h1>
@@ -666,16 +663,28 @@
     
     <div style="max-height: 55vh; overflow-y: auto;">
 
-      <!-- DIE NEUESTEN 3 VERSIONEN SIND STANDARDMÄSSIG OPEN (OFFEN) -->
       <div class="version-entry open">
         <div class="version-header" onclick="toggleVersionEntry(this)">
-          <h4>v2.1.0 (Aktuell)</h4>
+          <h4>v2.2.0 (Aktuell)</h4>
           <span class="version-toggle-icon">▼</span>
         </div>
         <div class="version-body">
           <ul>
-            <li><strong>Aufklappbare Versionsanzeige:</strong> Die neuesten 3 Versionen sind direkt geöffnet. Ältere Versionen bleiben im Verlauf enthalten und sind mit einem Klick aufklappbar.</li>
-            <li><strong>Hintergrund-Scroll-Sperre:</strong> Wenn ein Pop-up-Fenster geöffnet ist, wird das Scrollen der Hauptseite im Hintergrund komplett unterdrückt.</li>
+            <li><strong>Automatische Erstplatzierung:</strong> Manuell eingetragene echte Spielernamen sortieren sich sofort automatisch nach oben vor die Simpsons-Charaktere.</li>
+            <li><strong>Stabileres Drag & Drop:</strong> Seidenweicher Snapping-Effekt mit vergrößerter Lücke (45px) beim Verschieben verhindert Wackeln auf Handy & PC.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="version-entry open">
+        <div class="version-header" onclick="toggleVersionEntry(this)">
+          <h4>v2.1.0</h4>
+          <span class="version-toggle-icon">▼</span>
+        </div>
+        <div class="version-body">
+          <ul>
+            <li><strong>Aufklappbare Versionsanzeige:</strong> Die neuesten 3 Versionen sind direkt geöffnet. Ältere bleiben einklappbar erhalten.</li>
+            <li><strong>Hintergrund-Scroll-Sperre:</strong> Bei geöffnetem Pop-up-Fenster wird das Scrollen der Hauptseite gesperrt.</li>
           </ul>
         </div>
       </div>
@@ -687,24 +696,23 @@
         </div>
         <div class="version-body">
           <ul>
-            <li><strong>Drop-Indikator & Gap-Lücke:</strong> Beim Ziehen eines Namens öffnet sich eine deutliche Platzhalter-Lücke (oben/unten) am Ziel. Das Ziel-Element verkleinert sich sanft.</li>
+            <li><strong>Drop-Indikator & Gap-Lücke:</strong> Platzhalter-Lücke beim Drag & Drop.</li>
           </ul>
         </div>
       </div>
 
-      <div class="version-entry open">
+      <div class="version-entry">
         <div class="version-header" onclick="toggleVersionEntry(this)">
           <h4>v1.9.0</h4>
           <span class="version-toggle-icon">▼</span>
         </div>
         <div class="version-body">
           <ul>
-            <li><strong>Visuelle Drag&Drop-Hervorhebung:</strong> Das ausgewählte Namenselement vergrößert sich und leuchtet grün auf.</li>
+            <li><strong>Visuelle Drag&Drop-Hervorhebung:</strong> Ausgewähltes Namenselement vergrößert sich und leuchtet grün.</li>
           </ul>
         </div>
       </div>
 
-      <!-- ÄLTERE VERSIONEN SIND STANDARDMÄSSIG ZUGEKLAPPT (OHNE CLASS 'open') -->
       <div class="version-entry">
         <div class="version-header" onclick="toggleVersionEntry(this)">
           <h4>v1.8.0</h4>
@@ -712,103 +720,7 @@
         </div>
         <div class="version-body">
           <ul>
-            <li><strong>Fix Mobil-Drag&Drop:</strong> Drag & Drop auf iPhones (Chrome/Safari) optimiert. Unterdrückt ungewollte Textauswahl.</li>
-          </ul>
-        </div>
-      </div>
-
-      <div class="version-entry">
-        <div class="version-header" onclick="toggleVersionEntry(this)">
-          <h4>v1.7.0</h4>
-          <span class="version-toggle-icon">▼</span>
-        </div>
-        <div class="version-body">
-          <ul>
-            <li><strong>Auto-Reset beim Löschen:</strong> Beim Löschen einer Saison wird die Ansicht automatisch auf Null zurückgesetzt.</li>
-          </ul>
-        </div>
-      </div>
-
-      <div class="version-entry">
-        <div class="version-header" onclick="toggleVersionEntry(this)">
-          <h4>v1.6.0</h4>
-          <span class="version-toggle-icon">▼</span>
-        </div>
-        <div class="version-body">
-          <ul>
-            <li><strong>✏️ Saison bearbeiten:</strong> Saisons können nachträglich im Namen, den Zusatzpunkten und der Spieleranzahl angepasst werden.</li>
-          </ul>
-        </div>
-      </div>
-
-      <div class="version-entry">
-        <div class="version-header" onclick="toggleVersionEntry(this)">
-          <h4>v1.5.0</h4>
-          <span class="version-toggle-icon">▼</span>
-        </div>
-        <div class="version-body">
-          <ul>
-            <li><strong>Fortlaufende Nummerierung:</strong> Neue Saisons heißen automatisch 'Saison 1', 'Saison 2' usw.</li>
-          </ul>
-        </div>
-      </div>
-
-      <div class="version-entry">
-        <div class="version-header" onclick="toggleVersionEntry(this)">
-          <h4>v1.4.0</h4>
-          <span class="version-toggle-icon">▼</span>
-        </div>
-        <div class="version-body">
-          <ul>
-            <li><strong>Keine doppelten Namen:</strong> Eindeutigkeits-Prüfung verhindert Mehrfachbenennungen.</li>
-          </ul>
-        </div>
-      </div>
-
-      <div class="version-entry">
-        <div class="version-header" onclick="toggleVersionEntry(this)">
-          <h4>v1.3.0</h4>
-          <span class="version-toggle-icon">▼</span>
-        </div>
-        <div class="version-body">
-          <ul>
-            <li><strong>Pop-up Namenseingabe:</strong> Klick auf Spielernummer öffnet Namensänderungs-Modal.</li>
-          </ul>
-        </div>
-      </div>
-
-      <div class="version-entry">
-        <div class="version-header" onclick="toggleVersionEntry(this)">
-          <h4>v1.2.0</h4>
-          <span class="version-toggle-icon">▼</span>
-        </div>
-        <div class="version-body">
-          <ul>
-            <li><strong>Neuer Name & Untertitel:</strong> 'THIS IS DARTA 🎯' als Haupttitel & 'Dartsaison - Manager'.</li>
-          </ul>
-        </div>
-      </div>
-
-      <div class="version-entry">
-        <div class="version-header" onclick="toggleVersionEntry(this)">
-          <h4>v1.1.0</h4>
-          <span class="version-toggle-icon">▼</span>
-        </div>
-        <div class="version-body">
-          <ul>
-            <li><strong>Versional-Changelog:</strong> Klickbares Versions-Badge oben links.</li>
-          </ul>
-        </div>
-      </div>
-
-      <div class="version-entry">
-        <div class="version-header" onclick="toggleVersionEntry(this)">
-          <h4>v1.0.0</h4>
-          <span class="version-toggle-icon">▼</span>
-        </div>
-        <div class="version-body">
-          <ul>
-            <li><strong>Leg Stats Prüfungen:</strong> Max-Limits für Darts, Checkout %, Big Fish (170) & Highscores.</li>
+            <li><strong>Fix Mobil-Drag&Drop:</strong> Drag & Drop auf iPhones (Chrome/Safari) optimiert.</li>
           </ul>
         </div>
       </div>
@@ -887,7 +799,6 @@
     }
   }
 
-  // MODAL STEUERUNG MIT HINTERGRUND-SCROLL-SPERRE
   function openVersionHistoryModal() {
     openModalById('versionHistoryModal');
   }
@@ -904,7 +815,6 @@
 
   function closeModalById(id) {
     document.getElementById(id).style.display = 'none';
-    // PRÜFEN OB NOCH EIN ANDERES MODAL OFFEN IST
     const anyOpen = Array.from(document.querySelectorAll('.modal')).some(m => m.style.display === 'flex');
     if (!anyOpen) {
       document.body.classList.remove('modal-open');
@@ -930,6 +840,11 @@
   let editingPlayerIdx = null;
 
   let playersData = [];
+
+  function isSimpsonsName(name) {
+    if (!name) return false;
+    return simpsonsNames.some(s => s.toLowerCase() === name.trim().toLowerCase());
+  }
 
   function getUnusedSimpsonsName(excludeIndex = null) {
     let usedNames = playersData
@@ -964,10 +879,14 @@
     });
   }
 
+  // AUTOMATISCHE SORTIERUNG: ECHTE / MANUELLE NAMEN ZUERSCHT, DANN SIMPSONS NAMEN
   function sortPlayersData() {
     playersData.sort((a, b) => {
-      if (a.name !== "" && b.name === "") return -1;
-      if (a.name === "" && b.name !== "") return 1;
+      let isSimpA = isSimpsonsName(a.name);
+      let isSimpB = isSimpsonsName(b.name);
+
+      if (!isSimpA && isSimpB) return -1;
+      if (isSimpA && !isSimpB) return 1;
       return 0;
     });
   }
@@ -1022,7 +941,7 @@
 
     let nameExists = playersData.some((p, idx) => idx !== editingPlayerIdx && p.name.toLowerCase() === val.toLowerCase());
     if (nameExists) {
-      alert("⚠️ Dieser Name wird bereits verwendet. Bitte wähle einen eindeutigen Namen!");
+      alert("⚠️️ Dieser Name wird bereits verwendet. Bitte wähle einen eindeutigen Namen!");
       return;
     }
 
@@ -1054,7 +973,7 @@
     db.ref('playersData').set(saveObj);
   }
 
-  // PRÄZISE DRAG & DROP STEUERUNG MIT HILFE DES GAP- / DROP-INDIKATORS
+  // PRÄZISE & RUHIGE DRAG & DROP STEUERUNG MIT GROSSER LÜCKE
   let dragSrcIndex = null;
   let touchDragElement = null;
   let currentTargetItem = null;
@@ -1077,7 +996,6 @@
     const items = document.querySelectorAll('.draggable-item');
 
     items.forEach(item => {
-      // DESKTOP DRAG & DROP MIT VISUELLER LÜCKE
       item.addEventListener('dragstart', (e) => {
         dragSrcIndex = parseInt(item.getAttribute('data-index'));
         item.classList.add('dragging');
@@ -1091,21 +1009,18 @@
         if (item.classList.contains('dragging')) return;
 
         clearDragStylesExceptDragging();
-        item.classList.add('drag-over-target');
 
         const rect = item.getBoundingClientRect();
         const midY = rect.top + rect.height / 2;
         if (e.clientY < midY) {
           item.classList.add('drop-gap-above');
-          item.classList.remove('drop-gap-below');
         } else {
           item.classList.add('drop-gap-below');
-          item.classList.remove('drop-gap-above');
         }
       });
 
       item.addEventListener('dragleave', () => {
-        item.classList.remove('drag-over-target', 'drop-gap-above', 'drop-gap-below');
+        item.classList.remove('drop-gap-above', 'drop-gap-below');
       });
 
       item.addEventListener('dragend', () => {
@@ -1134,7 +1049,7 @@
         renderDraggablePlayerList();
       });
 
-      // MOBILE TOUCH DRAG & DROP (IPHONE/ANDROID OPTIMIERT)
+      // TOUCH DRAG & DROP FOR IPHONE / CHROME
       const handle = item.querySelector('.drag-handle');
       if (handle) {
         handle.addEventListener('touchstart', (e) => {
@@ -1154,7 +1069,6 @@
             const targetItem = targetEl.closest('.draggable-item');
             if (targetItem && targetItem !== touchDragElement) {
               currentTargetItem = targetItem;
-              targetItem.classList.add('drag-over-target');
 
               const rect = targetItem.getBoundingClientRect();
               const midY = rect.top + rect.height / 2;
@@ -1168,7 +1082,7 @@
           }
         }, { passive: true });
 
-        handle.addEventListener('touchend', (e) => {
+        handle.addEventListener('touchend', () => {
           if (touchDragElement && currentTargetItem) {
             const targetIndex = parseInt(currentTargetItem.getAttribute('data-index'));
             if (dragSrcIndex !== null && !isNaN(targetIndex) && dragSrcIndex !== targetIndex) {

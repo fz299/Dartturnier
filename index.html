@@ -34,6 +34,12 @@
     --points-bg: #2b3648;
   }
 
+  /* VERHINDERT SCROLLEN IM HINTERGRUND BEI GEÖFFNETEM MODAL */
+  body.modal-open {
+    overflow: hidden !important;
+    touch-action: none;
+  }
+
   /* BILD-HINTERGRUND MIT DUNKLEM OVERLAY */
   body { 
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
@@ -188,7 +194,7 @@
   
   /* MODAL POP-UPS */
   .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); justify-content: center; align-items: center; z-index: 1000; backdrop-filter: blur(5px); }
-  .modal-content { position: relative; background: var(--card-dark); border: 1px solid var(--card-border); padding: 25px; border-radius: 14px; width: 420px; max-width: 90%; max-height: 85vh; overflow-y: auto; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.9); color: white; }
+  .modal-content { position: relative; background: var(--card-dark); border: 1px solid var(--card-border); padding: 25px; border-radius: 14px; width: 420px; max-width: 90%; max-height: 85vh; overflow-y: auto; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.9); color: white; -webkit-overflow-scrolling: touch; }
   .modal input[type="text"], .modal input[type="number"] { width: 85%; padding: 8px; font-size: 14px; text-align: center; margin: 4px 0; border: 1px solid #4a5568; border-radius: 6px; background: #1a202c; color: white; }
 
   /* EDIT STATS ICON IN MODAL TOP-RIGHT */
@@ -254,7 +260,6 @@
     transition: transform 0.15s ease, box-shadow 0.15s ease, margin 0.15s ease, opacity 0.15s ease;
   }
 
-  /* AKTIV GEZOGENES ELEMENT (HERVORGEROHEN) */
   .draggable-item.dragging {
     transform: scale(1.08);
     background-color: rgba(30, 50, 40, 0.98) !important;
@@ -263,13 +268,11 @@
     z-index: 100;
   }
 
-  /* ZIEL-ELEMENT SANFT VERKLEINERN */
   .draggable-item.drag-over-target {
     transform: scale(0.96);
     opacity: 0.8;
   }
 
-  /* LÜCKE (GAP) OBERHALB / UNTERHALB DES ZIEL-ELEMENTS */
   .draggable-item.drop-gap-above {
     margin-top: 28px !important;
     border-top: 2px dashed #48bb78 !important;
@@ -307,19 +310,46 @@
     filter: brightness(0.92);
   }
 
-  /* VERSIONSVERLAUF BOX STYLES */
+  /* VERSIONSVERLAUF ACCORDION STYLES (AUFKLAPPBAR) */
   .version-entry {
-    background: rgba(26, 32, 44, 0.8);
+    background: rgba(26, 32, 44, 0.85);
     border-left: 4px solid var(--accent-green);
-    padding: 10px 12px;
-    margin-bottom: 12px;
-    border-radius: 4px;
+    margin-bottom: 10px;
+    border-radius: 6px;
     text-align: left;
+    overflow: hidden;
   }
-  .version-entry h4 {
-    margin: 0 0 6px 0;
+  .version-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 14px;
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.2s;
+  }
+  .version-header:hover {
+    background: rgba(45, 55, 72, 0.6);
+  }
+  .version-header h4 {
+    margin: 0;
     color: #48bb78;
     font-size: 14px;
+  }
+  .version-toggle-icon {
+    font-size: 12px;
+    color: var(--text-muted);
+    transition: transform 0.2s ease;
+  }
+  .version-body {
+    padding: 0 14px 12px 14px;
+    display: none;
+  }
+  .version-entry.open .version-body {
+    display: block;
+  }
+  .version-entry.open .version-toggle-icon {
+    transform: rotate(180deg);
   }
   .version-entry ul {
     margin: 0;
@@ -346,7 +376,7 @@
 <body id="mainBody" style="display:none;">
 
 <!-- VERSIONSANZEIGE GANZ LINKS OBEN (KLICKBAR) -->
-<div class="version-badge-top-left no-print" onclick="openVersionHistoryModal()">v2.0.0</div>
+<div class="version-badge-top-left no-print" onclick="openVersionHistoryModal()">v2.1.0</div>
 
 <div class="header-title-container no-print">
   <h1>THIS IS DARTA 🎯</h1>
@@ -502,7 +532,7 @@
 
     <div style="margin-top:18px;">
       <button class="btn" onclick="confirmSaveEditedSeason()">Änderungen Speichern</button>
-      <button class="btn" style="background:#777;" onclick="document.getElementById('editSeasonModal').style.display='none'">Abbrechen</button>
+      <button class="btn" style="background:#777;" onclick="closeModalById('editSeasonModal')">Abbrechen</button>
     </div>
   </div>
 </div>
@@ -516,7 +546,7 @@
     <div style="margin-top:15px; display:flex; justify-content:center; gap:8px; flex-wrap:wrap;">
       <button class="btn" onclick="saveEditedPlayerNameFromModal()">Name Speichern</button>
       <button class="btn btn-reset" style="margin-bottom:0;" onclick="resetPlayerNameToSimpsons()">🔄 Name zurücksetzen</button>
-      <button class="btn" style="background:#777;" onclick="document.getElementById('editPlayerNameModal').style.display='none'">Abbrechen</button>
+      <button class="btn" style="background:#777;" onclick="closeModalById('editPlayerNameModal')">Abbrechen</button>
     </div>
   </div>
 </div>
@@ -602,7 +632,7 @@
     <p id="viewStatsHeader" style="font-weight:bold; color:var(--text-muted);"></p>
     <div id="viewStatsContent"></div>
     <div style="margin-top:15px;">
-      <button class="btn" onclick="document.getElementById('viewStatsModal').style.display='none'">Schließen</button>
+      <button class="btn" onclick="closeModalById('viewStatsModal')">Schließen</button>
     </div>
   </div>
 </div>
@@ -623,12 +653,12 @@
       </table>
     </div>
     <div style="margin-top:15px;">
-      <button class="btn" onclick="document.getElementById('globalStatsModal').style.display='none'">Schließen</button>
+      <button class="btn" onclick="closeModalById('globalStatsModal')">Schließen</button>
     </div>
   </div>
 </div>
 
-<!-- VERSIONSVERLAUF MODAL -->
+<!-- VERSIONSVERLAUF MODAL (AUFKLAPPBAR / ACCORDION) -->
 <div id="versionHistoryModal" class="modal">
   <div class="modal-content" style="width: 500px; max-width:95%;">
     <h3>📜 VERSIONSVERLAUF</h3>
@@ -636,45 +666,157 @@
     
     <div style="max-height: 55vh; overflow-y: auto;">
 
+      <!-- DIE NEUESTEN 3 VERSIONEN SIND STANDARDMÄSSIG OPEN (OFFEN) -->
+      <div class="version-entry open">
+        <div class="version-header" onclick="toggleVersionEntry(this)">
+          <h4>v2.1.0 (Aktuell)</h4>
+          <span class="version-toggle-icon">▼</span>
+        </div>
+        <div class="version-body">
+          <ul>
+            <li><strong>Aufklappbare Versionsanzeige:</strong> Die neuesten 3 Versionen sind direkt geöffnet. Ältere Versionen bleiben im Verlauf enthalten und sind mit einem Klick aufklappbar.</li>
+            <li><strong>Hintergrund-Scroll-Sperre:</strong> Wenn ein Pop-up-Fenster geöffnet ist, wird das Scrollen der Hauptseite im Hintergrund komplett unterdrückt.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="version-entry open">
+        <div class="version-header" onclick="toggleVersionEntry(this)">
+          <h4>v2.0.0</h4>
+          <span class="version-toggle-icon">▼</span>
+        </div>
+        <div class="version-body">
+          <ul>
+            <li><strong>Drop-Indikator & Gap-Lücke:</strong> Beim Ziehen eines Namens öffnet sich eine deutliche Platzhalter-Lücke (oben/unten) am Ziel. Das Ziel-Element verkleinert sich sanft.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="version-entry open">
+        <div class="version-header" onclick="toggleVersionEntry(this)">
+          <h4>v1.9.0</h4>
+          <span class="version-toggle-icon">▼</span>
+        </div>
+        <div class="version-body">
+          <ul>
+            <li><strong>Visuelle Drag&Drop-Hervorhebung:</strong> Das ausgewählte Namenselement vergrößert sich und leuchtet grün auf.</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- ÄLTERE VERSIONEN SIND STANDARDMÄSSIG ZUGEKLAPPT (OHNE CLASS 'open') -->
       <div class="version-entry">
-        <h4>v2.0.0 (Aktuell)</h4>
-        <ul>
-          <li><strong>Drop-Indikator & Gap-Lücke:</strong> Beim Ziehen eines Namens öffnet sich eine deutliche Platzhalter-Lücke (oben/unten) am Ziel. Das Ziel-Element verkleinert sich sanft.</li>
-        </ul>
+        <div class="version-header" onclick="toggleVersionEntry(this)">
+          <h4>v1.8.0</h4>
+          <span class="version-toggle-icon">▼</span>
+        </div>
+        <div class="version-body">
+          <ul>
+            <li><strong>Fix Mobil-Drag&Drop:</strong> Drag & Drop auf iPhones (Chrome/Safari) optimiert. Unterdrückt ungewollte Textauswahl.</li>
+          </ul>
+        </div>
       </div>
 
       <div class="version-entry">
-        <h4>v1.9.0</h4>
-        <ul>
-          <li><strong>Visuelle Drag&Drop-Hervorhebung:</strong> Das ausgewählte Namenselement vergrößert sich und leuchtet grün auf.</li>
-        </ul>
+        <div class="version-header" onclick="toggleVersionEntry(this)">
+          <h4>v1.7.0</h4>
+          <span class="version-toggle-icon">▼</span>
+        </div>
+        <div class="version-body">
+          <ul>
+            <li><strong>Auto-Reset beim Löschen:</strong> Beim Löschen einer Saison wird die Ansicht automatisch auf Null zurückgesetzt.</li>
+          </ul>
+        </div>
       </div>
 
       <div class="version-entry">
-        <h4>v1.8.0</h4>
-        <ul>
-          <li><strong>Fix Mobil-Drag&Drop:</strong> Drag & Drop auf iPhones (Chrome/Safari) optimiert. Unterdrückt ungewollte Textauswahl.</li>
-        </ul>
+        <div class="version-header" onclick="toggleVersionEntry(this)">
+          <h4>v1.6.0</h4>
+          <span class="version-toggle-icon">▼</span>
+        </div>
+        <div class="version-body">
+          <ul>
+            <li><strong>✏️ Saison bearbeiten:</strong> Saisons können nachträglich im Namen, den Zusatzpunkten und der Spieleranzahl angepasst werden.</li>
+          </ul>
+        </div>
       </div>
 
       <div class="version-entry">
-        <h4>v1.7.0</h4>
-        <ul>
-          <li><strong>Auto-Reset beim Löschen:</strong> Beim Löschen einer Saison wird die Ansicht automatisch auf Null zurückgesetzt.</li>
-        </ul>
+        <div class="version-header" onclick="toggleVersionEntry(this)">
+          <h4>v1.5.0</h4>
+          <span class="version-toggle-icon">▼</span>
+        </div>
+        <div class="version-body">
+          <ul>
+            <li><strong>Fortlaufende Nummerierung:</strong> Neue Saisons heißen automatisch 'Saison 1', 'Saison 2' usw.</li>
+          </ul>
+        </div>
       </div>
 
       <div class="version-entry">
-        <h4>v1.6.0</h4>
-        <ul>
-          <li><strong>✏️ Saison bearbeiten:</strong> Saisons können nachträglich im Namen, den Zusatzpunkten und der Spieleranzahl angepasst werden.</li>
-        </ul>
+        <div class="version-header" onclick="toggleVersionEntry(this)">
+          <h4>v1.4.0</h4>
+          <span class="version-toggle-icon">▼</span>
+        </div>
+        <div class="version-body">
+          <ul>
+            <li><strong>Keine doppelten Namen:</strong> Eindeutigkeits-Prüfung verhindert Mehrfachbenennungen.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="version-entry">
+        <div class="version-header" onclick="toggleVersionEntry(this)">
+          <h4>v1.3.0</h4>
+          <span class="version-toggle-icon">▼</span>
+        </div>
+        <div class="version-body">
+          <ul>
+            <li><strong>Pop-up Namenseingabe:</strong> Klick auf Spielernummer öffnet Namensänderungs-Modal.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="version-entry">
+        <div class="version-header" onclick="toggleVersionEntry(this)">
+          <h4>v1.2.0</h4>
+          <span class="version-toggle-icon">▼</span>
+        </div>
+        <div class="version-body">
+          <ul>
+            <li><strong>Neuer Name & Untertitel:</strong> 'THIS IS DARTA 🎯' als Haupttitel & 'Dartsaison - Manager'.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="version-entry">
+        <div class="version-header" onclick="toggleVersionEntry(this)">
+          <h4>v1.1.0</h4>
+          <span class="version-toggle-icon">▼</span>
+        </div>
+        <div class="version-body">
+          <ul>
+            <li><strong>Versional-Changelog:</strong> Klickbares Versions-Badge oben links.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="version-entry">
+        <div class="version-header" onclick="toggleVersionEntry(this)">
+          <h4>v1.0.0</h4>
+          <span class="version-toggle-icon">▼</span>
+        </div>
+        <div class="version-body">
+          <ul>
+            <li><strong>Leg Stats Prüfungen:</strong> Max-Limits für Darts, Checkout %, Big Fish (170) & Highscores.</li>
+          </ul>
+        </div>
       </div>
 
     </div>
 
     <div style="margin-top:15px;">
-      <button class="btn" onclick="document.getElementById('versionHistoryModal').style.display='none'">Schließen</button>
+      <button class="btn" onclick="closeModalById('versionHistoryModal')">Schließen</button>
     </div>
   </div>
 </div>
@@ -745,8 +887,28 @@
     }
   }
 
+  // MODAL STEUERUNG MIT HINTERGRUND-SCROLL-SPERRE
   function openVersionHistoryModal() {
-    document.getElementById('versionHistoryModal').style.display = 'flex';
+    openModalById('versionHistoryModal');
+  }
+
+  function toggleVersionEntry(headerEl) {
+    const parent = headerEl.parentElement;
+    parent.classList.toggle('open');
+  }
+
+  function openModalById(id) {
+    document.getElementById(id).style.display = 'flex';
+    document.body.classList.add('modal-open');
+  }
+
+  function closeModalById(id) {
+    document.getElementById(id).style.display = 'none';
+    // PRÜFEN OB NOCH EIN ANDERES MODAL OFFEN IST
+    const anyOpen = Array.from(document.querySelectorAll('.modal')).some(m => m.style.display === 'flex');
+    if (!anyOpen) {
+      document.body.classList.remove('modal-open');
+    }
   }
 
   const colors = ["#ffcdd2","#e1bee7","#d1c4e9","#c5cae9","#bbdefb","#b2ebf2","#b2dfdb","#c8e6c9","#dcedc8","#fff9c4","#f8bbd0","#e1bee7","#d1c4e9","#c5cae9","#bbdefb","#b2ebf2","#b2dfdb","#c8e6c9","#dcedc8","#fff9c4"];
@@ -846,7 +1008,7 @@
     const p = playersData[idx];
     document.getElementById('editPlayerModalSub').innerText = `Spieler-Nummer ${idx+1}`;
     document.getElementById('inpEditPlayerNameVal').value = p.name;
-    document.getElementById('editPlayerNameModal').style.display = 'flex';
+    openModalById('editPlayerNameModal');
   }
 
   function saveEditedPlayerNameFromModal() {
@@ -865,7 +1027,7 @@
     }
 
     playersData[editingPlayerIdx].name = val;
-    document.getElementById('editPlayerNameModal').style.display = 'none';
+    closeModalById('editPlayerNameModal');
     
     saveAllPlayersToCloud();
     sortPlayersData();
@@ -876,7 +1038,7 @@
     if (editingPlayerIdx === null) return;
     const newName = getUnusedSimpsonsName(editingPlayerIdx);
     playersData[editingPlayerIdx].name = newName;
-    document.getElementById('editPlayerNameModal').style.display = 'none';
+    closeModalById('editPlayerNameModal');
 
     saveAllPlayersToCloud();
     sortPlayersData();
@@ -900,6 +1062,14 @@
   function clearDragStyles() {
     document.querySelectorAll('.draggable-item').forEach(el => {
       el.classList.remove('dragging', 'drag-over-target', 'drop-gap-above', 'drop-gap-below');
+    });
+  }
+
+  function clearDragStylesExceptDragging() {
+    document.querySelectorAll('.draggable-item').forEach(el => {
+      if (!el.classList.contains('dragging')) {
+        el.classList.remove('drag-over-target', 'drop-gap-above', 'drop-gap-below');
+      }
     });
   }
 
@@ -1016,14 +1186,6 @@
     });
   }
 
-  function clearDragStylesExceptDragging() {
-    document.querySelectorAll('.draggable-item').forEach(el => {
-      if (!el.classList.contains('dragging')) {
-        el.classList.remove('drag-over-target', 'drop-gap-above', 'drop-gap-below');
-      }
-    });
-  }
-
   function openStartModal() {
     if (isSeasonActive) {
       const autoSave = confirm("⚠️ Es läuft bereits eine Saison!\n\nSoll der aktuelle Stand der laufenden Saison vor dem Start der neuen Saison AUTOMATISCH GESPEICHERT werden?");
@@ -1032,11 +1194,11 @@
       }
     }
     document.getElementById('inpSeasonName').value = `Saison ${globalSeasonCounter}`;
-    document.getElementById('startSeasonModal').style.display = 'flex';
+    openModalById('startSeasonModal');
   }
 
   function closeStartModal() {
-    document.getElementById('startSeasonModal').style.display = 'none';
+    closeModalById('startSeasonModal');
   }
 
   function selectPlayerCount(count) {
@@ -1098,7 +1260,7 @@
     selectEditPlayerCount(editSelectedCount);
     selectEditBonusPoints(editSelectedBonus);
 
-    document.getElementById('editSeasonModal').style.display = 'flex';
+    openModalById('editSeasonModal');
   }
 
   function selectEditPlayerCount(count) {
@@ -1145,7 +1307,7 @@
       });
     }
 
-    document.getElementById('editSeasonModal').style.display = 'none';
+    closeModalById('editSeasonModal');
     renderActivePlayersInControl();
     document.getElementById('saisonTitle').innerText = `Rangliste - ${currentSeasonName} (Sieger-Zusatzpunkte: +${bonusPoints})`;
     renderSchedule();
@@ -1406,10 +1568,10 @@
     updateLegButtonsUI();
     validateResultAndToggleSave();
     
-    document.getElementById('resultModal').style.display = 'flex';
+    openModalById('resultModal');
   }
 
-  function closeModal() { document.getElementById('resultModal').style.display = 'none'; }
+  function closeModal() { closeModalById('resultModal'); }
 
   function selectLegsHome(val) {
     tempLegsH = val;
@@ -1464,16 +1626,16 @@
     currentMatches[selectedMatchIndex].legsG = tempLegsG;
     closeModal();
     
-    document.getElementById('askStatsModal').style.display = 'flex';
+    openModalById('askStatsModal');
   }
 
   function skipLegStatsAndSave() {
-    document.getElementById('askStatsModal').style.display = 'none';
+    closeModalById('askStatsModal');
     saveCurrentSeason();
   }
 
   function openLegStatsInputModal() {
-    document.getElementById('askStatsModal').style.display = 'none';
+    closeModalById('askStatsModal');
     const m = currentMatches[selectedMatchIndex];
     document.getElementById('legStatsMatchHeader').innerText = `${m.home.name} (${m.legsH}) vs (${m.legsG}) ${m.away.name}`;
     document.getElementById('statHomeHeader').innerText = m.home.name;
@@ -1499,11 +1661,11 @@
     document.getElementById('st_180_h').value = s.c180_h ?? '';
     document.getElementById('st_180_g').value = s.c180_g ?? '';
 
-    document.getElementById('legStatsModal').style.display = 'flex';
+    openModalById('legStatsModal');
   }
 
   function closeLegStatsModal() {
-    document.getElementById('legStatsModal').style.display = 'none';
+    closeModalById('legStatsModal');
   }
 
   function getLimitedValue(inputId, maxLimit) {
@@ -1572,11 +1734,11 @@
       <div class="stats-grid"><span>${s.c180_h}</span><label>180</label><span>${s.c180_g}</span></div>
     `;
 
-    document.getElementById('viewStatsModal').style.display = 'flex';
+    openModalById('viewStatsModal');
   }
 
   function editCurrentMatchStats() {
-    document.getElementById('viewStatsModal').style.display = 'none';
+    closeModalById('viewStatsModal');
     openLegStatsInputModal();
   }
 
@@ -1656,7 +1818,7 @@
       </tr>`;
     });
 
-    document.getElementById('globalStatsModal').style.display = 'flex';
+    openModalById('globalStatsModal');
   }
 
   function renderTable() {

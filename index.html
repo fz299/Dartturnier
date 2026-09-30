@@ -79,7 +79,7 @@
   .btn-reset { background: #c62828; }
   .btn-reset:hover { background: #b71c1c; }
   
-  /* LOGOUT BAR & STATUS BADGE */
+  /* STATUS BADGE & DROPDOWN AUFBLINKEN */
   .status-container {
     float: right;
     display: flex;
@@ -109,6 +109,16 @@
   }
   .btn-logout:hover {
     background: #c53030;
+  }
+
+  /* DROPDOWN BLINK ANIMATION BEIM SPEICHERN */
+  .flash-success {
+    animation: flashGreen 0.9s ease-in-out;
+  }
+  @keyframes flashGreen {
+    0% { border-color: #48bb78; box-shadow: 0 0 15px #48bb78; background-color: #22543d; }
+    50% { border-color: #48bb78; box-shadow: 0 0 20px #48bb78; background-color: #276749; }
+    100% { border-color: #4a5568; box-shadow: none; background-color: #2d3748; }
   }
 
   /* DARK TABLES */
@@ -223,7 +233,7 @@
   <div style="margin-top: 15px; background: rgba(26, 32, 44, 0.9); padding: 12px; border-radius: 8px; border: 1px solid #2d3748;">
     <label for="savedSeasonsSelect" style="font-weight:bold; color:var(--text-main);">📂 Gespeicherte Saison aufrufen:</label><br>
     <div style="display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin-top:8px;">
-      <select id="savedSeasonsSelect" style="padding: 8px; font-size: 14px; min-width: 200px; border-radius: 4px; border: 1px solid #4a5568; background:#2d3748; color:white;">
+      <select id="savedSeasonsSelect" style="padding: 8px; font-size: 14px; min-width: 200px; border-radius: 4px; border: 1px solid #4a5568; background:#2d3748; color:white; transition: all 0.3s;">
         <option value="">-- Saison auswählen --</option>
       </select>
       <button class="btn btn-load" style="margin-bottom:0; padding: 8px 14px; font-size: 13px;" onclick="loadSelectedSeasonExplicit()">📥 Saison laden</button>
@@ -465,7 +475,6 @@
     }
   }
 
-  // AUSLOGGEN FUNKTION
   function logoutUser() {
     if (confirm("Möchtest du dich wirklich ausloggen?")) {
       localStorage.removeItem("dart_logged_in");
@@ -590,7 +599,7 @@
 
   function openStartModal() {
     if (isSeasonActive) {
-      const autoSave = confirm("⚠️ Es läuft bereits eine Saison!\n\nSoll der aktuelle Stand der laufenden Saison vor dem Start der neuen Saison AUTOMATISCH GESPEICHERT werden?");
+      const autoSave = confirm("⚠️️ Es läuft bereits eine Saison!\n\nSoll der aktuelle Stand der laufenden Saison vor dem Start der neuen Saison AUTOMATISCH GESPEICHERT werden?");
       if (autoSave) {
         saveCurrentSeason();
       }
@@ -639,6 +648,7 @@
     saveCurrentSeason();
   }
 
+  // OPTIMIERTE SPEICHER-FUNKTION MIT VISUELLEM BLINKEN
   function saveCurrentSeason() {
     if (!isSeasonActive) { alert("Es läuft aktuell keine Saison zum Speichern!"); return; }
     
@@ -651,7 +661,12 @@
 
     db.ref('savedSeasons/' + currentSeasonName).set(seasonData);
     db.ref('activeSeasonState').set(seasonData);
-    alert(`✅ Saison '${currentSeasonName}' wurde erfolgreich gespeichert!`);
+
+    // OPTISCHES FEEDBACK: DROPDOWN AUFBLINKEN LASSEN
+    const selectElem = document.getElementById('savedSeasonsSelect');
+    selectElem.classList.remove('flash-success');
+    void selectElem.offsetWidth; // Trigger Reflow
+    selectElem.classList.add('flash-success');
   }
 
   function updateSavedSeasonsDropdown() {
@@ -694,8 +709,6 @@
       document.getElementById('saisonTitle').innerText = `Rangliste - ${currentSeasonName} (Sieger-Zusatzpunkte: +${bonusPoints})`;
       renderSchedule();
       renderTable();
-      
-      alert(`✅ Saison '${currentSeasonName}' wurde erfolgreich geladen!`);
     });
   }
 

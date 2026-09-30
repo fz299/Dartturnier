@@ -249,7 +249,27 @@
   }
   .draggable-item:active { cursor: grabbing; transform: scale(1.02); box-shadow: 0 5px 15px rgba(0,0,0,0.6); }
   .drag-handle { font-size: 16px; color: var(--text-muted); cursor: grab; }
-  .player-input-field { flex: 1; min-width: 0; padding: 6px 8px; border: 1px solid #4a5568; border-radius: 4px; font-weight: bold; color: #1a202c; font-size: 13px; }
+  
+  /* NEUES NAME BUTTON STYLING (NICHT FETT, DUNKELGRAUER SCHRAFTTON) */
+  .player-name-display-btn { 
+    flex: 1; 
+    min-width: 0; 
+    padding: 6px 10px; 
+    border: 1px solid #4a5568; 
+    border-radius: 4px; 
+    font-weight: normal !important; 
+    color: #2d3748 !important; 
+    font-size: 13px; 
+    text-align: left;
+    cursor: pointer;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    transition: filter 0.15s;
+  }
+  .player-name-display-btn:hover {
+    filter: brightness(0.92);
+  }
 
   /* VERSIONSVERLAUF BOX STYLES */
   .version-entry {
@@ -290,7 +310,7 @@
 <body id="mainBody" style="display:none;">
 
 <!-- VERSIONSANZEIGE GANZ LINKS OBEN (KLICKBAR) -->
-<div class="version-badge-top-left no-print" onclick="openVersionHistoryModal()">v1.2.0</div>
+<div class="version-badge-top-left no-print" onclick="openVersionHistoryModal()">v1.3.0</div>
 
 <div class="header-title-container no-print">
   <h1>THIS IS DARTA 🎯</h1>
@@ -401,6 +421,19 @@
     <div style="margin-top:18px;">
       <button class="btn" onclick="confirmStartSaison()">Saison Starten</button>
       <button class="btn" style="background:#777;" onclick="closeStartModal()">Abbrechen</button>
+    </div>
+  </div>
+</div>
+
+<!-- POP-UP MODAL FÜR DAS EDITIEREN EINES SPIELERNAMENS -->
+<div id="editPlayerNameModal" class="modal">
+  <div class="modal-content">
+    <h3>✏️ Spielernamen ändern</h3>
+    <p id="editPlayerModalSub" style="color:var(--text-muted); font-size:13px; margin-bottom:10px;"></p>
+    <input type="text" id="inpEditPlayerNameVal" placeholder="Name eingeben...">
+    <div style="margin-top:15px;">
+      <button class="btn" onclick="saveEditedPlayerNameFromModal()">Name Speichern</button>
+      <button class="btn" style="background:#777;" onclick="document.getElementById('editPlayerNameModal').style.display='none'">Abbrechen</button>
     </div>
   </div>
 </div>
@@ -519,9 +552,17 @@
     <p style="color:var(--text-muted); font-size:12px; margin-bottom:15px;">Übersicht der Änderungen & Entwicklungen der Homepage</p>
     
     <div style="max-height: 55vh; overflow-y: auto;">
+
+      <div class="version-entry">
+        <h4>v1.3.0 (Aktuell)</h4>
+        <ul>
+          <li><strong>Pop-up Namenseingabe:</strong> Beim Klick auf eine Spielernummer öffnet sich ein Pop-up-Fenster zur Namensänderung.</li>
+          <li><strong>Namens-Styling:</strong> Spielernamen in der Liste nicht mehr fett gedruckt und in Dunkelgrau (`#2d3748`).</li>
+        </ul>
+      </div>
       
       <div class="version-entry">
-        <h4>v1.2.0 (Aktuell)</h4>
+        <h4>v1.2.0</h4>
         <ul>
           <li><strong>Neuer Name & Untertitel:</strong> 'THIS IS DARTA 🎯' als Haupttitel & 'Dartsaison - Manager' als Untertitel.</li>
           <li><strong>WhatsApp-Linkvorschau:</strong> Neuer Titel und Beschreibung für geteilte Links.</li>
@@ -544,7 +585,7 @@
           <li><strong>Leg Stats Prüfungen:</strong> Max-Limits für Darts, Checkout %, Big Fish (170) & Highscores.</li>
           <li><strong>2-Spalten Layout:</strong> Spielerliste (1-10 und 11-20) übersichtlich nebeneinander.</li>
           <li><strong>Dauerhafter Login:</strong> Automatisches Merken des Login-Status im Browser.</li>
-          <li><strong>Bearbeiten-Funktion:</strong> Leg Stats über ✏️ Stift-Symbol nachträglich korrigierbar.</li>
+          <li><strong>Bearbeiten-Funktion:</strong> Leg Stats über ✏️️ Stift-Symbol nachträglich korrigierbar.</li>
         </ul>
       </div>
 
@@ -625,6 +666,7 @@
   let selectedCount = 4, selectedBonus = 1;
   let tempLegsH = null, tempLegsG = null;
   let isSeasonActive = false;
+  let editingPlayerIdx = null;
 
   let playersData = [];
 
@@ -664,8 +706,9 @@
         <div class="draggable-item" draggable="true" data-index="${idx}">
           <span class="drag-handle">☰</span>
           <span style="font-weight:bold; font-size:12px; width:20px; color:var(--text-muted);">${idx+1}.</span>
-          <input type="text" class="player-input-field" value="${p.name}" placeholder="Name eintragen..." 
-                 onchange="updatePlayerName(${idx}, this.value)" style="background:${p.color};">
+          <button class="player-name-display-btn" onclick="openEditPlayerModal(${idx})" style="background:${p.color};">
+            ${p.name}
+          </button>
         </div>`;
       
       if (idx < 10) {
@@ -682,8 +725,21 @@
     addDragDropListeners();
   }
 
-  function updatePlayerName(idx, val) {
-    playersData[idx].name = val.trim();
+  // POP-UP STEUERUNG FÜR DIE EDTIERUNG DES SPIELERNAMENS
+  function openEditPlayerModal(idx) {
+    editingPlayerIdx = idx;
+    const p = playersData[idx];
+    document.getElementById('editPlayerModalSub').innerText = `Spieler-Nummer ${idx+1}`;
+    document.getElementById('inpEditPlayerNameVal').value = p.name;
+    document.getElementById('editPlayerNameModal').style.display = 'flex';
+  }
+
+  function saveEditedPlayerNameFromModal() {
+    if (editingPlayerIdx === null) return;
+    const val = document.getElementById('inpEditPlayerNameVal').value.trim();
+    playersData[editingPlayerIdx].name = val;
+    document.getElementById('editPlayerNameModal').style.display = 'none';
+    
     saveAllPlayersToCloud();
     sortPlayersData();
     renderDraggablePlayerList();
@@ -727,7 +783,7 @@
 
   function openStartModal() {
     if (isSeasonActive) {
-      const autoSave = confirm("⚠️️ Es läuft bereits eine Saison!\n\nSoll der aktuelle Stand der laufenden Saison vor dem Start der neuen Saison AUTOMATISCH GESPEICHERT werden?");
+      const autoSave = confirm("⚠️ Es läuft bereits eine Saison!\n\nSoll der aktuelle Stand der laufenden Saison vor dem Start der neuen Saison AUTOMATISCH GESPEICHERT werden?");
       if (autoSave) {
         saveCurrentSeason();
       }
@@ -917,7 +973,7 @@
     let col2HTML = '<div class="player-column">';
 
     activePlayers.forEach((p, idx) => {
-      let badgeHTML = `<div style="padding:8px 12px; border-radius:6px; background:${p.color}; color:#1a202c; font-weight:bold; border:1px solid #ccc;">
+      let badgeHTML = `<div style="padding:8px 12px; border-radius:6px; background:${p.color}; color:#2d3748; font-weight:normal; border:1px solid #ccc;">
         ${idx+1}. ${p.name}
       </div>`;
       if (idx < 10) {

@@ -79,17 +79,36 @@
   .btn-reset { background: #c62828; }
   .btn-reset:hover { background: #b71c1c; }
   
-  /* STATUS BADGE */
+  /* LOGOUT BAR & STATUS BADGE */
+  .status-container {
+    float: right;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
   .login-status-badge {
     display: inline-block;
     background: #1c4522;
     color: #48bb78;
     border: 1px solid #2f855a;
-    padding: 4px 12px;
+    padding: 4px 10px;
     border-radius: 20px;
     font-size: 12px;
     font-weight: bold;
-    float: right;
+  }
+  .btn-logout {
+    background: #9b2c2c;
+    color: #fff;
+    border: 1px solid #e53e3e;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-logout:hover {
+    background: #c53030;
   }
 
   /* DARK TABLES */
@@ -105,8 +124,28 @@
   
   /* MODAL POP-UPS */
   .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); justify-content: center; align-items: center; z-index: 1000; backdrop-filter: blur(5px); }
-  .modal-content { background: var(--card-dark); border: 1px solid var(--card-border); padding: 25px; border-radius: 14px; width: 420px; max-width: 90%; max-height: 85vh; overflow-y: auto; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.9); color: white; }
+  .modal-content { position: relative; background: var(--card-dark); border: 1px solid var(--card-border); padding: 25px; border-radius: 14px; width: 420px; max-width: 90%; max-height: 85vh; overflow-y: auto; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.9); color: white; }
   .modal input[type="text"], .modal input[type="number"] { width: 85%; padding: 8px; font-size: 14px; text-align: center; margin: 4px 0; border: 1px solid #4a5568; border-radius: 6px; background: #1a202c; color: white; }
+
+  /* EDIT STATS ICON IN MODAL TOP-RIGHT */
+  .edit-stats-btn {
+    position: absolute;
+    top: 18px;
+    right: 20px;
+    background: #2d3748;
+    color: #e2e8f0;
+    border: 1px solid #4a5568;
+    border-radius: 6px;
+    padding: 6px 10px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .edit-stats-btn:hover {
+    background: var(--accent-green);
+    color: white;
+    border-color: #48bb78;
+  }
 
   /* BUTTON GRIDS IN MODALS */
   .grid-buttons-players { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin: 15px 0; }
@@ -121,13 +160,24 @@
   .stats-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; align-items: center; margin-bottom: 8px; text-align: center; font-size: 13px; }
   .stats-grid label { font-weight: bold; color: var(--text-muted); }
 
-  /* DRAG & DROP SPIELERLISTE */
-  .player-list-vertical { display: flex; flex-direction: column; gap: 8px; max-width: 380px; margin-top: 12px; }
+  /* ZWEI-SPALTIGES LAYOUT FÜR DIE SPIELERLISTE (1-10 und 11-20) */
+  .player-list-two-columns { 
+    display: grid; 
+    grid-template-columns: 1fr 1fr; 
+    gap: 15px; 
+    max-width: 720px; 
+    margin-top: 12px; 
+  }
+  @media (max-width: 600px) {
+    .player-list-two-columns { grid-template-columns: 1fr; }
+  }
+  .player-column { display: flex; flex-direction: column; gap: 8px; }
+
   .draggable-item { 
     display: flex; 
     align-items: center; 
-    gap: 10px; 
-    padding: 8px 12px; 
+    gap: 8px; 
+    padding: 6px 10px; 
     border-radius: 6px; 
     background: rgba(26, 32, 44, 0.9); 
     border: 1px solid #2d3748; 
@@ -136,8 +186,8 @@
     transition: transform 0.15s, box-shadow 0.15s;
   }
   .draggable-item:active { cursor: grabbing; transform: scale(1.02); box-shadow: 0 5px 15px rgba(0,0,0,0.6); }
-  .drag-handle { font-size: 18px; color: var(--text-muted); cursor: grab; }
-  .player-input-field { flex: 1; padding: 6px 10px; border: 1px solid #4a5568; border-radius: 4px; font-weight: bold; color: #1a202c; }
+  .drag-handle { font-size: 16px; color: var(--text-muted); cursor: grab; }
+  .player-input-field { flex: 1; min-width: 0; padding: 6px 8px; border: 1px solid #4a5568; border-radius: 4px; font-weight: bold; color: #1a202c; font-size: 13px; }
 
   /* STYLISCHE OPTIMIERTE PDF & DRUCK-ANSICHT */
   @media print {
@@ -159,7 +209,10 @@
 
 <!-- STEUERUNG -->
 <div class="card no-print">
-  <span class="login-status-badge">🟢 Eingeloggt</span>
+  <div class="status-container">
+    <span class="login-status-badge">🟢 Eingeloggt</span>
+    <button class="btn-logout" onclick="logoutUser()">🔴 Ausloggen</button>
+  </div>
   <h3>1. Saison-Steuerung</h3>
   <button class="btn" onclick="openStartModal()">🚀 Neue Saison starten</button>
   <button class="btn btn-save" onclick="saveCurrentSeason()">💾 Aktuelle Saison speichern</button>
@@ -179,7 +232,7 @@
   </div>
   
   <h4 style="margin-top:18px;" id="whoIsHeader">Wer ist dabei? (Drag & Drop zum Sortieren)</h4>
-  <div id="playerInputs" class="player-list-vertical"></div>
+  <div id="playerInputs" class="player-list-two-columns"></div>
 </div>
 
 <!-- LEGENDE / ERKLÄRUNG -->
@@ -319,13 +372,13 @@
 
       <div class="stats-grid"><input type="number" step="0.01" id="st_ppr_h" placeholder="0.00"><label>PPR</label><input type="number" step="0.01" id="st_ppr_g" placeholder="0.00"></div>
       <div class="stats-grid"><input type="number" step="0.01" id="st_f9_h" placeholder="0.00"><label>FIRST 9 PPR</label><input type="number" step="0.01" id="st_f9_g" placeholder="0.00"></div>
-      <div class="stats-grid"><input type="number" id="st_darts_h" placeholder="0"><label>DARTS THROWN</label><input type="number" id="st_darts_g" placeholder="0"></div>
-      <div class="stats-grid"><input type="number" step="0.1" id="st_co_pct_h" placeholder="0%"><label>CHECKOUT%</label><input type="number" step="0.1" id="st_co_pct_g" placeholder="0%"></div>
-      <div class="stats-grid"><input type="number" id="st_co_pts_h" placeholder="0"><label>CHECKOUT POINTS</label><input type="number" id="st_co_pts_g" placeholder="0"></div>
-      <div class="stats-grid"><input type="number" id="st_60_h" placeholder="0"><label>60+</label><input type="number" id="st_60_g" placeholder="0"></div>
-      <div class="stats-grid"><input type="number" id="st_100_h" placeholder="0"><label>100+</label><input type="number" id="st_100_g" placeholder="0"></div>
-      <div class="stats-grid"><input type="number" id="st_140_h" placeholder="0"><label>140+</label><input type="number" id="st_140_g" placeholder="0"></div>
-      <div class="stats-grid"><input type="number" id="st_180_h" placeholder="0"><label>180</label><input type="number" id="st_180_g" placeholder="0"></div>
+      <div class="stats-grid"><input type="number" id="st_darts_h" min="0" max="150" placeholder="max. 150"><label>DARTS THROWN</label><input type="number" id="st_darts_g" min="0" max="150" placeholder="max. 150"></div>
+      <div class="stats-grid"><input type="number" step="0.1" id="st_co_pct_h" min="0" max="100" placeholder="max. 100%"><label>CHECKOUT%</label><input type="number" step="0.1" id="st_co_pct_g" min="0" max="100" placeholder="max. 100%"></div>
+      <div class="stats-grid"><input type="number" id="st_co_pts_h" min="0" max="170" placeholder="max. 170"><label>CHECKOUT POINTS</label><input type="number" id="st_co_pts_g" min="0" max="170" placeholder="max. 170"></div>
+      <div class="stats-grid"><input type="number" id="st_60_h" min="0" max="30" placeholder="max. 30"><label>60+</label><input type="number" id="st_60_g" min="0" max="30" placeholder="max. 30"></div>
+      <div class="stats-grid"><input type="number" id="st_100_h" min="0" max="10" placeholder="max. 10"><label>100+</label><input type="number" id="st_100_g" min="0" max="10" placeholder="max. 10"></div>
+      <div class="stats-grid"><input type="number" id="st_140_h" min="0" max="10" placeholder="max. 10"><label>140+</label><input type="number" id="st_140_g" min="0" max="10" placeholder="max. 10"></div>
+      <div class="stats-grid"><input type="number" id="st_180_h" min="0" max="10" placeholder="max. 10"><label>180</label><input type="number" id="st_180_g" min="0" max="10" placeholder="max. 10"></div>
     </div>
 
     <div style="margin-top:15px;">
@@ -338,6 +391,7 @@
 <!-- VIEW MATCH STATS MODAL -->
 <div id="viewStatsModal" class="modal">
   <div class="modal-content">
+    <button class="edit-stats-btn" onclick="editCurrentMatchStats()" title="Statistiken bearbeiten">✏️</button>
     <h3>📊 MATCH LEG STATS</h3>
     <p id="viewStatsHeader" style="font-weight:bold; color:var(--text-muted);"></p>
     <div id="viewStatsContent"></div>
@@ -387,7 +441,6 @@
 
   const MASTER_PW = "1328";
 
-  // SIMPSONS PROMINENTE CHARAKTERE FÜR VORAUSFÜLLUNG (VOR- UND NACHNAME)
   const simpsonsNames = [
     "Homer Simpson", "Marge Simpson", "Bart Simpson", "Lisa Simpson", "Maggie Simpson",
     "Ned Flanders", "Barney Gumble", "Moe Szyslak", "Krusty Krustofski", "Charles Burns",
@@ -395,7 +448,6 @@
     "Apu Nahasapeemapetilon", "Chief Wiggum", "Sideshow Bob", "Fat Tony", "Disco Stu"
   ];
 
-  // LOGINSCHUTZ & DAUERHAFTE SESSION-SPEICHERUNG IN LOCALSTORAGE
   function checkInitialPassword() {
     let isLoggedIn = localStorage.getItem("dart_logged_in");
     if (isLoggedIn === "true") {
@@ -410,6 +462,14 @@
     } else {
       alert("❌ Falsches Passwort! Zugriff verweigert.");
       document.body.innerHTML = "<h2 style='text-align:center; margin-top:50px; color:#c62828;'>🔐 Zugriff verweigert. Falsches Passwort.</h2>";
+    }
+  }
+
+  // AUSLOGGEN FUNKTION
+  function logoutUser() {
+    if (confirm("Möchtest du dich wirklich ausloggen?")) {
+      localStorage.removeItem("dart_logged_in");
+      location.reload();
     }
   }
 
@@ -459,16 +519,29 @@
     const container = document.getElementById('playerInputs');
     container.innerHTML = '';
     
+    let col1HTML = '<div class="player-column">';
+    let col2HTML = '<div class="player-column">';
+
     playersData.forEach((p, idx) => {
-      container.innerHTML += `
+      let itemHTML = `
         <div class="draggable-item" draggable="true" data-index="${idx}">
           <span class="drag-handle">☰</span>
-          <span style="font-weight:bold; font-size:13px; width:22px; color:var(--text-muted);">${idx+1}.</span>
+          <span style="font-weight:bold; font-size:12px; width:20px; color:var(--text-muted);">${idx+1}.</span>
           <input type="text" class="player-input-field" value="${p.name}" placeholder="Name eintragen..." 
                  onchange="updatePlayerName(${idx}, this.value)" style="background:${p.color};">
         </div>`;
+      
+      if (idx < 10) {
+        col1HTML += itemHTML;
+      } else {
+        col2HTML += itemHTML;
+      }
     });
 
+    col1HTML += '</div>';
+    col2HTML += '</div>';
+
+    container.innerHTML = col1HTML + col2HTML;
     addDragDropListeners();
   }
 
@@ -672,11 +745,25 @@
     document.getElementById('whoIsHeader').innerText = `Wer ist dabei? (Aktive Saison: ${activePlayers.length} Spieler)`;
     const container = document.getElementById('playerInputs');
     container.innerHTML = '';
+    
+    let col1HTML = '<div class="player-column">';
+    let col2HTML = '<div class="player-column">';
+
     activePlayers.forEach((p, idx) => {
-      container.innerHTML += `<div style="padding:8px 12px; border-radius:6px; background:${p.color}; color:#1a202c; font-weight:bold; border:1px solid #ccc;">
+      let badgeHTML = `<div style="padding:8px 12px; border-radius:6px; background:${p.color}; color:#1a202c; font-weight:bold; border:1px solid #ccc;">
         ${idx+1}. ${p.name}
       </div>`;
+      if (idx < 10) {
+        col1HTML += badgeHTML;
+      } else {
+        col2HTML += badgeHTML;
+      }
     });
+
+    col1HTML += '</div>';
+    col2HTML += '</div>';
+
+    container.innerHTML = col1HTML + col2HTML;
   }
 
   function generateSchedule(n, isRueckrunde) {
@@ -723,8 +810,6 @@
       } else {
         let pktH = m.legsH !== null ? (m.legsH + (m.legsH === 4 ? bonusPoints : 0)) : '';
         let pktG = m.legsG !== null ? (m.legsG + (m.legsG === 4 ? bonusPoints : 0)) : '';
-        
-        // GRÜNER HAKEN WENN STATISTIKEN ERFASST WURDEN
         let hasStats = m.stats ? '✅' : '-';
         
         tbody.innerHTML += `<tr class="match-row" style="${rowStyle}">
@@ -855,26 +940,41 @@
     document.getElementById('legStatsModal').style.display = 'none';
   }
 
+  function getLimitedValue(inputId, maxLimit) {
+    let val = parseFloat(document.getElementById(inputId).value) || 0;
+    if (val > maxLimit) {
+      val = maxLimit;
+    }
+    return val;
+  }
+
   function saveMatchStats() {
     currentMatches[selectedMatchIndex].stats = {
       ppr_h: parseFloat(document.getElementById('st_ppr_h').value) || 0,
       ppr_g: parseFloat(document.getElementById('st_ppr_g').value) || 0,
       f9_h: parseFloat(document.getElementById('st_f9_h').value) || 0,
       f9_g: parseFloat(document.getElementById('st_f9_g').value) || 0,
-      darts_h: parseInt(document.getElementById('st_darts_h').value) || 0,
-      darts_g: parseInt(document.getElementById('st_darts_g').value) || 0,
-      co_pct_h: parseFloat(document.getElementById('st_co_pct_h').value) || 0,
-      co_pct_g: parseFloat(document.getElementById('st_co_pct_g').value) || 0,
-      co_pts_h: parseInt(document.getElementById('st_co_pts_h').value) || 0,
-      co_pts_g: parseInt(document.getElementById('st_co_pts_g').value) || 0,
-      c60_h: parseInt(document.getElementById('st_60_h').value) || 0,
-      c60_g: parseInt(document.getElementById('st_60_g').value) || 0,
-      c100_h: parseInt(document.getElementById('st_100_h').value) || 0,
-      c100_g: parseInt(document.getElementById('st_100_g').value) || 0,
-      c140_h: parseInt(document.getElementById('st_140_h').value) || 0,
-      c140_g: parseInt(document.getElementById('st_140_g').value) || 0,
-      c180_h: parseInt(document.getElementById('st_180_h').value) || 0,
-      c180_g: parseInt(document.getElementById('st_180_g').value) || 0
+      
+      darts_h: getLimitedValue('st_darts_h', 150),
+      darts_g: getLimitedValue('st_darts_g', 150),
+      
+      co_pct_h: getLimitedValue('st_co_pct_h', 100),
+      co_pct_g: getLimitedValue('st_co_pct_g', 100),
+      
+      co_pts_h: getLimitedValue('st_co_pts_h', 170),
+      co_pts_g: getLimitedValue('st_co_pts_g', 170),
+      
+      c60_h: getLimitedValue('st_60_h', 30),
+      c60_g: getLimitedValue('st_60_g', 30),
+      
+      c100_h: getLimitedValue('st_100_h', 10),
+      c100_g: getLimitedValue('st_100_g', 10),
+      
+      c140_h: getLimitedValue('st_140_h', 10),
+      c140_g: getLimitedValue('st_140_g', 10),
+      
+      c180_h: getLimitedValue('st_180_h', 10),
+      c180_g: getLimitedValue('st_180_g', 10)
     };
 
     closeLegStatsModal();
@@ -882,6 +982,7 @@
   }
 
   function viewMatchStats(idx) {
+    selectedMatchIndex = idx;
     const m = currentMatches[idx];
     if (!m.stats) {
       alert("Für dieses Match wurden keine Leg Stats erfasst.");
@@ -906,6 +1007,11 @@
     `;
 
     document.getElementById('viewStatsModal').style.display = 'flex';
+  }
+
+  function editCurrentMatchStats() {
+    document.getElementById('viewStatsModal').style.display = 'none';
+    openLegStatsInputModal();
   }
 
   function openGlobalStatsModal() {

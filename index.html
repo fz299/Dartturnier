@@ -45,13 +45,11 @@
     --points-bg: #2b3648;
   }
 
-  /* VERHINDERT SCROLLEN IM HINTERGRUND BEI GEÖFFNETEM MODAL ODER BEIM ZIEHEN */
   body.modal-open, body.dragging-active {
     overflow: hidden !important;
     touch-action: none !important;
   }
 
-  /* BILD-HINTERGRUND MIT DUNKLEM OVERLAY */
   body { 
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
     margin: 0; 
@@ -62,7 +60,6 @@
     min-height: 100vh;
   }
 
-  /* VERSION BADGE OBEN LINKS (INTERAKTIV) */
   .version-badge-top-left {
     position: absolute;
     top: 15px;
@@ -86,7 +83,6 @@
     border-color: #48bb78;
   }
 
-  /* KOPFZEILEN-STYLING */
   .header-title-container {
     text-align: center;
     margin-bottom: 25px;
@@ -120,7 +116,6 @@
 
   h3, h4 { color: #ffffff; margin-top: 0; }
   
-  /* EDLES BUTTON-STYLING */
   .btn { 
     background: var(--btn-primary); 
     color: white; 
@@ -152,7 +147,6 @@
   .btn-reset { background: var(--btn-danger); }
   .btn-reset:hover:not(:disabled) { background: var(--btn-danger-hover); }
   
-  /* STATUS BADGE & LOGOUT BUTTON */
   .status-container {
     float: right;
     display: flex;
@@ -184,7 +178,6 @@
     background: var(--btn-danger-hover);
   }
 
-  /* DROPDOWN BLINK ANIMATION BEIM SPEICHERN */
   .flash-success {
     animation: flashGreen 0.9s ease-in-out;
   }
@@ -194,7 +187,6 @@
     100% { border-color: #4a5568; box-shadow: none; background-color: #2d3748; }
   }
 
-  /* DARK TABLES */
   table { width: 100%; border-collapse: collapse; margin-top: 12px; background: rgba(26, 32, 44, 0.95); border-radius: 8px; overflow: hidden; }
   th { background: #2d3748; color: #ffffff; padding: 12px 10px; text-align: center; font-size: 14px; border-bottom: 2px solid #4a5568; }
   td { padding: 10px 8px; border: 1px solid #2d3748; text-align: center; color: var(--text-main); }
@@ -205,12 +197,10 @@
   
   .legend-box { background: rgba(23, 25, 35, 0.9); border-left: 5px solid var(--btn-primary); padding: 12px 15px; margin-top: 10px; border-radius: 6px; font-size: 13.5px; line-height: 1.5; color: var(--text-muted); }
   
-  /* MODAL POP-UPS */
   .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); justify-content: center; align-items: center; z-index: 1000; backdrop-filter: blur(5px); }
   .modal-content { position: relative; background: var(--card-dark); border: 1px solid var(--card-border); padding: 25px; border-radius: 14px; width: 420px; max-width: 90%; max-height: 85vh; overflow-y: auto; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.9); color: white; -webkit-overflow-scrolling: touch; }
   .modal input[type="text"], .modal input[type="number"] { width: 85%; padding: 8px; font-size: 14px; text-align: center; margin: 4px 0; border: 1px solid #4a5568; border-radius: 6px; background: #1a202c; color: white; }
 
-  /* EDIT STATS ICON IN MODAL TOP-RIGHT */
   .edit-stats-btn {
     position: absolute;
     top: 18px;
@@ -230,7 +220,6 @@
     border-color: #48bb78;
   }
 
-  /* BUTTON GRIDS IN MODALS */
   .grid-buttons-players { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin: 15px 0; }
   .grid-buttons { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 15px 0; }
   .grid-5 { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin: 10px 0; }
@@ -239,11 +228,9 @@
   .select-btn:hover { background: #4a5568; }
   .select-btn.selected { background: var(--btn-primary); color: white; border-color: #48bb78; box-shadow: 0 0 10px rgba(72, 187, 120, 0.5); }
 
-  /* STATS TABLE STYLE */
   .stats-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; align-items: center; margin-bottom: 8px; text-align: center; font-size: 13px; }
   .stats-grid label { font-weight: bold; color: var(--text-muted); }
 
-  /* ZWEI-SPALTIGES LAYOUT FÜR DIE SPIELERLISTE (1-10 und 11-20) */
   .player-list-two-columns { 
     display: grid; 
     grid-template-columns: 1fr 1fr; 
@@ -256,7 +243,6 @@
   }
   .player-column { display: flex; flex-direction: column; gap: 8px; position: relative; }
 
-  /* DRAG & DROP STYLING MIT HOCHSTABILER LÜCKE */
   .draggable-item { 
     display: flex; 
     align-items: center; 
@@ -298,7 +284,6 @@
     touch-action: none;
   }
   
-  /* NAMEN BUTTON STYLING */
   .player-name-display-btn { 
     flex: 1; 
     min-width: 0; 
@@ -324,6 +309,31 @@
   }
   .player-name-display-btn:hover {
     filter: brightness(0.92);
+  }
+
+  /* TAB BUTTONS FÜR HIN-, RÜCK- UND GESAMTRUNDE */
+  .tab-container {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+  }
+  .tab-btn {
+    background: #2d3748;
+    color: var(--text-muted);
+    border: 1px solid #4a5568;
+    padding: 8px 14px;
+    border-radius: 6px;
+    font-weight: bold;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .tab-btn.active {
+    background: var(--btn-primary);
+    color: white;
+    border-color: #48bb78;
+    box-shadow: 0 0 10px rgba(72, 187, 120, 0.4);
   }
 
   /* VERSIONSVERLAUF ACCORDION STYLES */
@@ -374,8 +384,7 @@
     color: var(--text-main);
   }
 
-  /* DRUCKBEREICH STATS TABLE (NUR IM DRUCK DRUCKBAR) */
-  #printStatsSection {
+  .print-only-table {
     display: none;
   }
 
@@ -411,9 +420,8 @@
     .match-row { background-color: transparent !important; }
     tr:nth-child(even) { background-color: #f2f4f6 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 
-    #printStatsSection {
+    .print-only-table {
       display: block !important;
-      page-break-before: auto;
     }
   }
 </style>
@@ -421,7 +429,7 @@
 <body id="mainBody" style="display:none;">
 
 <!-- VERSIONSANZEIGE GANZ LINKS OBEN (KLICKBAR) -->
-<div class="version-badge-top-left no-print" onclick="openVersionHistoryModal()">v2.6.0</div>
+<div class="version-badge-top-left no-print" onclick="openVersionHistoryModal()">v2.7.0</div>
 
 <div class="header-title-container">
   <h1>THIS IS DARTA 🎯</h1>
@@ -471,12 +479,41 @@
   <!-- RANGLISTE -->
   <div class="card">
     <h3 id="saisonTitle">Rangliste</h3>
+    
+    <!-- TABS FÜR HIN-, RÜCK- UND GESAMTRUNDE (NUR BEI SAISON MIT RÜCKRUNDE) -->
+    <div id="tableTabsContainer" class="tab-container no-print" style="display:none;">
+      <button class="tab-btn active" id="tabBtnAll" onclick="switchTableTab('all')">🏆 Gesamttabelle (Hin- & Rückrunde)</button>
+      <button class="tab-btn" id="tabBtnHin" onclick="switchTableTab('hin')">🥇 Hinrunde</button>
+      <button class="tab-btn" id="tabBtnRueck" onclick="switchTableTab('rueck')">🥈 Rückrunde</button>
+    </div>
+
     <table>
       <thead>
         <tr><th>Platz</th><th>Spieler</th><th>Spiele</th><th>Siege</th><th>Niederl.</th><th>Gewonnene Legs</th><th>Verlorene Legs</th><th>Punkte</th></tr>
       </thead>
       <tbody id="standingsBody"></tbody>
     </table>
+
+    <!-- ZUSÄTZLICHE TABELLEN FÜR DEN DRUCK BEI RÜCKRUNDE -->
+    <div class="print-only-table" id="printHinrundeSection">
+      <h3 style="margin-top:15px;">🥇 Hinrunde Rangliste</h3>
+      <table>
+        <thead>
+          <tr><th>Platz</th><th>Spieler</th><th>Spiele</th><th>Siege</th><th>Niederl.</th><th>Gewonnene Legs</th><th>Verlorene Legs</th><th>Punkte</th></tr>
+        </thead>
+        <tbody id="printHinBody"></tbody>
+      </table>
+    </div>
+
+    <div class="print-only-table" id="printRueckrundeSection">
+      <h3 style="margin-top:15px;">🥈 Rückrunde Rangliste</h3>
+      <table>
+        <thead>
+          <tr><th>Platz</th><th>Spieler</th><th>Spiele</th><th>Siege</th><th>Niederl.</th><th>Gewonnene Legs</th><th>Verlorene Legs</th><th>Punkte</th></tr>
+        </thead>
+        <tbody id="printRueckBody"></tbody>
+      </table>
+    </div>
   </div>
 
   <!-- SPIELPLAN -->
@@ -490,8 +527,8 @@
     </table>
   </div>
 
-  <!-- BEREICH FÜR DESTATISTIKEN IM DRUCK (NUR IN DER DRUCKANSICHT SICHTBAR) -->
-  <div class="card" id="printStatsSection">
+  <!-- BEREICH FÜR DESTATISTIKEN IM DRUCK -->
+  <div class="card print-only-table" id="printStatsSection">
     <h3>📊 Saison Gesamtstatistik</h3>
     <table>
       <thead>
@@ -542,6 +579,14 @@
       <button class="select-btn btn-bonus" onclick="selectBonusPoints(3)">+3 Pkt</button>
     </div>
 
+    <p style="margin-bottom:2px; font-weight:bold; margin-top:12px;">4. Rundenmodus:</p>
+    <div style="text-align:left; background:rgba(26,32,44,0.8); padding:10px; border-radius:6px; border:1px solid #4a5568;">
+      <label style="cursor:pointer; display:flex; align-items:center; gap:8px;">
+        <input type="checkbox" id="chkWithRueckrunde" style="width:18px; height:18px; cursor:pointer;">
+        <span>🔄 Rückrunde mit einplanen (Hin- & Rückrunde)</span>
+      </label>
+    </div>
+
     <div style="margin-top:18px;">
       <button class="btn" onclick="confirmStartSaison()">Saison Starten</button>
       <button class="btn" style="background:#777;" onclick="closeStartModal()">Abbrechen</button>
@@ -585,6 +630,14 @@
       <button class="select-btn btn-edit-bonus" onclick="selectEditBonusPoints(1)">+1 Pt</button>
       <button class="select-btn btn-edit-bonus" onclick="selectEditBonusPoints(2)">+2 Pkt</button>
       <button class="select-btn btn-edit-bonus" onclick="selectEditBonusPoints(3)">+3 Pkt</button>
+    </div>
+
+    <p style="margin-bottom:2px; font-weight:bold; margin-top:12px;">4. Rundenmodus:</p>
+    <div style="text-align:left; background:rgba(26,32,44,0.8); padding:10px; border-radius:6px; border:1px solid #4a5568;">
+      <label style="cursor:pointer; display:flex; align-items:center; gap:8px;">
+        <input type="checkbox" id="chkEditWithRueckrunde" style="width:18px; height:18px; cursor:pointer;">
+        <span>🔄 Rückrunde mit einplanen (Hin- & Rückrunde)</span>
+      </label>
     </div>
 
     <div style="margin-top:18px;">
@@ -725,12 +778,25 @@
 
       <div class="version-entry open">
         <div class="version-header" onclick="toggleVersionEntry(this)">
-          <h4>v2.6.0 (Aktuell)</h4>
+          <h4>v2.7.0 (Aktuell)</h4>
           <span class="version-toggle-icon">▼</span>
         </div>
         <div class="version-body">
           <ul>
-            <li><strong>Professionelles Farbkonzept:</strong> Einheitliche, stimmige Button-Farben (Grün, Schieferblau, Petrol, Dunkelorange, Mattrot).</li>
+            <li><strong>Rückrunde mit einplanen:</strong> Neue Checkbox beim Saisonstart / Bearbeiten zum automatischen Einplanen von Hin- & Rückrunde.</li>
+            <li><strong>3-fach Auswertung:</strong> Tabs für Gesamttabelle (Hin- & Rückrunde), Hinrunde-Sieger und Rückrunde-Sieger. All 3 Ranglisten werden auch beim PDF-Druck ausgegeben.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="version-entry">
+        <div class="version-header" onclick="toggleVersionEntry(this)">
+          <h4>v2.6.0</h4>
+          <span class="version-toggle-icon">▼</span>
+        </div>
+        <div class="version-body">
+          <ul>
+            <li><strong>Professionelles Farbkonzept:</strong> Stimmige Button-Farben (Grün, Schieferblau, Petrol, Dunkelorange, Mattrot).</li>
             <li><strong>Optimierte PDF-Druckansicht:</strong> Druck im automatischen Querformat (Landscape) mit integrierter Tabelle aller erfassten Leg Stats.</li>
           </ul>
         </div>
@@ -743,9 +809,8 @@
         </div>
         <div class="version-body">
           <ul>
-            <li><strong>Vollständiger Changelog:</strong> Alle historischen Versionen ab v1.0.0 wieder im Verlauf enthalten. Nur v2.5.0 ist standardmäßig geöffnet.</li>
+            <li><strong>Vollständiger Changelog:</strong> Alle historischen Versionen ab v1.0.0 wieder im Verlauf enthalten.</li>
             <li><strong>Bereinigte Überschriften:</strong> '1. Saison-Steuerung' und 'Drag & Drop zum Sortieren' entfernt.</li>
-            <li><strong>Stärkerer Neon-Glow:</strong> Manuell eingetragene Namen leuchten in einem kräftigeren Grün.</li>
           </ul>
         </div>
       </div>
@@ -770,7 +835,6 @@
         <div class="version-body">
           <ul>
             <li><strong>Visuelle Hervorhebung manueller Namen:</strong> Echte Namen werden fett und mit einem dezenten Neon-Glow hervorgehoben.</li>
-            <li><strong>Fix Mobil-Drag&Drop:</strong> Scroll-Sperre während des Ziehens verhindert Wackeln.</li>
           </ul>
         </div>
       </div>
@@ -783,7 +847,6 @@
         <div class="version-body">
           <ul>
             <li><strong>Automatische Erstplatzierung:</strong> Manuell eingetragene Spielernamen sortieren sich sofort automatisch nach oben.</li>
-            <li><strong>Stabiles Drag & Drop:</strong> Snapping-Effekt mit vergrößerter Lücke (42px).</li>
           </ul>
         </div>
       </div>
@@ -795,8 +858,7 @@
         </div>
         <div class="version-body">
           <ul>
-            <li><strong>Aufklappbare Versionsanzeige:</strong> Die neuesten 3 Versionen waren geöffnet, ältere einklappbar.</li>
-            <li><strong>Hintergrund-Scroll-Sperre:</strong> Bei geöffnetem Pop-up-Fenster wird das Scrollen der Hauptseite gesperrt.</li>
+            <li><strong>Aufklappbare Versionsanzeige & Scroll-Sperre:</strong> Aufklappbarer Verlauf und Hintergrund-Scroll-Sperre.</li>
           </ul>
         </div>
       </div>
@@ -820,7 +882,7 @@
         </div>
         <div class="version-body">
           <ul>
-            <li><strong>Visuelle Drag&Drop-Hervorhebung:</strong> Ausgewähltes Namenselement vergrößert sich und leuchtet grün.</li>
+            <li><strong>Visuelle Drag&Drop-Hervorhebung:</strong> Ausgewähltes Namenselement vergrößert sich.</li>
           </ul>
         </div>
       </div>
@@ -844,7 +906,7 @@
         </div>
         <div class="version-body">
           <ul>
-            <li><strong>Auto-Reset beim Löschen:</strong> Beim Löschen einer Saison wird die Ansicht automatisch zurückgesetzt.</li>
+            <li><strong>Auto-Reset beim Löschen:</strong> Beim Löschen einer Saison wird die Ansicht zurückgesetzt.</li>
           </ul>
         </div>
       </div>
@@ -1043,6 +1105,8 @@
   let currentSeasonName = "Saison 1", currentMatches = [], activePlayers = [], selectedMatchIndex = null;
   let selectedCount = 4, selectedBonus = 1;
   let editSelectedCount = 4, editSelectedBonus = 1;
+  let hasRueckrunde = false;
+  let currentTableTab = 'all'; // 'all', 'hin', 'rueck'
   let tempLegsH = null, tempLegsG = null;
   let isSeasonActive = false;
   let editingPlayerIdx = null;
@@ -1183,7 +1247,6 @@
     db.ref('playersData').set(saveObj);
   }
 
-  // VOLLSTÄNDIG ULTRA-STABILER TOUCH & DESKTOP DRAG & DROP LOGIK
   let dragSrcIndex = null;
   let touchDragElement = null;
   let currentTargetItem = null;
@@ -1320,6 +1383,7 @@
       }
     }
     document.getElementById('inpSeasonName').value = `Saison ${globalSeasonCounter}`;
+    document.getElementById('chkWithRueckrunde').checked = false;
     openModalById('startSeasonModal');
   }
 
@@ -1351,6 +1415,7 @@
 
     currentSeasonName = sName;
     bonusPoints = selectedBonus;
+    hasRueckrunde = document.getElementById('chkWithRueckrunde').checked;
 
     activePlayers = [];
     for(let i=0; i<selectedCount; i++) {
@@ -1362,9 +1427,10 @@
     closeStartModal();
     renderActivePlayersInControl();
 
-    generateSchedule(selectedCount, false);
+    generateSchedule(selectedCount, hasRueckrunde);
     document.getElementById('tournamentArea').style.display = 'block';
-    document.getElementById('saisonTitle').innerText = `Rangliste - ${currentSeasonName} (Sieger-Zusatzpunkte: +${bonusPoints})`;
+    
+    setupTableTabsUI();
     renderTable();
     saveCurrentSeason();
   }
@@ -1380,6 +1446,7 @@
     }
 
     document.getElementById('inpEditSeasonName').value = currentSeasonName;
+    document.getElementById('chkEditWithRueckrunde').checked = hasRueckrunde;
     editSelectedCount = activePlayers.length;
     editSelectedBonus = bonusPoints;
 
@@ -1410,6 +1477,7 @@
     let oldSeasonName = currentSeasonName;
     currentSeasonName = newName;
     bonusPoints = editSelectedBonus;
+    hasRueckrunde = document.getElementById('chkEditWithRueckrunde').checked;
 
     if (oldSeasonName !== newName) {
       let localSaved = JSON.parse(localStorage.getItem('dart_saved_seasons') || '{}');
@@ -1424,7 +1492,6 @@
         let name = playersData[i] ? playersData[i].name : `Spieler ${i+1}`;
         activePlayers.push({ id: i+1, name: name, color: colors[i % colors.length] });
       }
-      generateSchedule(editSelectedCount, false);
     } else if (editSelectedCount < oldCount) {
       activePlayers = activePlayers.slice(0, editSelectedCount);
       let validNames = activePlayers.map(p => p.name);
@@ -1433,10 +1500,11 @@
       });
     }
 
+    generateSchedule(editSelectedCount, hasRueckrunde);
+
     closeModalById('editSeasonModal');
     renderActivePlayersInControl();
-    document.getElementById('saisonTitle').innerText = `Rangliste - ${currentSeasonName} (Sieger-Zusatzpunkte: +${bonusPoints})`;
-    renderSchedule();
+    setupTableTabsUI();
     renderTable();
     saveCurrentSeason();
 
@@ -1452,6 +1520,7 @@
     const seasonData = {
       seasonName: currentSeasonName,
       bonusPoints: bonusPoints,
+      hasRueckrunde: hasRueckrunde,
       activePlayers: activePlayers,
       currentMatches: currentMatches
     };
@@ -1516,13 +1585,14 @@
   function applyLoadedSeason(sData) {
     currentSeasonName = sData.seasonName;
     bonusPoints = sData.bonusPoints;
+    hasRueckrunde = sData.hasRueckrunde || false;
     activePlayers = sData.activePlayers;
     currentMatches = sData.currentMatches;
     isSeasonActive = true;
 
     renderActivePlayersInControl();
     document.getElementById('tournamentArea').style.display = 'block';
-    document.getElementById('saisonTitle').innerText = `Rangliste - ${currentSeasonName} (Sieger-Zusatzpunkte: +${bonusPoints})`;
+    setupTableTabsUI();
     renderSchedule();
     renderTable();
   }
@@ -1602,7 +1672,8 @@
     container.innerHTML = col1HTML + col2HTML;
   }
 
-  function generateSchedule(n, isRueckrunde) {
+  // SPIELPLAN ERZEUGEN FÜR HIN- ODER HIN- & RÜCKRUNDE
+  function generateSchedule(n, withRueckrunde) {
     let pool = activePlayers.map((p, idx) => idx);
     if(n % 2 !== 0) pool.push(-1);
     const numRounds = pool.length - 1, half = pool.length / 2;
@@ -1610,14 +1681,14 @@
     let oldMatches = [...currentMatches];
     currentMatches = [];
 
+    // 1. HINRUNDE
     for(let r=0; r<numRounds; r++) {
       for(let i=0; i<half; i++) {
         let p1 = pool[i], p2 = pool[pool.length - 1 - i];
-        if(isRueckrunde) [p1, p2] = [p2, p1];
         if(p1 !== -1 && p2 !== -1) {
           let hPlayer = activePlayers[p1];
           let aPlayer = activePlayers[p2];
-          let existing = oldMatches.find(m => m.home && m.away && m.home.name === hPlayer.name && m.away.name === aPlayer.name);
+          let existing = oldMatches.find(m => m.day === (r+1) && m.home && m.away && m.home.name === hPlayer.name && m.away.name === aPlayer.name);
           if (existing) {
             currentMatches.push(existing);
           } else {
@@ -1630,6 +1701,35 @@
       }
       pool.splice(1, 0, pool.pop());
     }
+
+    // 2. RÜCKRUNDE (FALLS OPTION AN)
+    if (withRueckrunde) {
+      let poolR = activePlayers.map((p, idx) => idx);
+      if(n % 2 !== 0) poolR.push(-1);
+
+      for(let r=0; r<numRounds; r++) {
+        let currentRound = numRounds + r + 1;
+        for(let i=0; i<half; i++) {
+          let p1 = poolR[i], p2 = poolR[poolR.length - 1 - i];
+          // GETAUSCHTES HEIM / GASTRECHT IN DER RÜCKRUNDE
+          if(p1 !== -1 && p2 !== -1) {
+            let hPlayer = activePlayers[p2];
+            let aPlayer = activePlayers[p1];
+            let existing = oldMatches.find(m => m.day === currentRound && m.home && m.away && m.home.name === hPlayer.name && m.away.name === aPlayer.name);
+            if (existing) {
+              currentMatches.push(existing);
+            } else {
+              currentMatches.push({ day: currentRound, home: hPlayer, away: aPlayer, legsH: null, legsG: null, stats: null });
+            }
+          } else if(p1 !== -1 || p2 !== -1) {
+            let active = p1 !== -1 ? activePlayers[p1] : activePlayers[p2];
+            currentMatches.push({ day: currentRound, home: active, away: null, legsH: null, legsG: null, stats: null });
+          }
+        }
+        poolR.splice(1, 0, poolR.pop());
+      }
+    }
+
     renderSchedule();
   }
 
@@ -1867,7 +1967,6 @@
     openModalById('globalStatsModal');
   }
 
-  // HILFSFUNKTION FÜR STATISTIKBERECHNUNG UND RENDERN (AUCH FÜR DIE DRUCKANSICHT)
   function renderGlobalStatsTable(targetBodyId) {
     let pStats = activePlayers.map(p => ({
       name: p.name,
@@ -1941,35 +2040,66 @@
     });
   }
 
-  // DRUCK-TRIGGER FÜR PROFI-QUERFORMAT FÜR PDF
   function triggerLandscapePrint() {
     if (isSeasonActive) {
       renderGlobalStatsTable('printStatsBody');
+      if (hasRueckrunde) {
+        renderSingleTable(computeStatsFiltered(m => true), 'standingsBody');
+        renderSingleTable(computeStatsFiltered(m => m.day <= (activePlayers.length % 2 === 0 ? activePlayers.length - 1 : activePlayers.length)), 'printHinBody');
+        renderSingleTable(computeStatsFiltered(m => m.day > (activePlayers.length % 2 === 0 ? activePlayers.length - 1 : activePlayers.length)), 'printRueckBody');
+      }
     }
     window.print();
   }
 
-  function renderTable() {
+  // UMSCHALTEN DER TABELLEN-TABS (HIN-, RÜCK- & GESAMTRUNDE)
+  function setupTableTabsUI() {
+    const tabsContainer = document.getElementById('tableTabsContainer');
+    if (hasRueckrunde) {
+      tabsContainer.style.display = 'flex';
+      switchTableTab(currentTableTab);
+    } else {
+      tabsContainer.style.display = 'none';
+      currentTableTab = 'all';
+    }
+  }
+
+  function switchTableTab(tabKey) {
+    currentTableTab = tabKey;
+    document.getElementById('tabBtnAll').classList.toggle('active', tabKey === 'all');
+    document.getElementById('tabBtnHin').classList.toggle('active', tabKey === 'hin');
+    document.getElementById('tabBtnRueck').classList.toggle('active', tabKey === 'rueck');
+    renderTable();
+  }
+
+  // TABELLEN BERECHNUNGS-FUNKTION MIT GEFILTERTEN MATCHES
+  function computeStatsFiltered(filterFn) {
     let stats = activePlayers.map(p => ({ player: p, spiele: 0, siege: 0, niederlagen: 0, legsP: 0, legsM: 0, punkte: 0 }));
-    currentMatches.forEach(m => {
+    currentMatches.filter(filterFn).forEach(m => {
       if(m.away && m.legsH !== null && m.legsG !== null) {
         let h = stats.find(s => s.player.name === m.home.name);
         let g = stats.find(s => s.player.name === m.away.name);
-        h.spiele++; g.spiele++;
-        h.legsP += m.legsH; h.legsM += m.legsG;
-        g.legsP += m.legsG; g.legsM += m.legsH;
-        let pktH = m.legsH + (m.legsH === 4 ? bonusPoints : 0);
-        let pktG = m.legsG + (m.legsG === 4 ? bonusPoints : 0);
-        h.punkte += pktH; g.punkte += pktG;
-        if(m.legsH === 4) { h.siege++; g.niederlagen++; }
-        if(m.legsG === 4) { g.siege++; h.niederlagen++; }
+        if (h && g) {
+          h.spiele++; g.spiele++;
+          h.legsP += m.legsH; h.legsM += m.legsG;
+          g.legsP += m.legsG; g.legsM += m.legsH;
+          let pktH = m.legsH + (m.legsH === 4 ? bonusPoints : 0);
+          let pktG = m.legsG + (m.legsG === 4 ? bonusPoints : 0);
+          h.punkte += pktH; g.punkte += pktG;
+          if(m.legsH === 4) { h.siege++; g.niederlagen++; }
+          if(m.legsG === 4) { g.siege++; h.niederlagen++; }
+        }
       }
     });
 
     stats.sort((a,b) => b.punkte - a.punkte || (b.legsP - b.legsM) - (a.legsP - a.legsM));
-    const tbody = document.getElementById('standingsBody');
+    return stats;
+  }
+
+  function renderSingleTable(statsList, targetTbodyId) {
+    const tbody = document.getElementById(targetTbodyId);
     tbody.innerHTML = '';
-    stats.forEach((s, idx) => {
+    statsList.forEach((s, idx) => {
       tbody.innerHTML += `<tr>
         <td><b>${idx+1}</b></td>
         <td style="background:${s.player.color}; color:#1a202c; text-align:left; font-weight:bold;">${s.player.name}</td>
@@ -1978,6 +2108,21 @@
         <td style="background:var(--points-bg); color:#ffffff; font-weight:bold; border:1px solid #4a5568;">${s.punkte}</td>
       </tr>`;
     });
+  }
+
+  function renderTable() {
+    let roundsCount = activePlayers.length % 2 === 0 ? activePlayers.length - 1 : activePlayers.length;
+    
+    if (!hasRueckrunde || currentTableTab === 'all') {
+      document.getElementById('saisonTitle').innerText = `Rangliste - ${currentSeasonName} (Sieger-Zusatzpunkte: +${bonusPoints})`;
+      renderSingleTable(computeStatsFiltered(m => true), 'standingsBody');
+    } else if (currentTableTab === 'hin') {
+      document.getElementById('saisonTitle').innerText = `Rangliste Hinrunde - ${currentSeasonName}`;
+      renderSingleTable(computeStatsFiltered(m => m.day <= roundsCount), 'standingsBody');
+    } else if (currentTableTab === 'rueck') {
+      document.getElementById('saisonTitle').innerText = `Rangliste Rückrunde - ${currentSeasonName}`;
+      renderSingleTable(computeStatsFiltered(m => m.day > roundsCount), 'standingsBody');
+    }
   }
 
   // INITIALISIERUNG

@@ -27,8 +27,19 @@
     --bg-dark: #12181f;
     --card-dark: rgba(30, 38, 48, 0.92);
     --card-border: #2d3748;
-    --accent-green: #2e7d32;
-    --accent-hover: #1b5e20;
+    
+    /* PROFESSIONELLES EINHEITLICHES FARBSCHEMA */
+    --btn-primary: #2e7d32;
+    --btn-primary-hover: #1b5e20;
+    --btn-secondary: #1a365d;
+    --btn-secondary-hover: #102a43;
+    --btn-info: #0e4a6d;
+    --btn-info-hover: #08334c;
+    --btn-warning: #c05621;
+    --btn-warning-hover: #9c4221;
+    --btn-danger: #9b2c2c;
+    --btn-danger-hover: #742a2a;
+    
     --text-main: #e2e8f0;
     --text-muted: #a0aec0;
     --points-bg: #2b3648;
@@ -70,7 +81,7 @@
     box-shadow: 0 2px 6px rgba(0,0,0,0.4);
   }
   .version-badge-top-left:hover {
-    background: var(--accent-green);
+    background: var(--btn-primary);
     color: white;
     border-color: #48bb78;
   }
@@ -109,37 +120,39 @@
 
   h3, h4 { color: #ffffff; margin-top: 0; }
   
+  /* EDLES BUTTON-STYLING */
   .btn { 
-    background: var(--accent-green); 
+    background: var(--btn-primary); 
     color: white; 
     border: none; 
-    padding: 12px 18px; 
-    font-size: 14px; 
+    padding: 11px 16px; 
+    font-size: 13.5px; 
     font-weight: bold; 
     border-radius: 6px; 
     cursor: pointer; 
     margin-right: 8px; 
     margin-bottom: 10px; 
-    transition: all 0.2s; 
+    transition: all 0.2s ease; 
     box-shadow: 0 2px 5px rgba(0,0,0,0.4); 
+    border: 1px solid rgba(255,255,255,0.1);
   }
-  .btn:hover:not(:disabled) { background: var(--accent-hover); transform: translateY(-2px); }
+  .btn:hover:not(:disabled) { background: var(--btn-primary-hover); transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
   .btn:disabled { background: #4a5568 !important; color: #a0aec0 !important; cursor: not-allowed !important; transform: none !important; opacity: 0.6; }
   
-  .btn-print { background: #0277bd; }
-  .btn-print:hover { background: #01579b; }
-  .btn-save { background: #d97706; }
-  .btn-save:hover { background: #b45309; }
-  .btn-load { background: #00838f; }
-  .btn-load:hover { background: #006064; }
-  .btn-edit-season { background: #d97706; }
-  .btn-edit-season:hover { background: #b45309; }
-  .btn-stats { background: #8e24aa; }
-  .btn-stats:hover { background: #6a1b9a; }
-  .btn-reset { background: #c62828; }
-  .btn-reset:hover { background: #b71c1c; }
+  .btn-print { background: var(--btn-info); }
+  .btn-print:hover:not(:disabled) { background: var(--btn-info-hover); }
+  .btn-save { background: var(--btn-primary); }
+  .btn-save:hover:not(:disabled) { background: var(--btn-primary-hover); }
+  .btn-load { background: var(--btn-secondary); }
+  .btn-load:hover:not(:disabled) { background: var(--btn-secondary-hover); }
+  .btn-edit-season { background: var(--btn-warning); }
+  .btn-edit-season:hover:not(:disabled) { background: var(--btn-warning-hover); }
+  .btn-stats { background: var(--btn-secondary); }
+  .btn-stats:hover:not(:disabled) { background: var(--btn-secondary-hover); }
+  .btn-reset { background: var(--btn-danger); }
+  .btn-reset:hover:not(:disabled) { background: var(--btn-danger-hover); }
   
-  /* STATUS BADGE & DROPDOWN AUFBLINKEN */
+  /* STATUS BADGE & LOGOUT BUTTON */
   .status-container {
     float: right;
     display: flex;
@@ -157,7 +170,7 @@
     font-weight: bold;
   }
   .btn-logout {
-    background: #9b2c2c;
+    background: var(--btn-danger);
     color: #fff;
     border: 1px solid #e53e3e;
     padding: 4px 10px;
@@ -168,7 +181,7 @@
     transition: all 0.2s;
   }
   .btn-logout:hover {
-    background: #c53030;
+    background: var(--btn-danger-hover);
   }
 
   /* DROPDOWN BLINK ANIMATION BEIM SPEICHERN */
@@ -190,7 +203,7 @@
   .match-row { cursor: pointer; transition: background 0.2s; }
   .match-row:hover { background-color: #2d3748 !important; }
   
-  .legend-box { background: rgba(23, 25, 35, 0.9); border-left: 5px solid var(--accent-green); padding: 12px 15px; margin-top: 10px; border-radius: 6px; font-size: 13.5px; line-height: 1.5; color: var(--text-muted); }
+  .legend-box { background: rgba(23, 25, 35, 0.9); border-left: 5px solid var(--btn-primary); padding: 12px 15px; margin-top: 10px; border-radius: 6px; font-size: 13.5px; line-height: 1.5; color: var(--text-muted); }
   
   /* MODAL POP-UPS */
   .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); justify-content: center; align-items: center; z-index: 1000; backdrop-filter: blur(5px); }
@@ -212,7 +225,7 @@
     transition: all 0.2s;
   }
   .edit-stats-btn:hover {
-    background: var(--accent-green);
+    background: var(--btn-primary);
     color: white;
     border-color: #48bb78;
   }
@@ -224,7 +237,7 @@
   
   .select-btn { background: #2d3748; color: white; border: 2px solid #4a5568; padding: 10px 2px; font-size: 15px; font-weight: bold; border-radius: 8px; cursor: pointer; transition: all 0.2s; }
   .select-btn:hover { background: #4a5568; }
-  .select-btn.selected { background: var(--accent-green); color: white; border-color: #48bb78; box-shadow: 0 0 10px rgba(72, 187, 120, 0.5); }
+  .select-btn.selected { background: var(--btn-primary); color: white; border-color: #48bb78; box-shadow: 0 0 10px rgba(72, 187, 120, 0.5); }
 
   /* STATS TABLE STYLE */
   .stats-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; align-items: center; margin-bottom: 8px; text-align: center; font-size: 13px; }
@@ -260,7 +273,6 @@
     transition: transform 0.15s ease, box-shadow 0.15s ease, margin 0.15s ease, opacity 0.15s ease;
   }
 
-  /* GEZOGENES ELEMENT */
   .draggable-item.dragging {
     transform: scale(1.06);
     background-color: rgba(30, 50, 40, 0.98) !important;
@@ -269,7 +281,6 @@
     z-index: 100;
   }
 
-  /* DEUTLICHE, GROSSE LÜCKE BEIM EINFÜGEN BEIM ZIEL-ELEMENT */
   .draggable-item.drop-gap-above {
     margin-top: 42px !important;
     border-top: 2px dashed #48bb78 !important;
@@ -305,7 +316,6 @@
     transition: all 0.2s ease;
   }
 
-  /* MANUELLER / ECHTER SPIELERNAME: VERSTÄRKTER FETT & NEON-GLOW EFFEKT */
   .player-name-display-btn.custom-player-name {
     font-weight: bold !important;
     color: #0d1117 !important;
@@ -319,7 +329,7 @@
   /* VERSIONSVERLAUF ACCORDION STYLES */
   .version-entry {
     background: rgba(26, 32, 44, 0.85);
-    border-left: 4px solid var(--accent-green);
+    border-left: 4px solid var(--btn-primary);
     margin-bottom: 10px;
     border-radius: 6px;
     text-align: left;
@@ -364,27 +374,56 @@
     color: var(--text-main);
   }
 
-  /* STYLISCHE OPTIMIERTE PDF & DRUCK-ANSICHT */
+  /* DRUCKBEREICH STATS TABLE (NUR IM DRUCK DRUCKBAR) */
+  #printStatsSection {
+    display: none;
+  }
+
+  /* EDLE PDF & DRUCK-ANSICHT IM QUERFORMAT (LANDSCAPE) */
   @media print {
+    @page {
+      size: landscape;
+      margin: 1cm;
+    }
     .no-print { display: none !important; }
-    body { background: #ffffff !important; padding: 0 !important; color: #000 !important; }
-    .card { box-shadow: none !important; border: 2px solid #1b5e20 !important; border-radius: 8px !important; margin-bottom: 20px !important; padding: 15px !important; background: #fff !important; color: #000 !important; }
-    h1 { color: #1b5e20 !important; font-size: 24px !important; text-shadow: none !important; margin-bottom: 2px; }
-    .header-subtitle { color: #555 !important; }
-    table { background: #fff !important; }
-    th { background: #1b5e20 !important; color: #ffffff !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-    td { border: 1px solid #888 !important; color: #000 !important; }
+    body { background: #ffffff !important; padding: 0 !important; color: #000000 !important; }
+    
+    .header-title-container h1 { color: #1b5e20 !important; font-size: 26px !important; text-shadow: none !important; }
+    .header-subtitle { color: #444 !important; font-size: 13px !important; }
+
+    .card { 
+      box-shadow: none !important; 
+      border: 1px solid #1b5e20 !important; 
+      border-radius: 6px !important; 
+      margin-bottom: 15px !important; 
+      padding: 12px !important; 
+      background: #ffffff !important; 
+      color: #000000 !important; 
+      page-break-inside: avoid;
+    }
+    
+    h3 { color: #1b5e20 !important; font-size: 16px !important; border-bottom: 2px solid #1b5e20; padding-bottom: 4px; margin-bottom: 8px !important; }
+
+    table { background: #ffffff !important; margin-top: 8px !important; font-size: 11px !important; }
+    th { background: #1b5e20 !important; color: #ffffff !important; padding: 6px 8px !important; border: 1px solid #1b5e20 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    td { border: 1px solid #ccc !important; color: #000000 !important; padding: 5px 6px !important; }
+    
     .match-row { background-color: transparent !important; }
-    tr:nth-child(even) { background-color: #f8f9fa !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    tr:nth-child(even) { background-color: #f2f4f6 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+
+    #printStatsSection {
+      display: block !important;
+      page-break-before: auto;
+    }
   }
 </style>
 </head>
 <body id="mainBody" style="display:none;">
 
 <!-- VERSIONSANZEIGE GANZ LINKS OBEN (KLICKBAR) -->
-<div class="version-badge-top-left no-print" onclick="openVersionHistoryModal()">v2.5.0</div>
+<div class="version-badge-top-left no-print" onclick="openVersionHistoryModal()">v2.6.0</div>
 
-<div class="header-title-container no-print">
+<div class="header-title-container">
   <h1>THIS IS DARTA 🎯</h1>
   <p class="header-subtitle">Dartsaison - Manager</p>
 </div>
@@ -398,7 +437,7 @@
   <button class="btn" onclick="openStartModal()">🚀 Neue Saison starten</button>
   <button class="btn btn-save" onclick="saveCurrentSeason()">💾 Aktuelle Saison speichern</button>
   <button class="btn btn-stats" onclick="openGlobalStatsModal()">📊 Gesamtstatistik anzeigen</button>
-  <button class="btn btn-print" onclick="window.print()">🖨 PDF / Druckansicht</button>
+  <button class="btn btn-print" onclick="triggerLandscapePrint()">🖨 PDF / Druckansicht</button>
   <button class="btn btn-reset" onclick="resetSeason()">🔄 Saison zurücksetzen</button>
 
   <div style="margin-top: 15px; background: rgba(26, 32, 44, 0.9); padding: 12px; border-radius: 8px; border: 1px solid #2d3748;">
@@ -448,6 +487,19 @@
         <tr><th>Spieltag</th><th>Heim</th><th>vs</th><th>Gast</th><th>Legs Heim</th><th>Legs Gast</th><th>Punkte Heim</th><th>Punkte Gast</th><th class="no-print">Stats</th></tr>
       </thead>
       <tbody id="scheduleBody"></tbody>
+    </table>
+  </div>
+
+  <!-- BEREICH FÜR DESTATISTIKEN IM DRUCK (NUR IN DER DRUCKANSICHT SICHTBAR) -->
+  <div class="card" id="printStatsSection">
+    <h3>📊 Saison Gesamtstatistik</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Spieler</th><th>Ø PPR</th><th>Ø F9 PPR</th><th>Darts</th><th>Ø CO%</th><th>Max CO</th><th>60+</th><th>100+</th><th>140+</th><th>180</th>
+        </tr>
+      </thead>
+      <tbody id="printStatsBody"></tbody>
     </table>
   </div>
 </div>
@@ -663,7 +715,7 @@
   </div>
 </div>
 
-<!-- VERSIONSVERLAUF MODAL (VOLLSTÄNDIGER HISTORISCHER ACCORDION-VERLAUF) -->
+<!-- VERSIONSVERLAUF MODAL -->
 <div id="versionHistoryModal" class="modal">
   <div class="modal-content" style="width: 500px; max-width:95%;">
     <h3>📜 VERSIONSVERLAUF</h3>
@@ -671,10 +723,22 @@
     
     <div style="max-height: 55vh; overflow-y: auto;">
 
-      <!-- NUR DIE NEUESTE VERSION IST STANDARDMÄSSIG OPEN (OFFEN) -->
       <div class="version-entry open">
         <div class="version-header" onclick="toggleVersionEntry(this)">
-          <h4>v2.5.0 (Aktuell)</h4>
+          <h4>v2.6.0 (Aktuell)</h4>
+          <span class="version-toggle-icon">▼</span>
+        </div>
+        <div class="version-body">
+          <ul>
+            <li><strong>Professionelles Farbkonzept:</strong> Einheitliche, stimmige Button-Farben (Grün, Schieferblau, Petrol, Dunkelorange, Mattrot).</li>
+            <li><strong>Optimierte PDF-Druckansicht:</strong> Druck im automatischen Querformat (Landscape) mit integrierter Tabelle aller erfassten Leg Stats.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="version-entry">
+        <div class="version-header" onclick="toggleVersionEntry(this)">
+          <h4>v2.5.0</h4>
           <span class="version-toggle-icon">▼</span>
         </div>
         <div class="version-body">
@@ -1799,7 +1863,12 @@
     if (!isSeasonActive) { alert("Es läuft aktuell keine Saison!"); return; }
     
     document.getElementById('globalStatsTitle').innerText = `Kumulierte Daten aller Spiele aus '${currentSeasonName}'`;
-    
+    renderGlobalStatsTable('globalStatsBody');
+    openModalById('globalStatsModal');
+  }
+
+  // HILFSFUNKTION FÜR STATISTIKBERECHNUNG UND RENDERN (AUCH FÜR DIE DRUCKANSICHT)
+  function renderGlobalStatsTable(targetBodyId) {
     let pStats = activePlayers.map(p => ({
       name: p.name,
       color: p.color,
@@ -1849,7 +1918,7 @@
       }
     });
 
-    const tbody = document.getElementById('globalStatsBody');
+    const tbody = document.getElementById(targetBodyId);
     tbody.innerHTML = '';
 
     pStats.forEach(st => {
@@ -1867,11 +1936,17 @@
         <td>${st.c60}</td>
         <td>${st.c100}</td>
         <td>${st.c140}</td>
-        <td style="color:#48bb78; font-weight:bold;">${st.c180}</td>
+        <td style="color:#1b5e20; font-weight:bold;">${st.c180}</td>
       </tr>`;
     });
+  }
 
-    openModalById('globalStatsModal');
+  // DRUCK-TRIGGER FÜR PROFI-QUERFORMAT FÜR PDF
+  function triggerLandscapePrint() {
+    if (isSeasonActive) {
+      renderGlobalStatsTable('printStatsBody');
+    }
+    window.print();
   }
 
   function renderTable() {

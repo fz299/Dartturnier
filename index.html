@@ -126,6 +126,8 @@
   .btn-save:hover { background: #b45309; }
   .btn-load { background: #00838f; }
   .btn-load:hover { background: #006064; }
+  .btn-edit-season { background: #d97706; }
+  .btn-edit-season:hover { background: #b45309; }
   .btn-stats { background: #8e24aa; }
   .btn-stats:hover { background: #6a1b9a; }
   .btn-reset { background: #c62828; }
@@ -309,7 +311,7 @@
 <body id="mainBody" style="display:none;">
 
 <!-- VERSIONSANZEIGE GANZ LINKS OBEN (KLICKBAR) -->
-<div class="version-badge-top-left no-print" onclick="openVersionHistoryModal()">v1.5.0</div>
+<div class="version-badge-top-left no-print" onclick="openVersionHistoryModal()">v1.6.0</div>
 
 <div class="header-title-container no-print">
   <h1>THIS IS DARTA 🎯</h1>
@@ -336,6 +338,7 @@
         <option value="">-- Saison auswählen --</option>
       </select>
       <button class="btn btn-load" style="margin-bottom:0; padding: 8px 14px; font-size: 13px;" onclick="loadSelectedSeasonExplicit()">📥 Saison laden</button>
+      <button class="btn btn-edit-season" style="margin-bottom:0; padding: 8px 14px; font-size: 13px;" onclick="openEditSeasonModal()">✏️ Saison bearbeiten</button>
       <button class="btn btn-reset" style="margin-bottom:0; padding: 8px 12px; font-size: 13px;" onclick="deleteSelectedSeason()">Löschen</button>
     </div>
   </div>
@@ -420,6 +423,51 @@
     <div style="margin-top:18px;">
       <button class="btn" onclick="confirmStartSaison()">Saison Starten</button>
       <button class="btn" style="background:#777;" onclick="closeStartModal()">Abbrechen</button>
+    </div>
+  </div>
+</div>
+
+<!-- POP-UP MODAL FÜR SAISON BEARBEITEN (NEU) -->
+<div id="editSeasonModal" class="modal">
+  <div class="modal-content">
+    <h3>✏️ Saison bearbeiten</h3>
+    
+    <p style="margin-bottom:2px; font-weight:bold;">1. Name der Saison:</p>
+    <input type="text" id="inpEditSeasonName" placeholder="Name der Saison...">
+
+    <p style="margin-bottom:2px; font-weight:bold;">2. Anzahl Spieler (2 bis 20):</p>
+    <div class="grid-buttons-players">
+      <button class="select-btn btn-edit-count" onclick="selectEditPlayerCount(2)">2</button>
+      <button class="select-btn btn-edit-count" onclick="selectEditPlayerCount(3)">3</button>
+      <button class="select-btn btn-edit-count" onclick="selectEditPlayerCount(4)">4</button>
+      <button class="select-btn btn-edit-count" onclick="selectEditPlayerCount(5)">5</button>
+      <button class="select-btn btn-edit-count" onclick="selectEditPlayerCount(6)">6</button>
+      <button class="select-btn btn-edit-count" onclick="selectEditPlayerCount(7)">7</button>
+      <button class="select-btn btn-edit-count" onclick="selectEditPlayerCount(8)">8</button>
+      <button class="select-btn btn-edit-count" onclick="selectEditPlayerCount(9)">9</button>
+      <button class="select-btn btn-edit-count" onclick="selectEditPlayerCount(10)">10</button>
+      <button class="select-btn btn-edit-count" onclick="selectEditPlayerCount(11)">11</button>
+      <button class="select-btn btn-edit-count" onclick="selectEditPlayerCount(12)">12</button>
+      <button class="select-btn btn-edit-count" onclick="selectEditPlayerCount(13)">13</button>
+      <button class="select-btn btn-edit-count" onclick="selectEditPlayerCount(14)">14</button>
+      <button class="select-btn btn-edit-count" onclick="selectEditPlayerCount(15)">15</button>
+      <button class="select-btn btn-edit-count" onclick="selectEditPlayerCount(16)">16</button>
+      <button class="select-btn btn-edit-count" onclick="selectEditPlayerCount(17)">17</button>
+      <button class="select-btn btn-edit-count" onclick="selectEditPlayerCount(18)">18</button>
+      <button class="select-btn btn-edit-count" onclick="selectEditPlayerCount(19)">19</button>
+      <button class="select-btn btn-edit-count" onclick="selectEditPlayerCount(20)">20</button>
+    </div>
+
+    <p style="margin-bottom:2px; font-weight:bold;">3. Sieger-Zusatzpunkte:</p>
+    <div class="grid-buttons" style="grid-template-columns: repeat(3, 1fr);">
+      <button class="select-btn btn-edit-bonus" onclick="selectEditBonusPoints(1)">+1 Pt</button>
+      <button class="select-btn btn-edit-bonus" onclick="selectEditBonusPoints(2)">+2 Pkt</button>
+      <button class="select-btn btn-edit-bonus" onclick="selectEditBonusPoints(3)">+3 Pkt</button>
+    </div>
+
+    <div style="margin-top:18px;">
+      <button class="btn" onclick="confirmSaveEditedSeason()">Änderungen Speichern</button>
+      <button class="btn" style="background:#777;" onclick="document.getElementById('editSeasonModal').style.display='none'">Abbrechen</button>
     </div>
   </div>
 </div>
@@ -554,27 +602,33 @@
     <div style="max-height: 55vh; overflow-y: auto;">
 
       <div class="version-entry">
-        <h4>v1.5.0 (Aktuell)</h4>
+        <h4>v1.6.0 (Aktuell)</h4>
         <ul>
-          <li><strong>Fortlaufende Nummerierung:</strong> Neue Saisons heißen automatisch 'Saison 1', 'Saison 2' usw. anstatt das Datum zu verwenden.</li>
+          <li><strong>✏️ Saison bearbeiten:</strong> Saisons können nachträglich im Namen, den Zusatzpunkten und der Spieleranzahl angepasst werden.</li>
+          <li><strong>Dynamischer Spielplan:</strong> Hinzugefügte oder entfernte Spieler passen den Spielplan & die Statistiken automatisch an.</li>
+        </ul>
+      </div>
+
+      <div class="version-entry">
+        <h4>v1.5.0</h4>
+        <ul>
+          <li><strong>Fortlaufende Nummerierung:</strong> Neue Saisons heißen automatisch 'Saison 1', 'Saison 2' usw.</li>
           <li><strong>Verwendungszähler:</strong> Der Zähler merkt sich gestartete Saisons und zählt verlässlich weiter.</li>
-          <li><strong>Duplikat-Schutz:</strong> Saisons mit exakt demselben Namen können nicht aus Versehentlichkeit überschrieben werden.</li>
         </ul>
       </div>
 
       <div class="version-entry">
         <h4>v1.4.0</h4>
         <ul>
-          <li><strong>Keine doppelten Namen:</strong> Intelligente Eindeutigkeits-Prüfung verhindert Mehrfachbenennung (wie 2x Disco Stu).</li>
-          <li><strong>Name zurücksetzen Button:</strong> Neuer Button '🔄 Name zurücksetzen' wählt automatisch den nächsten unbenutzten Simpsons-Namen.</li>
+          <li><strong>Keine doppelten Namen:</strong> Eindeutigkeits-Prüfung verhindert Mehrfachbenennungen.</li>
+          <li><strong>Name zurücksetzen Button:</strong> Wählt automatisch den nächsten unbenutzten Simpsons-Namen.</li>
         </ul>
       </div>
 
       <div class="version-entry">
         <h4>v1.3.0</h4>
         <ul>
-          <li><strong>Pop-up Namenseingabe:</strong> Klick auf Spielernummer öffnet ein Namensänderungs-Modal.</li>
-          <li><strong>Namens-Styling:</strong> Spielernamen schlicht und in Dunkelgrau gehalten.</li>
+          <li><strong>Pop-up Namenseingabe:</strong> Klick auf Spielernummer öffnet Namensänderungs-Modal.</li>
         </ul>
       </div>
       
@@ -582,15 +636,13 @@
         <h4>v1.2.0</h4>
         <ul>
           <li><strong>Neuer Name & Untertitel:</strong> 'THIS IS DARTA 🎯' als Haupttitel & 'Dartsaison - Manager'.</li>
-          <li><strong>Speicher-Fix:</strong> Doppelte Absicherung der Saisonspeicherung in Cloud & Browser.</li>
         </ul>
       </div>
 
       <div class="version-entry">
         <h4>v1.1.0</h4>
         <ul>
-          <li><strong>Versional-Changelog:</strong> Klickbares Versions-Badge oben links hinzugefügt.</li>
-          <li><strong>Favicon:</strong> Darts-Icon (🎯) für Browser-Tab und App-Home-Bildschirm ergänzt.</li>
+          <li><strong>Versional-Changelog:</strong> Klickbares Versions-Badge oben links.</li>
         </ul>
       </div>
 
@@ -598,8 +650,6 @@
         <h4>v1.0.0</h4>
         <ul>
           <li><strong>Leg Stats Prüfungen:</strong> Max-Limits für Darts, Checkout %, Big Fish (170) & Highscores.</li>
-          <li><strong>2-Spalten Layout:</strong> Spielerliste (1-10 und 11-20) übersichtlich nebeneinander.</li>
-          <li><strong>Dauerhafter Login:</strong> Automatisches Merken des Login-Status im Browser.</li>
         </ul>
       </div>
 
@@ -637,7 +687,6 @@
     "Apu Nahasapeemapetilon", "Chief Wiggum", "Sideshow Bob", "Fat Tony", "Disco Stu"
   ];
 
-  // FORTLAUFENDE SAISON-NUMMER LOGIK
   let globalSeasonCounter = 1;
 
   function initSeasonCounter() {
@@ -695,6 +744,7 @@
 
   let currentSeasonName = "Saison 1", currentMatches = [], activePlayers = [], selectedMatchIndex = null;
   let selectedCount = 4, selectedBonus = 1;
+  let editSelectedCount = 4, editSelectedBonus = 1;
   let tempLegsH = null, tempLegsG = null;
   let isSeasonActive = false;
   let editingPlayerIdx = null;
@@ -858,7 +908,6 @@
         saveCurrentSeason();
       }
     }
-    // FORTLAUFENDE NUMMER ANSTATT DATUM
     document.getElementById('inpSeasonName').value = `Saison ${globalSeasonCounter}`;
     document.getElementById('startSeasonModal').style.display = 'flex';
   }
@@ -883,7 +932,6 @@
     const sName = document.getElementById('inpSeasonName').value.trim();
     if (!sName) { alert("Bitte gib einen Namen für die Saison ein!"); return; }
     
-    // ZÄHLER ERHÖHEN WENN 'Saison X' BENUTZT WURDE
     if (sName === `Saison ${globalSeasonCounter}`) {
       globalSeasonCounter++;
       db.ref('seasonCounter').set(globalSeasonCounter);
@@ -908,6 +956,85 @@
     document.getElementById('saisonTitle').innerText = `Rangliste - ${currentSeasonName} (Sieger-Zusatzpunkte: +${bonusPoints})`;
     renderTable();
     saveCurrentSeason();
+  }
+
+  // ==============================================================================
+  // LOGIK FÜR SAISON BEARBEITEN (NEU)
+  // ==============================================================================
+  function openEditSeasonModal() {
+    if (!isSeasonActive) {
+      let select = document.getElementById('savedSeasonsSelect');
+      if (!select.value) {
+        alert("Bitte wähle zuerst eine Saison aus dem Dropdown-Menü aus, um sie zu bearbeiten!");
+        return;
+      }
+      loadSelectedSeasonExplicit();
+    }
+
+    document.getElementById('inpEditSeasonName').value = currentSeasonName;
+    editSelectedCount = activePlayers.length;
+    editSelectedBonus = bonusPoints;
+
+    selectEditPlayerCount(editSelectedCount);
+    selectEditBonusPoints(editSelectedBonus);
+
+    document.getElementById('editSeasonModal').style.display = 'flex';
+  }
+
+  function selectEditPlayerCount(count) {
+    editSelectedCount = count;
+    document.querySelectorAll('.btn-edit-count').forEach(btn => {
+      btn.classList.toggle('selected', parseInt(btn.innerText) === count);
+    });
+  }
+
+  function selectEditBonusPoints(pts) {
+    editSelectedBonus = pts;
+    document.querySelectorAll('.btn-edit-bonus').forEach(btn => {
+      btn.classList.toggle('selected', btn.innerText.includes(`+${pts}`));
+    });
+  }
+
+  function confirmSaveEditedSeason() {
+    const newName = document.getElementById('inpEditSeasonName').value.trim();
+    if (!newName) { alert("Bitte gib einen Saison-Namen ein!"); return; }
+
+    let oldSeasonName = currentSeasonName;
+    currentSeasonName = newName;
+    bonusPoints = editSelectedBonus;
+
+    // FALLS NAME GEÄNDERT WURDE, ALTEN EINTRAG LÖSCHEN
+    if (oldSeasonName !== newName) {
+      let localSaved = JSON.parse(localStorage.getItem('dart_saved_seasons') || '{}');
+      delete localSaved[oldSeasonName];
+      localStorage.setItem('dart_saved_seasons', JSON.stringify(localSaved));
+      db.ref('savedSeasons/' + oldSeasonName).remove();
+    }
+
+    // TEILNEHMER-ANPASSUNG (SPIELER HINZUFÜGEN ODER ENTFERNEN)
+    let oldCount = activePlayers.length;
+    if (editSelectedCount > oldCount) {
+      for (let i = oldCount; i < editSelectedCount; i++) {
+        let name = playersData[i] ? playersData[i].name : `Spieler ${i+1}`;
+        activePlayers.push({ id: i+1, name: name, color: colors[i % colors.length] });
+      }
+      generateSchedule(editSelectedCount, false);
+    } else if (editSelectedCount < oldCount) {
+      activePlayers = activePlayers.slice(0, editSelectedCount);
+      let validNames = activePlayers.map(p => p.name);
+      currentMatches = currentMatches.filter(m => {
+        return validNames.includes(m.home.name) && (!m.away || validNames.includes(m.away.name));
+      });
+    }
+
+    document.getElementById('editSeasonModal').style.display = 'none';
+    renderActivePlayersInControl();
+    document.getElementById('saisonTitle').innerText = `Rangliste - ${currentSeasonName} (Sieger-Zusatzpunkte: +${bonusPoints})`;
+    renderSchedule();
+    renderTable();
+    saveCurrentSeason();
+
+    alert(`✅ Saison '${currentSeasonName}' wurde erfolgreich aktualisiert!`);
   }
 
   function saveCurrentSeason() {
@@ -1071,6 +1198,9 @@
     let pool = activePlayers.map((p, idx) => idx);
     if(n % 2 !== 0) pool.push(-1);
     const numRounds = pool.length - 1, half = pool.length / 2;
+    
+    // BEHALTE BEREITS GESPIELTE MATCHES BEI
+    let oldMatches = [...currentMatches];
     currentMatches = [];
 
     for(let r=0; r<numRounds; r++) {
@@ -1078,7 +1208,14 @@
         let p1 = pool[i], p2 = pool[pool.length - 1 - i];
         if(isRueckrunde) [p1, p2] = [p2, p1];
         if(p1 !== -1 && p2 !== -1) {
-          currentMatches.push({ day: r+1, home: activePlayers[p1], away: activePlayers[p2], legsH: null, legsG: null, stats: null });
+          let hPlayer = activePlayers[p1];
+          let aPlayer = activePlayers[p2];
+          let existing = oldMatches.find(m => m.home && m.away && m.home.name === hPlayer.name && m.away.name === aPlayer.name);
+          if (existing) {
+            currentMatches.push(existing);
+          } else {
+            currentMatches.push({ day: r+1, home: hPlayer, away: aPlayer, legsH: null, legsG: null, stats: null });
+          }
         } else if(p1 !== -1 || p2 !== -1) {
           let active = p1 !== -1 ? activePlayers[p1] : activePlayers[p2];
           currentMatches.push({ day: r+1, home: active, away: null, legsH: null, legsG: null, stats: null });

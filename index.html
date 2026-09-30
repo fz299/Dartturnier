@@ -237,6 +237,7 @@
   }
   .player-column { display: flex; flex-direction: column; gap: 8px; }
 
+  /* DRAG & DROP FÜR MOBILGERÄTE OPTIMIERT (TEXTAUSWAHL VERHINDERN) */
   .draggable-item { 
     display: flex; 
     align-items: center; 
@@ -247,10 +248,24 @@
     border: 1px solid #2d3748; 
     cursor: grab; 
     user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+    touch-action: none;
     transition: transform 0.15s, box-shadow 0.15s;
   }
-  .draggable-item:active { cursor: grabbing; transform: scale(1.02); box-shadow: 0 5px 15px rgba(0,0,0,0.6); }
-  .drag-handle { font-size: 16px; color: var(--text-muted); cursor: grab; }
+  .draggable-item.dragging {
+    opacity: 0.6;
+    transform: scale(1.03);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.8);
+    z-index: 100;
+  }
+  .drag-handle { 
+    font-size: 18px; 
+    color: var(--text-muted); 
+    cursor: grab; 
+    padding: 2px 6px;
+    touch-action: none;
+  }
   
   .player-name-display-btn { 
     flex: 1; 
@@ -311,7 +326,7 @@
 <body id="mainBody" style="display:none;">
 
 <!-- VERSIONSANZEIGE GANZ LINKS OBEN (KLICKBAR) -->
-<div class="version-badge-top-left no-print" onclick="openVersionHistoryModal()">v1.7.0</div>
+<div class="version-badge-top-left no-print" onclick="openVersionHistoryModal()">v1.8.0</div>
 
 <div class="header-title-container no-print">
   <h1>THIS IS DARTA 🎯</h1>
@@ -602,9 +617,16 @@
     <div style="max-height: 55vh; overflow-y: auto;">
 
       <div class="version-entry">
-        <h4>v1.7.0 (Aktuell)</h4>
+        <h4>v1.8.0 (Aktuell)</h4>
         <ul>
-          <li><strong>Auto-Reset beim Löschen:</strong> Beim Löschen einer Saison wird die Ansicht automatisch auf Null zurückgesetzt und das Turnierfenster geschlossen.</li>
+          <li><strong>Fix Mobil-Drag&Drop:</strong> Drag & Drop auf iPhones (Chrome/Safari) repariert. Unterdrückt ungewollte Textauswahl und Pop-up-Menüs.</li>
+        </ul>
+      </div>
+
+      <div class="version-entry">
+        <h4>v1.7.0</h4>
+        <ul>
+          <li><strong>Auto-Reset beim Löschen:</strong> Beim Löschen einer Saison wird die Ansicht automatisch auf Null zurückgesetzt.</li>
         </ul>
       </div>
 
@@ -612,7 +634,6 @@
         <h4>v1.6.0</h4>
         <ul>
           <li><strong>✏️ Saison bearbeiten:</strong> Saisons können nachträglich im Namen, den Zusatzpunkten und der Spieleranzahl angepasst werden.</li>
-          <li><strong>Dynamischer Spielplan:</strong> Hinzugefügte oder entfernte Spieler passen den Spielplan & die Statistiken automatisch an.</li>
         </ul>
       </div>
 
@@ -620,7 +641,6 @@
         <h4>v1.5.0</h4>
         <ul>
           <li><strong>Fortlaufende Nummerierung:</strong> Neue Saisons heißen automatisch 'Saison 1', 'Saison 2' usw.</li>
-          <li><strong>Verwendungszähler:</strong> Der Zähler merkt sich gestartete Saisons und zählt verlässlich weiter.</li>
         </ul>
       </div>
 
@@ -628,35 +648,6 @@
         <h4>v1.4.0</h4>
         <ul>
           <li><strong>Keine doppelten Namen:</strong> Eindeutigkeits-Prüfung verhindert Mehrfachbenennungen.</li>
-          <li><strong>Name zurücksetzen Button:</strong> Wählt automatisch den nächsten unbenutzten Simpsons-Namen.</li>
-        </ul>
-      </div>
-
-      <div class="version-entry">
-        <h4>v1.3.0</h4>
-        <ul>
-          <li><strong>Pop-up Namenseingabe:</strong> Klick auf Spielernummer öffnet Namensänderungs-Modal.</li>
-        </ul>
-      </div>
-      
-      <div class="version-entry">
-        <h4>v1.2.0</h4>
-        <ul>
-          <li><strong>Neuer Name & Untertitel:</strong> 'THIS IS DARTA 🎯' als Haupttitel & 'Dartsaison - Manager'.</li>
-        </ul>
-      </div>
-
-      <div class="version-entry">
-        <h4>v1.1.0</h4>
-        <ul>
-          <li><strong>Versional-Changelog:</strong> Klickbares Versions-Badge oben links.</li>
-        </ul>
-      </div>
-
-      <div class="version-entry">
-        <h4>v1.0.0</h4>
-        <ul>
-          <li><strong>Leg Stats Prüfungen:</strong> Max-Limits für Darts, Checkout %, Big Fish (170) & Highscores.</li>
         </ul>
       </div>
 
@@ -849,7 +840,7 @@
 
     let nameExists = playersData.some((p, idx) => idx !== editingPlayerIdx && p.name.toLowerCase() === val.toLowerCase());
     if (nameExists) {
-      alert("⚠️️ Dieser Name wird bereits verwendet. Bitte wähle einen eindeutigen Namen!");
+      alert("⚠️ Dieser Name wird bereits verwendet. Bitte wähle einen eindeutigen Namen!");
       return;
     }
 
@@ -881,10 +872,15 @@
     db.ref('playersData').set(saveObj);
   }
 
+  // OPTIMIERTE MOBIL- UND DESKTOP-DRAG&DROP STEUERUNG
   let dragSrcIndex = null;
+  let touchDragElement = null;
+
   function addDragDropListeners() {
     const items = document.querySelectorAll('.draggable-item');
+
     items.forEach(item => {
+      // DESKTOP DRAG & DROP
       item.addEventListener('dragstart', (e) => {
         dragSrcIndex = parseInt(item.getAttribute('data-index'));
         e.dataTransfer.effectAllowed = 'move';
@@ -905,6 +901,42 @@
           renderDraggablePlayerList();
         }
       });
+
+      // MOBILE TOUCH DRAG & DROP (IPHONE & CHROME OPTIMIERT)
+      const handle = item.querySelector('.drag-handle');
+      if (handle) {
+        handle.addEventListener('touchstart', (e) => {
+          dragSrcIndex = parseInt(item.getAttribute('data-index'));
+          touchDragElement = item;
+          item.classList.add('dragging');
+        }, { passive: true });
+
+        handle.addEventListener('touchmove', (e) => {
+          if (!touchDragElement) return;
+          const touchLocation = e.touches[0];
+          const targetEl = document.elementFromPoint(touchLocation.clientX, touchLocation.clientY);
+          if (targetEl) {
+            const targetItem = targetEl.closest('.draggable-item');
+            if (targetItem && targetItem !== touchDragElement) {
+              const targetIndex = parseInt(targetItem.getAttribute('data-index'));
+              if (dragSrcIndex !== null && targetIndex !== undefined && !isNaN(targetIndex)) {
+                const movedItem = playersData.splice(dragSrcIndex, 1)[0];
+                playersData.splice(targetIndex, 0, movedItem);
+                dragSrcIndex = targetIndex;
+                renderDraggablePlayerList();
+              }
+            }
+          }
+        }, { passive: true });
+
+        handle.addEventListener('touchend', () => {
+          if (touchDragElement) {
+            touchDragElement.classList.remove('dragging');
+            touchDragElement = null;
+            saveAllPlayersToCloud();
+          }
+        });
+      }
     });
   }
 
@@ -1134,7 +1166,6 @@
     renderTable();
   }
 
-  // LÖSCHEN EINER SAISON MIT AUTOMATISCHEM ZURÜCKSETZEN DER ANSICHT
   function deleteSelectedSeason() {
     let select = document.getElementById('savedSeasonsSelect');
     let sKey = select.value;
@@ -1147,7 +1178,6 @@
 
       db.ref('savedSeasons/' + sKey).remove();
 
-      // IF DIE GELÖSCHTE SAISON GERADE AKTIV GELADEN WAR, ANSICHT ZURÜCKSETZEN
       if (currentSeasonName === sKey || isSeasonActive) {
         isSeasonActive = false;
         currentMatches = [];

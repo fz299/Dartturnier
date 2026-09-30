@@ -309,7 +309,7 @@
 <body id="mainBody" style="display:none;">
 
 <!-- VERSIONSANZEIGE GANZ LINKS OBEN (KLICKBAR) -->
-<div class="version-badge-top-left no-print" onclick="openVersionHistoryModal()">v1.4.0</div>
+<div class="version-badge-top-left no-print" onclick="openVersionHistoryModal()">v1.5.0</div>
 
 <div class="header-title-container no-print">
   <h1>THIS IS DARTA 🎯</h1>
@@ -346,7 +346,7 @@
 
 <!-- LEGENDE / ERKLÄRUNG -->
 <div class="card no-print">
-  <h3>ℹ️️ Legende & Punktesystem</h3>
+  <h3>ℹ Legende & Punktesystem</h3>
   <div class="legend-box">
     <strong>Spielmodus:</strong> 501 Single In / Double Out (First to 4 Legs).<br>
     <strong>Punktevergabe:</strong> Jedes gewonnene Leg bringt 1 Punkt. Der Gesamtsieger des Matches erhält zusätzlich die gewählten <em>Siegerpunkte</em> (1, 2 oder 3).<br>
@@ -385,7 +385,7 @@
     <h3>🚀 Neue Saison starten</h3>
     
     <p style="margin-bottom:2px; font-weight:bold;">1. Name der Saison:</p>
-    <input type="text" id="inpSeasonName" placeholder="z. B. Saison Teil 1, Rückrunde...">
+    <input type="text" id="inpSeasonName" placeholder="Name der Saison...">
 
     <p style="margin-bottom:2px; font-weight:bold;">2. Anzahl Spieler (2 bis 20):</p>
     <div class="grid-buttons-players">
@@ -554,11 +554,19 @@
     <div style="max-height: 55vh; overflow-y: auto;">
 
       <div class="version-entry">
-        <h4>v1.4.0 (Aktuell)</h4>
+        <h4>v1.5.0 (Aktuell)</h4>
+        <ul>
+          <li><strong>Fortlaufende Nummerierung:</strong> Neue Saisons heißen automatisch 'Saison 1', 'Saison 2' usw. anstatt das Datum zu verwenden.</li>
+          <li><strong>Verwendungszähler:</strong> Der Zähler merkt sich gestartete Saisons und zählt verlässlich weiter.</li>
+          <li><strong>Duplikat-Schutz:</strong> Saisons mit exakt demselben Namen können nicht aus Versehentlichkeit überschrieben werden.</li>
+        </ul>
+      </div>
+
+      <div class="version-entry">
+        <h4>v1.4.0</h4>
         <ul>
           <li><strong>Keine doppelten Namen:</strong> Intelligente Eindeutigkeits-Prüfung verhindert Mehrfachbenennung (wie 2x Disco Stu).</li>
-          <li><strong>Name zurücksetzen Button:</strong> Neuer Button '🔄 Name zurücksetzen' im Namens-Modal wählt automatisch den nächsten unbenutzten Simpsons-Namen.</li>
-          <li><strong>Doppelnamen-Schutz:</strong> Warnung bei versuchter doppelter manueller Namenseingabe.</li>
+          <li><strong>Name zurücksetzen Button:</strong> Neuer Button '🔄 Name zurücksetzen' wählt automatisch den nächsten unbenutzten Simpsons-Namen.</li>
         </ul>
       </div>
 
@@ -574,7 +582,6 @@
         <h4>v1.2.0</h4>
         <ul>
           <li><strong>Neuer Name & Untertitel:</strong> 'THIS IS DARTA 🎯' als Haupttitel & 'Dartsaison - Manager'.</li>
-          <li><strong>WhatsApp-Linkvorschau:</strong> Neuer Titel und Beschreibung für geteilte Links.</li>
           <li><strong>Speicher-Fix:</strong> Doppelte Absicherung der Saisonspeicherung in Cloud & Browser.</li>
         </ul>
       </div>
@@ -630,6 +637,23 @@
     "Apu Nahasapeemapetilon", "Chief Wiggum", "Sideshow Bob", "Fat Tony", "Disco Stu"
   ];
 
+  // FORTLAUFENDE SAISON-NUMMER LOGIK
+  let globalSeasonCounter = 1;
+
+  function initSeasonCounter() {
+    db.ref('seasonCounter').once('value', (snapshot) => {
+      const val = snapshot.val();
+      if (val && !isNaN(val)) {
+        globalSeasonCounter = parseInt(val);
+      } else {
+        let localVal = localStorage.getItem('dart_season_counter');
+        if (localVal && !isNaN(localVal)) {
+          globalSeasonCounter = parseInt(localVal);
+        }
+      }
+    });
+  }
+
   function checkInitialPassword() {
     let isLoggedIn = localStorage.getItem("dart_logged_in");
     if (isLoggedIn === "true") {
@@ -677,7 +701,6 @@
 
   let playersData = [];
 
-  // HILFSFUNKTION: FINDEST DEN NÄCHSTEN NOCH UNBENUTZTEN SIMPSONS NAMEN
   function getUnusedSimpsonsName(excludeIndex = null) {
     let usedNames = playersData
       .filter((p, idx) => idx !== excludeIndex && p.name && p.name.trim() !== "")
@@ -700,7 +723,6 @@
         playersData.push({ id: i, name: name, color: colors[i-1] });
       }
 
-      // Prüfe und fülle leere oder doppelte Namen eindeutig auf
       playersData.forEach((p, i) => {
         if (!p.name || p.name.trim() === "") {
           p.name = getUnusedSimpsonsName(i);
@@ -768,7 +790,6 @@
       return;
     }
 
-    // PRÜFEN, OB DER NEUE NAME BEREITS BEI EINEM ANDERN SPIELER EXISTIERT
     let nameExists = playersData.some((p, idx) => idx !== editingPlayerIdx && p.name.toLowerCase() === val.toLowerCase());
     if (nameExists) {
       alert("⚠️ Dieser Name wird bereits verwendet. Bitte wähle einen eindeutigen Namen!");
@@ -783,7 +804,6 @@
     renderDraggablePlayerList();
   }
 
-  // SPIELERNAME AUF NÄCHSTEN FREIEN SIMPSONS NAMEN ZURÜCKSETZEN
   function resetPlayerNameToSimpsons() {
     if (editingPlayerIdx === null) return;
     const newName = getUnusedSimpsonsName(editingPlayerIdx);
@@ -838,7 +858,8 @@
         saveCurrentSeason();
       }
     }
-    document.getElementById('inpSeasonName').value = `Saison ${new Date().toLocaleDateString()}`;
+    // FORTLAUFENDE NUMMER ANSTATT DATUM
+    document.getElementById('inpSeasonName').value = `Saison ${globalSeasonCounter}`;
     document.getElementById('startSeasonModal').style.display = 'flex';
   }
 
@@ -862,6 +883,13 @@
     const sName = document.getElementById('inpSeasonName').value.trim();
     if (!sName) { alert("Bitte gib einen Namen für die Saison ein!"); return; }
     
+    // ZÄHLER ERHÖHEN WENN 'Saison X' BENUTZT WURDE
+    if (sName === `Saison ${globalSeasonCounter}`) {
+      globalSeasonCounter++;
+      db.ref('seasonCounter').set(globalSeasonCounter);
+      localStorage.setItem('dart_season_counter', globalSeasonCounter);
+    }
+
     currentSeasonName = sName;
     bonusPoints = selectedBonus;
 
@@ -1399,6 +1427,7 @@
 
   // INITIALISIERUNG
   checkInitialPassword();
+  initSeasonCounter();
   initPlayerInputs();
   updateSavedSeasonsDropdown();
 </script>

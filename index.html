@@ -3,7 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🎯 Dartturnier Manager (501 SI/DO)</title>
+<title>Dartturnier Manager (501 SI/DO) 🎯</title>
+
+<!-- HOMEPAGE FAVICON / APP ICON (DART PFEIL / SCHEIBE) -->
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎯</text></svg>">
 
 <!-- PWA / App-Unterstützung für Android & iOS -->
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -37,20 +40,28 @@
     min-height: 100vh;
   }
 
-  /* VERSION BADGE OBEN LINKS */
+  /* VERSION BADGE OBEN LINKS (INTERAKTIV) */
   .version-badge-top-left {
     position: absolute;
     top: 15px;
     left: 15px;
-    background: rgba(45, 55, 72, 0.8);
-    color: var(--text-muted);
+    background: rgba(45, 55, 72, 0.85);
+    color: #48bb78;
     border: 1px solid var(--card-border);
-    padding: 4px 10px;
+    padding: 5px 12px;
     border-radius: 6px;
     font-size: 12px;
     font-weight: bold;
     letter-spacing: 0.5px;
     z-index: 10;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+  }
+  .version-badge-top-left:hover {
+    background: var(--accent-green);
+    color: white;
+    border-color: #48bb78;
   }
 
   h1 { text-align: center; color: #ffffff; margin-bottom: 25px; text-shadow: 0 2px 4px rgba(0,0,0,0.9); font-size: 28px; }
@@ -215,6 +226,27 @@
   .drag-handle { font-size: 16px; color: var(--text-muted); cursor: grab; }
   .player-input-field { flex: 1; min-width: 0; padding: 6px 8px; border: 1px solid #4a5568; border-radius: 4px; font-weight: bold; color: #1a202c; font-size: 13px; }
 
+  /* VERSIONSVERLAUF BOX STYLES */
+  .version-entry {
+    background: rgba(26, 32, 44, 0.8);
+    border-left: 4px solid var(--accent-green);
+    padding: 10px 12px;
+    margin-bottom: 12px;
+    border-radius: 4px;
+    text-align: left;
+  }
+  .version-entry h4 {
+    margin: 0 0 6px 0;
+    color: #48bb78;
+    font-size: 14px;
+  }
+  .version-entry ul {
+    margin: 0;
+    padding-left: 18px;
+    font-size: 12px;
+    color: var(--text-main);
+  }
+
   /* STYLISCHE OPTIMIERTE PDF & DRUCK-ANSICHT */
   @media print {
     .no-print { display: none !important; }
@@ -231,10 +263,10 @@
 </head>
 <body id="mainBody" style="display:none;">
 
-<!-- VERSIONSANZEIGE GANZ LINKS OBEN -->
-<div class="version-badge-top-left no-print">v1.0.0</div>
+<!-- VERSIONSANZEIGE GANZ LINKS OBEN (KLICKBAR) -->
+<div class="version-badge-top-left no-print" onclick="openVersionHistoryModal()">v1.1.0</div>
 
-<h1 class="no-print">🎯 Dartturnier Manager (501 SI/DO)</h1>
+<h1 class="no-print">Dartturnier Manager (501 SI/DO) 🎯</h1>
 
 <!-- STEUERUNG -->
 <div class="card no-print">
@@ -451,6 +483,43 @@
   </div>
 </div>
 
+<!-- VERSIONSVERLAUF MODAL -->
+<div id="versionHistoryModal" class="modal">
+  <div class="modal-content" style="width: 500px; max-width:95%;">
+    <h3>📜 VERSIONSVERLAUF</h3>
+    <p style="color:var(--text-muted); font-size:12px; margin-bottom:15px;">Übersicht der Änderungen & Entwicklungen der Homepage</p>
+    
+    <div style="max-height: 55vh; overflow-y: auto;">
+      
+      <div class="version-entry">
+        <h4>v1.1.0 (Aktuell)</h4>
+        <ul>
+          <li><strong>Fix Speicherfunktion:</strong> Saison-Speicherung in LocalStorage + Cloud abgesichert.</li>
+          <li><strong>Versional-Changelog:</strong> Klickbares Versions-Badge oben links hinzugefügt.</li>
+          <li><strong>Favicon:</strong> Darts-Icon (🎯) für Browser-Tab und App-Home-Bildschirm ergänzt.</li>
+          <li><strong>Titel:</strong> Darts-Emoji ans Ende des Seitentitels gesetzt.</li>
+        </ul>
+      </div>
+
+      <div class="version-entry">
+        <h4>v1.0.0</h4>
+        <ul>
+          <li><strong>Plausibilitätsprüfungen Leg Stats:</strong> Max-Limits für Darts, Checkout %, Big Fish (170) & Highscores.</li>
+          <li><strong>2-Spalten Layout:</strong> Spielerliste (1-10 und 11-20) übersichtlich nebeneinander.</li>
+          <li><strong>Dauerhafter Login:</strong> Automatisches Merken des Login-Status im Browser.</li>
+          <li><strong>Bearbeiten-Funktion:</strong> Leg Stats über ✏️ Stift-Symbol nachträglich korrigierbar.</li>
+          <li><strong>Simpsons Namen:</strong> Vorbefüllung mit Vor- und Nachnamen prominenter Charaktere.</li>
+        </ul>
+      </div>
+
+    </div>
+
+    <div style="margin-top:15px;">
+      <button class="btn" onclick="document.getElementById('versionHistoryModal').style.display='none'">Schließen</button>
+    </div>
+  </div>
+</div>
+
 <script>
   // ==============================================================================
   // FIREBASE ZUGANGSDATEN
@@ -499,6 +568,10 @@
       localStorage.removeItem("dart_logged_in");
       location.reload();
     }
+  }
+
+  function openVersionHistoryModal() {
+    document.getElementById('versionHistoryModal').style.display = 'flex';
   }
 
   const colors = ["#ffcdd2","#e1bee7","#d1c4e9","#c5cae9","#bbdefb","#b2ebf2","#b2dfdb","#c8e6c9","#dcedc8","#fff9c4","#f8bbd0","#e1bee7","#d1c4e9","#c5cae9","#bbdefb","#b2ebf2","#b2dfdb","#c8e6c9","#dcedc8","#fff9c4"];
@@ -618,7 +691,7 @@
 
   function openStartModal() {
     if (isSeasonActive) {
-      const autoSave = confirm("⚠️️ Es läuft bereits eine Saison!\n\nSoll der aktuelle Stand der laufenden Saison vor dem Start der neuen Saison AUTOMATISCH GESPEICHERT werden?");
+      const autoSave = confirm("⚠️ Es läuft bereits eine Saison!\n\nSoll der aktuelle Stand der laufenden Saison vor dem Start der neuen Saison AUTOMATISCH GESPEICHERT werden?");
       if (autoSave) {
         saveCurrentSeason();
       }
@@ -667,8 +740,12 @@
     saveCurrentSeason();
   }
 
+  // VOLLSTÄNDIG REPARIERTE SPEICHERFUNKTION (LOKAL & CLOUD MIT VISUELLEM FEEDBACK)
   function saveCurrentSeason() {
-    if (!isSeasonActive) { alert("Es läuft aktuell keine Saison zum Speichern!"); return; }
+    if (!isSeasonActive) { 
+      alert("Es läuft aktuell keine Saison zum Speichern!"); 
+      return; 
+    }
     
     const seasonData = {
       seasonName: currentSeasonName,
@@ -677,26 +754,52 @@
       currentMatches: currentMatches
     };
 
-    db.ref('savedSeasons/' + currentSeasonName).set(seasonData);
-    db.ref('activeSeasonState').set(seasonData);
+    // 1. In LocalStorage speichern
+    let localSaved = JSON.parse(localStorage.getItem('dart_saved_seasons') || '{}');
+    localSaved[currentSeasonName] = seasonData;
+    localStorage.setItem('dart_saved_seasons', JSON.stringify(localSaved));
 
+    // 2. In Firebase Cloud sichern
+    try {
+      db.ref('savedSeasons/' + currentSeasonName).set(seasonData);
+      db.ref('activeSeasonState').set(seasonData);
+    } catch(e) {
+      console.warn("Cloud-Sync Warnung:", e);
+    }
+
+    // 3. Optisches Feedback: Dropdown leuchtet auf
     const selectElem = document.getElementById('savedSeasonsSelect');
     selectElem.classList.remove('flash-success');
     void selectElem.offsetWidth;
     selectElem.classList.add('flash-success');
+
+    updateSavedSeasonsDropdown();
   }
 
   function updateSavedSeasonsDropdown() {
-    db.ref('savedSeasons').on('value', (snapshot) => {
+    let select = document.getElementById('savedSeasonsSelect');
+    select.innerHTML = '<option value="">-- Saison auswählen --</option>';
+
+    // Lade aus LocalStorage & Firebase
+    let localSaved = JSON.parse(localStorage.getItem('dart_saved_seasons') || '{}');
+    for (let sKey in localSaved) {
+      let opt = document.createElement('option');
+      opt.value = sKey;
+      opt.innerText = sKey;
+      if (sKey === currentSeasonName && isSeasonActive) opt.selected = true;
+      select.appendChild(opt);
+    }
+
+    db.ref('savedSeasons').once('value', (snapshot) => {
       const saved = snapshot.val() || {};
-      let select = document.getElementById('savedSeasonsSelect');
-      select.innerHTML = '<option value="">-- Saison auswählen --</option>';
       for (let sKey in saved) {
-        let opt = document.createElement('option');
-        opt.value = sKey;
-        opt.innerText = sKey;
-        if (sKey === currentSeasonName && isSeasonActive) opt.selected = true;
-        select.appendChild(opt);
+        if (!localSaved[sKey]) {
+          let opt = document.createElement('option');
+          opt.value = sKey;
+          opt.innerText = sKey;
+          if (sKey === currentSeasonName && isSeasonActive) opt.selected = true;
+          select.appendChild(opt);
+        }
       }
     });
   }
@@ -709,24 +812,33 @@
       return;
     }
 
+    // Erst lokal prüfen, dann Cloud
+    let localSaved = JSON.parse(localStorage.getItem('dart_saved_seasons') || '{}');
+    if (localSaved[sKey]) {
+      applyLoadedSeason(localSaved[sKey]);
+      return;
+    }
+
     db.ref('savedSeasons/' + sKey).once('value', (snapshot) => {
       let sData = snapshot.val();
-      if (!sData) return;
-
-      currentSeasonName = sData.seasonName;
-      bonusPoints = sData.bonusPoints;
-      activePlayers = sData.activePlayers;
-      currentMatches = sData.currentMatches;
-      isSeasonActive = true;
-
-      db.ref('activeSeasonState').set(sData);
-
-      renderActivePlayersInControl();
-      document.getElementById('tournamentArea').style.display = 'block';
-      document.getElementById('saisonTitle').innerText = `Rangliste - ${currentSeasonName} (Sieger-Zusatzpunkte: +${bonusPoints})`;
-      renderSchedule();
-      renderTable();
+      if (sData) {
+        applyLoadedSeason(sData);
+      }
     });
+  }
+
+  function applyLoadedSeason(sData) {
+    currentSeasonName = sData.seasonName;
+    bonusPoints = sData.bonusPoints;
+    activePlayers = sData.activePlayers;
+    currentMatches = sData.currentMatches;
+    isSeasonActive = true;
+
+    renderActivePlayersInControl();
+    document.getElementById('tournamentArea').style.display = 'block';
+    document.getElementById('saisonTitle').innerText = `Rangliste - ${currentSeasonName} (Sieger-Zusatzpunkte: +${bonusPoints})`;
+    renderSchedule();
+    renderTable();
   }
 
   function deleteSelectedSeason() {
@@ -735,7 +847,12 @@
     if (!sKey) { alert("Bitte wähle eine Saison zum Löschen aus!"); return; }
 
     if (confirm(`Möchtest du die gespeicherte Saison '${sKey}' wirklich löschen?`)) {
+      let localSaved = JSON.parse(localStorage.getItem('dart_saved_seasons') || '{}');
+      delete localSaved[sKey];
+      localStorage.setItem('dart_saved_seasons', JSON.stringify(localSaved));
+
       db.ref('savedSeasons/' + sKey).remove();
+      updateSavedSeasonsDropdown();
       alert(`Saison '${sKey}' wurde gelöscht.`);
     }
   }
@@ -757,17 +874,7 @@
   db.ref('activeSeasonState').on('value', (snapshot) => {
     const sData = snapshot.val();
     if (sData) {
-      currentSeasonName = sData.seasonName;
-      bonusPoints = sData.bonusPoints;
-      activePlayers = sData.activePlayers;
-      currentMatches = sData.currentMatches;
-      isSeasonActive = true;
-
-      renderActivePlayersInControl();
-      document.getElementById('tournamentArea').style.display = 'block';
-      document.getElementById('saisonTitle').innerText = `Rangliste - ${currentSeasonName} (Sieger-Zusatzpunkte: +${bonusPoints})`;
-      renderSchedule();
-      renderTable();
+      applyLoadedSeason(sData);
     }
   });
 
